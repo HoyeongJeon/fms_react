@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@fullcalendar/daygrid": "^6.1.10",
     "@fullcalendar/google-calendar": "^6.1.10",
     "@fullcalendar/react": "^6.1.10",
     "@mui/material": "^5.15.5",
     "@nivo/bar": "^0.84.0",
+    "@nivo/line": "^0.84.0",
     "@nivo/pie": "^0.84.0",
     "@react-spring/web": "^9.7.3",
     "@testing-library/jest-dom": "^5.17.0",
@@ -73,6 +75,7 @@
     ]
   },
   "devDependencies": {
+    "@nivo/radar": "^0.84.0",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react-datepicker": "^4.19.5",
     "@types/react-mentions": "^4.1.13",
