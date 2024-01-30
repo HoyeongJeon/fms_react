@@ -29,25 +29,12 @@ const TripleContainer = styled.div`
 
     > div {
     flex: 1; // 세 개의 div가 부모의 공간을 균등하게 나누어 가짐
+    display: flex;
     //border: 2px solid green; // 각 div의 테두리를 초록색으로 설정
     &:not(:last-child) {
         margin-right: 2px; // 오른쪽 div에만 여백을 추가하여 구분
     }
     }
-`;
-
-const ReservationInfo = styled.div`
-  padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #d6d6d6;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  height: auto; // 필요한 만큼 높이 자동 조정
-`;
-
-const ReservationTitle = styled.h2`
-  font-weight: bold;
-  margin-bottom: 20px; // 타이틀과 리스트 사이의 여백
-  color: black;
 `;
 
 const Button = styled.button`
@@ -110,10 +97,17 @@ color: white; // 텍스트 색상
 
 const PlayerList = styled.ul`
     list-style: none;
+    width: 30%;
     padding: 0;
     margin: 0;
+    justify-content: center;
     overflow-y: auto; /* 목록이 길어질 경우 스크롤 가능하도록 설정 */
     max-height: 90vh; /* 화면 크기에 따라 최대 높이 설정 */
+    overflow: visible;
+
+    > h3 {
+      margin-top:20px;
+      }
 `;
 
 const PlayerListItem = styled.li`
@@ -124,6 +118,37 @@ const PlayerListItem = styled.li`
     &:hover {
         background-color: #f0f0f0; /* 마우스 오버 시 배경색 변경 */
     }
+`;
+
+const RightContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+`;
+
+const TacticalAdvantages = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  text-align: left;
+`;
+
+const TacticalDisadvantages = styled(TacticalAdvantages)``;
+
+const TacticalPoint = styled.li`
+  &:before {
+    content: '• ';
+    color: green; // 장점은 녹색
+  }
+`;
+
+const TacticalWeakness = styled(TacticalPoint)`
+  text-align:left;
+  &:before {
+    content: '• ';
+    color: red; // 단점은 적색
+  }
 `;
 
 const Formation = () => {
@@ -618,6 +643,8 @@ const Formation = () => {
         alert("포메이션 및 포지션 정보 저장되었습니다.");
         // navigate("/home"); // 여기서 "/home"은 홈 페이지의 경로입니다.
 
+        window.location.reload();
+
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
@@ -653,15 +680,47 @@ const Formation = () => {
     const handleResetSelection = () => {
       setSelectedPlayerNames({});
     };
+
+    function getPositionsByFormation(formationName: string): string[] {
+      // 주어진 포메이션명에 해당하는 포메이션 객체를 찾음
+      const formation = formations[formationName];
     
-    // 사용자가 선택할 수 있는 포지션 목록
-    const positions: string[] = ["FW", "MF", "DF", "GK"]; // 예시 포지션들
+      if (!formation) {
+        throw new Error(`Formation "${formationName}" not found`);
+      }
+    
+      // 각 포지션의 이름들을 추출하여 하나의 배열로 결합
+      const positions = [
+        ...formation.positionNames.defenders,
+        ...formation.positionNames.midfielders,
+        ...formation.positionNames.attackers,
+        formation.positionNames.goalkeeper
+      ];
+    
+      return positions;
+    }
+
+    const positions = getPositionsByFormation(currentFormation);
 
     const PlayerListItem = styled.li`
         // ... 기존 스타일링 유지
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 10px 20px; // 좌우 여백 추가
+        border-bottom: 1px solid #ddd; // 하단에 경계선을 추가합니다.
+        &:hover {
+          background-color: #f0f0f0; // 마우스 호버 시 배경색을 변경합니다.
+        }
+      
+        > div:first-child {
+          margin-right: auto; // 첫 번째 자식 div(텍스트를 감싼 div)에 오른쪽 여백을 자동으로 설정하여 나머지 요소들을 오른쪽으로 밀어냅니다.
+        }
+    `;
+
+    // Dropdown 컴포넌트를 스타일링합니다.
+    const StyledDropdown = styled(Dropdown)`
+    margin-left: 16px; // 드롭다운과 텍스트 사이의 간격을 설정합니다.
     `;
 
     type onSelectPositionType = (playerId: number, newPosition: string) => void;
@@ -673,23 +732,47 @@ const Formation = () => {
 
     // PlayerListItem 내부에 드롭다운을 추가하는 컴포넌트
     const PlayerDropdown: React.FC<PlayerDropdownProps>  = ({ player, onSelectPosition }) => {
-        return (
-            <Dropdown>
-                <Dropdown.Toggle variant="success" id={`dropdown-${player.id}`}>
-                    {player.position || "포지션 선택"}
-                </Dropdown.Toggle>
 
-                <Dropdown.Menu>
-                    {positions.map((pos) => (
-                        <Dropdown.Item
-                            key={pos}
-                            onClick={() => onSelectPosition(player.id, pos)}
-                        >
-                            {pos}
-                        </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-            </Dropdown>
+      const handlePositionSelect = (newPosition: string) => {
+        // 선택한 포지션을 onSelectPosition 함수를 통해 부모 컴포넌트로 전달합니다.
+
+        const playerCount = Object.keys(selectedPlayerNames).length;
+
+        if (playerCount >= 11) {
+            alert('최대 11명의 선수만 등록할 수 있습니다.');
+            return;
+        }
+
+        if (Object.values(selectedPlayerNames).includes(player.name)){
+
+          alert('이미 선택된 선수입니다.');
+
+        }else{
+          onSelectPosition(player.id, newPosition);
+        }
+        
+      };
+
+        return (
+          <StyledDropdown>
+            <Dropdown>
+              <Dropdown.Toggle variant="success" id={`dropdown-${player.id}`}>
+                  {"포지션"}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                  {positions.map((pos) => (
+                      <Dropdown.Item
+                          key={pos}
+                          onClick={() => handlePositionSelect(pos)}
+                      >
+                          {pos}
+                      </Dropdown.Item>
+                  ))}
+              </Dropdown.Menu>
+          </Dropdown>
+          </StyledDropdown>
+
         );
   };
 
@@ -701,8 +784,50 @@ const Formation = () => {
             player.id === playerId ? { ...player, position: newPosition } : player
         )
     );
+
+    // selectedPlayerNames 상태를 업데이트하여 선택한 포지션 정보 추가
+    setSelectedPlayerNames((prevNames) => ({
+      ...prevNames,
+      [newPosition]: modalData.find((player) => player.id === playerId)?.name || ""
+    }));
   };
 
+    // 전술의 장점과 단점 데이터를 상태로 관리하거나 고정 데이터로 설정할 수 있습니다.
+    const tacticalAdvantages = [
+      "공격적인 포메이션으로, 세 명의 전방 공격수가 강력한 공격력을 발휘할 수 있습니다.",
+      "네 명의 미드필더가 중앙과 측면을 넓게 커버하며, 상대 팀의 공격을 빠르게 차단할 수 있습니다.",
+      "수비 시에는 중앙 미드필더가 뒤로 내려와 수비수를 지원하여 5명의 수비 라인을 형성할 수 있습니다."
+    ];
+  
+    const tacticalDisadvantages = [
+      "수비수 세 명만이 후방을 담당하기 때문에, 상대의 측면 공격에 취약할 수 있습니다.",
+      "미드필더와 수비수 사이의 간격이 멀어, 상대에게 공간을 제공할 위험이 있습니다.",
+      "중앙 미드필더가 수비적인 역할을 소화해야 하며, 이를 소화하지 못할 경우 수비에 구멍이 생길 수 있습니다."
+    ];
+
+    interface FormationAdvantagesDisadvantages {
+      advantages: string[];
+      disadvantages: string[];
+    }
+
+  const [formationDetails, setFormationDetails] = useState<FormationAdvantagesDisadvantages>({
+    advantages: [],
+    disadvantages: []
+  });
+
+  // 현재 선택된 포메이션의 장점과 단점을 설정하는 함수
+  const setFormationDetailsFromName = (formationName: string) => {
+    const formation = formations[formationName];
+    setFormationDetails({
+      advantages: formation.advantages,
+      disadvantages: formation.disadvantages
+    });
+  };
+
+  // 포메이션 상태가 변경될 때마다 장점과 단점을 업데이트합니다.
+  useEffect(() => {
+    setFormationDetailsFromName(currentFormation);
+  }, [currentFormation]);
 
   return (
     <Layout>
@@ -734,12 +859,11 @@ const Formation = () => {
             {renderFormation(currentFormation)}
           </ImageContainer>
         </Sidebar>
-      </div>
-      <div>
         <PlayerList>
-            {playerPositions.map(player => (
+          <h3>선수명단</h3>
+            {modalData.map(player => (
                 <PlayerListItem key={player.id}>
-                {`${player.name} - ${player.position}`}
+                {`${player.name} ${player.position}`}
                 <PlayerDropdown
                         player={player}
                         onSelectPosition={handleSelectPosition}
@@ -747,6 +871,24 @@ const Formation = () => {
                 </PlayerListItem>
             ))}
         </PlayerList>
+      </div>
+      <div>
+          <RightContainer>
+              <h2 style={{marginTop:"20px"}}>전술 소개</h2>
+            <TacticalAdvantages>
+              {formationDetails.advantages.map((advantage, index) => (
+                <TacticalPoint key={`advantage-${index}`}><b>장점</b> : {advantage}</TacticalPoint>
+              ))}
+            </TacticalAdvantages>
+            <TacticalDisadvantages>
+              {formationDetails.disadvantages.map((disadvantage, index) => (
+                <TacticalWeakness key={`disadvantage-${index}`}><b>단점</b> : {disadvantage}</TacticalWeakness>
+              ))}
+            </TacticalDisadvantages>
+            <h3>추천 포메이션?</h3>
+            <h3>인기 포메이션?</h3>
+            <h3>해당 포메이션으로 승리한 확률</h3>
+          </RightContainer>
       </div>
     </TripleContainer>
     {renderModal()}
