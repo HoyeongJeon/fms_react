@@ -1,0 +1,21 @@
+.card-div {
+    width: 1200px; /* 고정된 너비 */
+}
+
+.card-p-title {
+    font-weight: bold;
+}
+
+.card-p-text {
+    font-size: 12px;
+}
+
+.team-dl {
+    margin: 30px 0; /* 상하 여백 추가 */
+    margin-right: 50px;
+    /* 기타 스타일 조정 */
+}
+
+.team-info-preview {
+    /* width: 300px; */
+}

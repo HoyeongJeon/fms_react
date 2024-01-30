@@ -16,7 +16,13 @@
 }
 
 .team-div {
+    width: 300px;
     display: flex;
+    justify-content: space-between;
+}
+
+.team-child-div {
+    width: 500px;
 }
 
 .team-dl {

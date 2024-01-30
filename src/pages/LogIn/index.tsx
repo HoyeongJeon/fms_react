@@ -56,11 +56,12 @@ const LogIn = () => {
     }
   };
 
-  // const CLIENT_ID = `${process.env.KAKAO_API_KEY}`;
-  // const REDIRECT_URI = `${process.env.KAKAO_CALLBACK_URL}`;
-  const CLIENT_ID = "87e81e12dd9ec54f482031c186a83318";
-  const REDIRECT_URI = "http://localhost:3000/api/auth/kakao/callback";
+  const CLIENT_ID = `${process.env.REACT_APP_KAKAO_LOGIN_API_KEY}`;
+  const REDIRECT_URI = `${process.env.REACT_APP_SERVER_HOST}:${
+    process.env.REACT_APP_SERVER_PORT || 3000
+  }/api/auth/kakao/callback`;
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
   const onKakaoLoginClick = async () => {
     window.location.href = kakaoURL;
   };
@@ -108,22 +109,27 @@ const LogIn = () => {
           <Label>
             <StyledButton type="submit">로그인</StyledButton>
           </Label>
-          <LinkContainer className="CenterAlign"> {/* Apply the CenterAlign class here */}
+          <LinkContainer className="CenterAlign">
+            {" "}
+            {/* Apply the CenterAlign class here */}
             아직 회원이 아니신가요?&nbsp;
             <Link to="/signup">회원가입 하러가기</Link>
           </LinkContainer>
-          <LinkContainer className="CenterAlign"> {/* Apply the CenterAlign class here */}
+          <LinkContainer className="CenterAlign">
+            {" "}
+            {/* Apply the CenterAlign class here */}
             비밀번호를 잊으셨나요?&nbsp;
             <Link to="/emailCode">비밀번호 찾기</Link>
           </LinkContainer>
-          <LinkContainer className="CenterAlign"> {/* Apply the CenterAlign class here */}
+          <LinkContainer className="CenterAlign">
+            {" "}
+            {/* Apply the CenterAlign class here */}
             &nbsp;
             <Link to="/home">메인화면으로 돌아가기</Link>
           </LinkContainer>
           <div
             className="ms-auto kakao-login-container"
-            style={{ cursor: "pointer", width: "100%" }}
-          >
+            style={{ cursor: "pointer", width: "100%" }}>
             <img
               src="img/kakao_login_image.png"
               alt="카카오 로그인"

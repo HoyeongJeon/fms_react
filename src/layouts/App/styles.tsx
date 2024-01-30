@@ -27,7 +27,13 @@ export const MenuItem = styled.p`
   margin: 0.5rem 0;
   font-size: 0.9rem;
   cursor: pointer;
+  font-weight: normal; // 기본값은 normal로 설정
+
+  &:hover {
+    font-weight: bold; // hover 시에 bold로 변경
+  }
 `;
+
 
 export const Card = styled.div`
   width: 80%;

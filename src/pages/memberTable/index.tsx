@@ -47,7 +47,7 @@ const ProfileTable = () => {
 
   const fetchProfiles = async () => {
     try {
-      let apiUrl = `http://localhost:${
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
         process.env.REACT_APP_SERVER_PORT || 3000
       }/api/profile/available?page=1`;
 
@@ -89,7 +89,7 @@ const ProfileTable = () => {
           data: { total, data: profileDatas },
         },
       } = await axios.get(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/profile/available/?page=${page || 1}&name=${searchQuery}`,
         {
@@ -126,7 +126,7 @@ const ProfileTable = () => {
       const accessToken = localStorage.getItem("accessToken");
       // Make the API call to invite the selected profile to a team //멤버 스토어에서 가져올수있나?
       const response = await axios.post(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/team/${teamId}/user/${selectedProfile?.id}`,
         {
@@ -136,19 +136,18 @@ const ProfileTable = () => {
           withCredentials: true,
         }
       );
-  
+
       console.log("Invitation API response:", response.data);
-  
+
       setShowModal(false);
       setSelectedProfile(null);
-  
+
       // Refresh the page after confirmation
       window.location.reload();
     } catch (error) {
       console.error("Error inviting member:", error);
     }
   };
-  
 
   const handleCancelInvite = () => {
     setShowModal(false);

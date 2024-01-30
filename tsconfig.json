@@ -15,7 +15,8 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        
     },
     "include": [
         //컴파일할 폴더 입력. src의 모든파일 확인하게 됨

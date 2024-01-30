@@ -13,6 +13,7 @@ import Layout from "layouts/App";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "antd";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
+import { useTeamStore } from "store/teamStore";
 
 const CreateTeam = () => {
   const { kakao } = window;
@@ -33,6 +34,7 @@ const CreateTeam = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>();
   const [selectedToggle, setSelectedToggle] = useState<boolean>(false);
   const [validationMessage, setValidationMessage] = useState<string>("");
+  const { setTeamId } = useTeamStore();
   const navigate = useNavigate();
 
   const open = useDaumPostcodePopup();
@@ -122,11 +124,11 @@ const CreateTeam = () => {
 
     if (
       !teamInfo.name ||
-      !teamInfo.name ||
+      !teamInfo.description ||
       !selectedFile ||
       !addressValues ||
-      !!addressValues.postalCode ||
-      !!addressValues.roadAddress
+      !addressValues.postalCode ||
+      !addressValues.roadAddress
     ) {
       setValidationMessage("필수 입력값을 입력해주세요");
     }
@@ -146,7 +148,7 @@ const CreateTeam = () => {
       const accessToken = localStorage.getItem("accessToken");
 
       const response = await axios.post(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/team`,
         formData,
@@ -158,11 +160,16 @@ const CreateTeam = () => {
       );
 
       if (response.status === 201) {
+        console.log(response.data.data.id);
+        setTeamId(response.data.data.id);
         alert("팀등록이 완료되었습니다.");
         navigate("/home");
       }
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data.message);
+        return;
+      }
     }
   };
 
@@ -178,8 +185,7 @@ const CreateTeam = () => {
                 type="error"
                 showIcon
                 closable
-                onClose={() => setValidationMessage("")}
-              ></Alert>
+                onClose={() => setValidationMessage("")}></Alert>
             )}
             <FileUploader
               descLabel="구단 로고를 등록해주세요"
@@ -212,10 +218,10 @@ const CreateTeam = () => {
                 주소 검색
               </Button>
             </div>
+            <div style={{ fontSize: "12px", color: "gray" }}>
+              {validationMessage}
+            </div>
             <Button variant="dark" onClick={onClickAddButton}>
-              <div style={{ fontSize: "12px", color: "gray" }}>
-                {validationMessage}
-              </div>
               Add
             </Button>
           </form>
