@@ -1,5 +1,5 @@
 import axios from "axios";
-import useAuthStore from "store/useAuthStore";
+import useAuthStore from "../store/useAuthStore";
 
 export const BASE_URL = `${process.env.REACT_APP_SERVER_HOST}:${
   process.env.REACT_APP_SERVER_PORT || 3000
