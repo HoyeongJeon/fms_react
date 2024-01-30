@@ -2,13 +2,11 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   ChatArea,
   Form,
-  MentionsTextarea,
   SendButton,
   StyledTextAreaWrapper,
   Toolbox,
 } from "./styles";
 import { AiOutlineSend } from "react-icons/ai";
-import useSocket from "utils/useSocket";
 
 interface Props {
   chat: string;
@@ -28,7 +26,7 @@ const ChatBox = ({ chat, teamId, onSubmitForm, onChangeChat }: Props) => {
   const onKeyDownChat = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter") {
-        if (!e.shiftKey) {
+        if (e.nativeEvent.isComposing === false && !e.shiftKey) {
           e.preventDefault();
           submitForm();
         }

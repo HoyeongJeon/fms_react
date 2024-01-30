@@ -107,10 +107,12 @@ const App = () => {
           />
           <Route
             path="/match/:matchId/preview"
-            element={<MatchPreview />}></Route>
+            element={<MatchPreview />}
+          ></Route>
           <Route
             path="/match/:matchId/review"
-            element={<MatchReview />}></Route>
+            element={<MatchReview />}
+          ></Route>
 
           <Route path="/match/book" element={<MatchBook />} />
           <Route path="/match/calendar" element={<MatchCalendar />} />
@@ -125,8 +127,9 @@ const App = () => {
           {/* <Route path="/*" element={<NotFound />} /> */}
         </>
       ) : (
-        // <Route path="/*" element={<Navigate replace to="/login" />} />
-        <></>
+        <>
+          <Route path="/*" element={<Navigate replace to="/login" />} />
+        </>
       )}
     </Routes>
   );

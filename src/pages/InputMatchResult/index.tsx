@@ -103,14 +103,12 @@ const InputMatchResult = () => {
       outPlayerId: getPlayerIdByName(sub.out, memberData?.data || []),
     }));
 
-    // 유효하지 않은 교체 선수가 있는지 확인합니다.
     const invalidSubstitution = substitutionsWithIds.find(
       (sub) =>
         (sub.in !== "" && !sub.inPlayerId) ||
         (sub.out !== "" && !sub.outPlayerId)
     );
 
-    // 유효하지 않은 교체 선수가 있으면 오류 메시지를 표시하고 처리를 중지합니다.
     if (invalidSubstitution) {
       if (invalidSubstitution.in !== "" && !invalidSubstitution.inPlayerId) {
         alert(
@@ -128,12 +126,10 @@ const InputMatchResult = () => {
       return;
     }
 
-    // 유효한 교체 선수 목록만 서버로 전송할 데이터에 포함합니다.
     const validSubstitutions = substitutionsWithIds
       .filter((sub) => sub.inPlayerId && sub.outPlayerId)
       .map(({ inPlayerId, outPlayerId }) => ({ inPlayerId, outPlayerId }));
 
-    // matchInfo 객체에 substitutions 키를 추가하여 서버의 형식에 맞게 조합
     const dataToSend = {
       ...matchInfo,
       ...(validSubstitutions.length > 0 && {
@@ -189,55 +185,30 @@ const InputMatchResult = () => {
           }
         })}
         <>
-          <br />
-          <Text>교체 1</Text>
-          <Input
-            placeholder="교체로 들어간 선수를 입력해주세요"
-            type="string"
-            name={"in"}
-            onChange={(e) => handleSubstitutionChange(0, "in", e.target.value)}
-            value={substitution[0].in}
-          />
-          <Input
-            placeholder="교체로 나온 선수를 입력해주세요"
-            type="string"
-            name={"out"}
-            onChange={(e) => handleSubstitutionChange(0, "out", e.target.value)}
-            value={substitution[0].out}
-          />
-          <br />
-          <Text>교체 2</Text>
-          <Input
-            placeholder="교체로 들어간 선수를 입력해주세요"
-            type="string"
-            name={"in"}
-            onChange={(e) => handleSubstitutionChange(1, "in", e.target.value)}
-            value={substitution[1].in}
-          />
-          <Input
-            placeholder="교체로 나온 선수를 입력해주세요"
-            type="string"
-            name={"out"}
-            onChange={(e) => handleSubstitutionChange(1, "out", e.target.value)}
-            value={substitution[1].out}
-          />
-          <br />
-          <Text>교체 3</Text>
-          <Input
-            placeholder="교체로 들어간 선수를 입력해주세요"
-            type="string"
-            name={"in"}
-            onChange={(e) => handleSubstitutionChange(2, "in", e.target.value)}
-            value={substitution[2].in}
-          />
-          <Input
-            placeholder="교체로 나온 선수를 입력해주세요"
-            type="string"
-            name={"out"}
-            onChange={(e) => handleSubstitutionChange(2, "out", e.target.value)}
-            value={substitution[2].out}
-          />
-          <br />
+          {substitution.map((item, index) => (
+            <div key={index}>
+              <Text>교체 {index + 1}</Text>
+              <Input
+                placeholder="교체로 들어간 선수를 입력해주세요"
+                type="string"
+                name={"in"}
+                onChange={(e) =>
+                  handleSubstitutionChange(index, "in", e.target.value)
+                }
+                value={item.in}
+              />
+              <Input
+                placeholder="교체로 나온 선수를 입력해주세요"
+                type="string"
+                name={"out"}
+                onChange={(e) =>
+                  handleSubstitutionChange(index, "out", e.target.value)
+                }
+                value={item.out}
+              />
+              <br />
+            </div>
+          ))}
         </>
         <NextButton onClick={handleNext}>Next</NextButton>
       </ScoreboardContainer>
