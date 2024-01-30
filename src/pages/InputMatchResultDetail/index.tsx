@@ -2,219 +2,284 @@ import Layout from "layouts/App";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTeamStore } from "store/teamStore";
-import styled from "styled-components";
-import { Input, Typography, Button, Flex } from "antd";
 import axios from "axios";
+import PlayerInputRow from "components/PlayerInputRow";
+import useSWR from "swr";
+import fetcher from "utils/fetcher";
+import {
+  StyledButton,
+  CustomButton,
+  ScoreboardContainer,
+  Table,
+} from "./styles";
+import { BiFootball } from "react-icons/bi";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
-const { Text, Link, Title } = Typography;
+import { Space, Typography } from "antd";
 
-const ScoreboardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-height: 90vh; /* Maximum height of the scoreboard container */
-  overflow-y: auto; /* Enable vertical scrolling */
-`;
+const { Text, Link } = Typography;
 
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  width: 100%; /* 폼의 너비를 부모 요소의 100%로 설정 */
-  max-height: 80vh; /* Maximum height of the form */
-  overflow-y: auto; /* Enable vertical scrolling */
-`;
-
-const records = [
-  "goal",
-  "assist",
-  "yellowCards",
-  "redCards",
-  "cornerKick",
-  "freeKick",
-  "penaltyKick",
-  "saves",
-  "substitionOut",
-  "substitionIn",
-  "passes",
-];
-
-interface MatchInfo {
-  goal: string;
-  assist: string;
-  yellowCards: string;
-  redCards: string;
-  cornerKick: number;
-  freeKick: number;
-  penaltyKick: number;
+interface PlayerInfo {
+  id: number;
+  name: string;
+  goal: number;
+  assist: number;
+  yellowCards: number;
+  redCards: number;
   saves: number;
-  substitionOut: string;
-  substitionIn: string;
-  passes: number;
 }
 
-interface PlayerRecord {
+interface Member {
+  memberId: number;
   name: string;
-  count: number;
+}
+
+interface TransformedPlayer {
+  memberId: number | null;
+  name: string;
+  assists: number;
+  goals: number;
+  yellowCards: number;
+  redCards: number;
+  saves: number;
 }
 
 const InputMatchResultDetail = () => {
-  const [matchInfo, setMatchInfo] = useState<MatchInfo>({
-    goal: "",
-    assist: "",
-    yellowCards: "",
-    redCards: "",
-    cornerKick: 0,
-    freeKick: 0,
-    penaltyKick: 0,
-    saves: 0,
-    substitionOut: "",
-    substitionIn: "",
-    passes: 0,
-  });
-
   const { matchId } = useParams();
   const { teamId } = useTeamStore();
+  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher);
+  const [players, setPlayers] = useState<PlayerInfo[]>([]);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setMatchInfo(() => {
-      return {
-        ...matchInfo,
-        [name]: value,
-      };
-    });
-  };
-
-  const convertToServerFormat = (matchInfo: MatchInfo) => {
-    const convertListToObjects = (list: string[]): PlayerRecord[] => {
-      const counts = list.reduce(
-        (acc: { [key: string]: number }, name: string) => {
-          acc[name] = (acc[name] || 0) + 1;
-          return acc;
-        },
-        {}
-      );
-
-      return Object.keys(counts).map((name) => ({
-        name: name,
-        count: counts[name],
-      }));
-    };
-
-    const parseAndConvert = (str: string): PlayerRecord[] => {
-      return convertListToObjects(
-        str
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s)
-      );
-    };
-
-    return {
-      goals: parseAndConvert(matchInfo.goal),
-      assists: parseAndConvert(matchInfo.assist),
-      yellowCards: parseAndConvert(matchInfo.yellowCards),
-      redCards: parseAndConvert(matchInfo.redCards),
-      substitionsIn: parseAndConvert(matchInfo.substitionIn), // 'substitionOut'도 처리 필요
-      substitionsOut: parseAndConvert(matchInfo.substitionOut), // 'substitionOut'도 처리 필요
-      saves: matchInfo.saves,
-      cornerKick: matchInfo.cornerKick,
-      freeKick: matchInfo.freeKick,
-      penaltyKick: matchInfo.penaltyKick,
-      passes: matchInfo.passes,
-    };
+  const getPlayerIdByName = (
+    name: string,
+    members: Member[]
+  ): number | null => {
+    const player = members.find((member) => member.name === name);
+    return player ? player.memberId : null;
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    const serverData = convertToServerFormat(matchInfo);
-    console.log(serverData);
-    // post 요청?
+    const playersWithIds: TransformedPlayer[] = players.map((player) => ({
+      name: player.name,
+      memberId: getPlayerIdByName(player.name, memberData?.data || []),
+      assists: player.assist,
+      goals: player.goal,
+      yellowCards: player.yellowCards,
+      redCards: player.redCards,
+      saves: player.saves,
+    }));
+    const validPlayers = playersWithIds.filter(
+      (player) => player.memberId != null
+    );
+
+    // 존재하지 않는 선수 지워버림
+    const nonExistingPlayers = playersWithIds.filter(
+      (player) => player.memberId == null
+    );
+
+    // 존재하지 않는 선수를 찾아서 이름을 비워줌
+    nonExistingPlayers.forEach((nonExistingPlayer) => {
+      const playerToReset = players.find(
+        (p) => p.name === nonExistingPlayer.name
+      );
+      if (playerToReset) {
+        handlePlayerChange(playerToReset.id, "name", "");
+      }
+    });
+
+    if (nonExistingPlayers.length > 0) {
+      alert("팀에 존재하지 않는 선수입니다.");
+      return;
+    }
+
+    const dataToSubmit = {
+      results: validPlayers,
+    };
+
+    console.log(dataToSubmit);
     // axios
     //   .post(
-    //     `http://localhost:8080/api/v1/matches/${matchId}/result`,
-    //     serverData,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-    //       },
-    //     }
+    //     `http://localhost:3000/api/match/${matchId}/result/member`,
+    //     dataToSubmit
     //   )
     //   .then((res) => {
     //     console.log(res);
-    //     navigate("/home");
+    //     navigate(`/team`);
     //   })
     //   .catch((err) => {
+    //     alert("오류가 발생했습니다.");
     //     console.log(err);
+    //     navigate(`/match/${matchId}`);
     //   });
   };
-  const handleNext = () => {
-    // navigate("/home");
+
+  const handlePlayerChange = (
+    playerId: number,
+    field: keyof PlayerInfo,
+    value: string
+  ) => {
+    const newValue = field === "name" ? value : Number(value);
+    setPlayers((currentPlayers) =>
+      currentPlayers.map((player) =>
+        player.id === playerId ? { ...player, [field]: newValue } : player
+      )
+    );
+  };
+  const addPlayer = () => {
+    const newPlayerId = players[players.length - 1].id + 1;
+    setPlayers([
+      ...players,
+      {
+        id: newPlayerId,
+        name: "",
+        goal: 0,
+        assist: 0,
+        yellowCards: 0,
+        redCards: 0,
+        saves: 0,
+      },
+    ]);
+  };
+
+  const removePlayer = (playerId: number) => {
+    setPlayers((currentPlayers) =>
+      currentPlayers.filter((player) => player.id !== playerId)
+    );
+  };
+
+  // 모달 클릭 시 선수 추가
+  const addPlayerByName = (selectedMember: Member) => {
+    if (players.some((player) => player.id === selectedMember.memberId)) {
+      alert("이미 추가된 선수입니다.");
+      return;
+    }
+
+    setPlayers((currentPlayers) => [
+      ...currentPlayers,
+      {
+        id: selectedMember.memberId,
+        name: selectedMember.name,
+        goal: 0,
+        assist: 0,
+        yellowCards: 0,
+        redCards: 0,
+        saves: 0,
+      },
+    ]);
   };
 
   return (
     <Layout>
-      <ScoreboardContainer>
-        <Title level={3}>XX년 XX월 XX일 (경기장 이름) MatchID {matchId}</Title>
-        <StyledForm>
-          {Object.keys(matchInfo).map((record) => {
-            if (
-              record === "goal" ||
-              record === "assist" ||
-              record === "substitionIn" ||
-              record === "substitionOut" ||
-              record === "yellowCards" ||
-              record === "redCards"
-            ) {
-              return (
-                <>
-                  <Text>{record}</Text>
-                  <Input
-                    key={record}
-                    name={record}
-                    placeholder="이름을 입력해주세요(e.g 홍길동, 홍길동, 심청이)"
-                    type="text"
-                    onChange={handleChange}
-                    value={matchInfo[record]}
-                  />
-                </>
-              );
-            } else if (
-              record === "cornerKick" ||
-              record === "freeKick" ||
-              record === "penaltyKick" ||
-              record === "saves" ||
-              record === "passes"
-            ) {
-              return (
-                <>
-                  <Text>{record} 횟수</Text>
-                  <Input
-                    key={record}
-                    name={record}
-                    placeholder="숫자를 입력해주세요(e.g 10)"
-                    type="number"
-                    onChange={handleChange}
-                    value={matchInfo[record]}
-                  />
-                </>
-              );
-            }
-          })}
-          <Button
-            type="primary"
-            style={{ marginTop: "20px" }}
-            onClick={handleSubmit}
-          >
-            등록
+      <Button
+        variant="
+      outline-dark
+      "
+        onClick={handleShow}
+      >
+        선수 목록 <BiFootball />
+      </Button>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>선수 명단</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {memberData?.data.map((member: Member) => (
+            <div
+              key={member.memberId}
+              onClick={() => {
+                addPlayerByName(member);
+                handleClose();
+              }}
+              style={{ cursor: "pointer", margin: "5px 0" }}
+            >
+              {member.name}
+            </div>
+          ))}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-dark" onClick={handleClose}>
+            닫기
           </Button>
-        </StyledForm>
+        </Modal.Footer>
+      </Modal>
+      <ScoreboardContainer>
+        <Table>
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>골</th>
+              <th>어시스트</th>
+              <th>옐로우 카드</th>
+              <th>레드 카드</th>
+              <th>선방 횟수</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+        </Table>
+        {/* <tbody
+          style={{
+            width: "100%",
+          }}
+        >
+          {players.map((player) => (
+            <>
+              <tr key={player.id}>
+                <PlayerInputRow
+                  player={player}
+                  onPlayerChange={handlePlayerChange}
+                />
+                <td>
+                  <CustomButton onClick={() => removePlayer(player.id)}>
+                    X
+                  </CustomButton>
+                </td>
+              </tr>
+            </>
+          ))}
+        </tbody> */}
+
+        <tbody
+          style={{
+            width: "100%",
+          }}
+        >
+          {players.length > 0 ? (
+            players.map((player) => (
+              <>
+                <tr key={player.id}>
+                  <PlayerInputRow
+                    player={player}
+                    onPlayerChange={handlePlayerChange}
+                  />
+                  <td>
+                    <CustomButton onClick={() => removePlayer(player.id)}>
+                      X
+                    </CustomButton>
+                  </td>
+                </tr>
+              </>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={7}>
+                <Text type="secondary">
+                  선수 목록의 선수들을 클릭하여 추가해주세요.
+                </Text>
+              </td>
+            </tr>
+          )}
+        </tbody>
+        {/* <StyledButton onClick={addPlayer}>선수 추가</StyledButton> */}
+        <StyledButton onClick={handleSubmit}>save</StyledButton>
       </ScoreboardContainer>
     </Layout>
   );

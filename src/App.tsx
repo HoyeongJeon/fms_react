@@ -237,6 +237,10 @@ const App: React.FC = () => {
           <Route path="/teamTable" element={<TeamTable />} />
           <Route path="/memberTable" element={<MemberTable />} />
         </>
+      ) : (
+        <>
+          <Route path="/*" element={<Navigate replace to="/login" />} />
+        </>
       )}
     </Routes>
   );

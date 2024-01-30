@@ -36,4 +36,12 @@ export const useTeamStore = create<TeamStore>((set) => ({
     set({
       teamId,
     }),
+
+  clearTeamInfo: () =>
+    set({
+      teamId: undefined,
+      name: "",
+      imageUUID: "",
+      chatId: undefined,
+    }),
 }));
