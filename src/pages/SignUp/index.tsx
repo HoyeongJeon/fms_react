@@ -65,7 +65,7 @@ const SignUp = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/auth/sign-up`,
         {
