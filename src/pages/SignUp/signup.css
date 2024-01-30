@@ -22,8 +22,38 @@
 input,
 select,
 button {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+.kakao-login-container {
+  cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.StyledButton,
+.kakao-login-container {
+  margin-bottom: 20px;
+  padding: 10px;
+
+  border-radius: 4px;
+}
+
+.StyledButton {
+  /* Apply the same styles to both buttons */
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Media query for smaller screens (e.g., mobile devices) */
+@media (max-width: 600px) {
+  .login-form {
+    width: 90%;
+  }
 }

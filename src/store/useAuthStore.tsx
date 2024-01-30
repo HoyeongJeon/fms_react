@@ -6,6 +6,7 @@ interface AuthStore {
   login: () => void;
   logout: () => void;
   kakaoLogin: () => void;
+ 
 }
 const useAuthStore = create(
   persist<AuthStore>(

@@ -70,6 +70,24 @@ const MatchPreview = () => {
                 </Text>
               );
             })}
+            <div>
+              <Text style={{ color: "black", fontWeight: "lighter" }}>
+                평균득점
+                <span
+                  style={{
+                    color: "#91D0F1",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {(
+                    Data.home.goal /
+                    (Data.home.result.W +
+                      Data.home.result.D +
+                      Data.home.result.L)
+                  ).toFixed(2)}
+                </span>
+              </Text>
+            </div>
           </TeamBadge>
           <Title level={4}>vs</Title>
           <TeamBadge>
@@ -97,6 +115,24 @@ const MatchPreview = () => {
                 </Text>
               );
             })}
+            <div>
+              <Text style={{ color: "black", fontWeight: "lighter" }}>
+                평균득점
+                <span
+                  style={{
+                    color: "#BF9394",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {(
+                    Data.away.goal /
+                    (Data.away.result.W +
+                      Data.away.result.D +
+                      Data.away.result.L)
+                  ).toFixed(2)}
+                </span>
+              </Text>
+            </div>
           </TeamBadge>
         </TeamsContainer>
         <Button onClick={handleNext}>경기 종료</Button>

@@ -11,7 +11,7 @@ interface LayoutProps {
 }
 
 const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
-  const { data, error } = useSWR("http://localhost:3000/api/users/me", fetcher);
+  const { data, error } = useSWR("/users/me", fetcher);
   const teamId = data?.teamId;
 
   const navigate = useNavigate();

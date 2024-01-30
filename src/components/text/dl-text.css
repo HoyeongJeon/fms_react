@@ -1,0 +1,16 @@
+dl {
+    width: 100px;
+    height: 16px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+dt,
+dd {
+    flex: 3;
+}
+
+dt {
+    margin-right: 3px;
+    width: 100px;
+}

@@ -72,13 +72,13 @@ const EditProfile = () => {
 
               <ListGroup.Item>
                 <span>키: </span>
-                {height}
+                {height}cm
               </ListGroup.Item>
               <br />
 
               <ListGroup.Item>
                 <span>몸무게: </span>
-                {weight}
+                {weight}kg
               </ListGroup.Item>
               <br />
               <LinkContainer>

@@ -12,11 +12,13 @@ const KakaoSuccess = () => {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const code = urlSearchParams.get("code");
-    console.log("code=",code);
+
     if (code) {
       axios
         .post(
-          "http://localhost:3000/api/auth/kakao/callback/code",
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/auth/kakao/callback/code`,
           { code: code },
           {
             headers: {
@@ -26,8 +28,6 @@ const KakaoSuccess = () => {
           }
         )
         .then((response) => {
-          console.log("Kakao code verification response:", response.data);
-
           const { accessToken } = response.data;
 
           localStorage.setItem("accessToken", accessToken);
@@ -35,9 +35,7 @@ const KakaoSuccess = () => {
           navigate("/home", { replace: true });
         });
     }
-
   });
-
 
   return (
     <Layout>
