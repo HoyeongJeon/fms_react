@@ -78,9 +78,7 @@ const Home = () => {
     mutate: mutateChat,
     setSize,
     isValidating,
-  } = useSWRInfinite(getKey, fetcher, {
-    revalidateOnFocus: false,
-  });
+  } = useSWRInfinite(getKey, fetcher);
   const isEmpty = chatData?.[0]?.data?.length === 0;
   const isReachingEnd =
     isEmpty || (chatData && chatData[chatData.length - 1]?.data?.length < 20);
@@ -98,18 +96,22 @@ const Home = () => {
   const onScroll = useCallback(
     (e: React.UIEvent<HTMLElement>) => {
       const scrollable = e.currentTarget;
-      if (scrollable.scrollTop === 0 && !isReachingEnd && !isValidating) {
+      // 스크롤 최상단인 경우
+      if (
+        scrollable.scrollTop === 0
+        //  && !isReachingEnd && !isValidating
+      ) {
         setSize((size) => size + 1); // This will load the next page
         const data = chatData?.flat().reverse()[0];
         const formattedData = data.data.map((msg: any) => {
           return {
             ...msg,
-            // createdAt: msg.createdAt,
+            createdAt: msg.createdAt,
 
-            createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
+            // createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
           };
         });
-        setMessages((messages) => [...messages, ...formattedData]);
+        setMessages((messages) => [...formattedData, ...messages]);
       }
     },
     [setSize, isReachingEnd, isValidating]
@@ -153,8 +155,7 @@ const Home = () => {
         createdAt: time,
         // createdAt: dayjs(time).add(3, "minutes").format("h:mm A"),
       };
-      console.log(tempMsg);
-      setMessages((messages) => [...messages, tempMsg]);
+      setMessages((messages) => [tempMsg, ...messages]);
     }
     setChat("");
   };
@@ -191,7 +192,7 @@ const Home = () => {
           console.log("err= ", err);
         });
     }
-  }, [teamId, setMessages]);
+  }, [teamId]);
 
   // 메세지 받은 경우 화면 리렌더링
   useEffect(() => {
@@ -200,7 +201,7 @@ const Home = () => {
         ...data,
         createdAt: dayjs(data.createdAt).add(9, "hour").format("h:mm A"),
       };
-      setMessages((messages) => [...messages, data]);
+      setMessages((messages) => [data, ...messages]);
     });
   }, [socket]);
 
@@ -211,9 +212,10 @@ const Home = () => {
     }
   }, [show]);
 
-  const chatSections = makeSections(messages ? [...messages].reverse() : []);
-
-  console.log(chatSections);
+  console.log("messages=  ", messages);
+  const chatSections = makeSections(messages ? [...messages] : []);
+  // const chatSections = makeSections(chatData ? chatData.flat().reverse() : []);
+  console.log("chatSections= ", chatSections);
   return (
     <Layout>
       {teamId ? (
@@ -280,7 +282,6 @@ const Home = () => {
                                   <OthersTime>
                                     {
                                       // message.createdAt
-
                                       dayjs(message.createdAt)
                                         .add(9, "hour")
                                         .format("h:mm A")

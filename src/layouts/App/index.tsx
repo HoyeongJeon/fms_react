@@ -47,17 +47,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (data) {
       resetProfile();
       setUser(data.data);
-      console.log("data=", data.data);
       setTeamInfo(
         data.data.member[0]?.team?.id,
         data.data.member[0]?.team?.name,
         data.data.member[0]?.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id
       );
-      console.log(data.data.member[0]?.team?.id);
-      console.log(data.data.member[0]?.team?.name);
-      console.log(data.data.member[0]?.team?.imageUUID);
-      console.log(data.data.member[0]?.team?.chat?.id);
     }
     if (data?.data.profile) {
       setProfile(data.data.profile);
@@ -81,7 +76,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               profileId
                 ? `/profile/${profileId}`
                 : `/profile/${userId}/register`
-            }>
+            }
+          >
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -109,7 +105,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}>
+          }}
+        >
           LOGOUT
         </MenuItem>
       </Menu>
