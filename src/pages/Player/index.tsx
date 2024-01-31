@@ -4,6 +4,7 @@ import { Pagination } from "antd";
 import Layout from "layouts/App";
 import "./table.css";
 import { useTeamStore } from "store/teamStore";
+import { useNavigate } from "react-router-dom";
 
 interface Member {
   id: number;
@@ -32,6 +33,7 @@ const Player: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { teamId, setTeamId } = useTeamStore();
+  const navigate = useNavigate();
 
   const fetchMembers = async (page: number = 1) => {
     try {
@@ -145,6 +147,11 @@ const Player: React.FC = () => {
     setSelectedMember(team);
     setShowModal(true);
     setShow(true);
+
+    // Navigate to the MemberDetail page with the selected member's ID
+    if (team.id) {
+      navigate(`/member/${team.id}`);
+    }
   };
 
   const handleSearchButtonClick = () => {
@@ -179,6 +186,7 @@ const Player: React.FC = () => {
             <th>선호 포지션</th>
             <th>나이</th>
             <th>사진</th>
+            <th>더보기</th>
           </tr>
         </thead>
 
@@ -192,6 +200,11 @@ const Player: React.FC = () => {
                 <td>{member.user.profile.preferredPosition}</td>
                 <td>{member.user.profile.age}</td>
                 <td>{member.user.profile.imageUrl}</td>
+                <td>
+                  <button onClick={() => handleApplyButton(member)}>
+                    링크
+                  </button>
+                </td>
               </tr>
             ))}
         </tbody>
