@@ -60,6 +60,7 @@ const LogIn = () => {
   const REDIRECT_URI = `${process.env.REACT_APP_SERVER_HOST}:${
     process.env.REACT_APP_SERVER_PORT || 3000
   }/api/auth/kakao/callback`;
+  
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
   console.log("CLIENT_ID =", CLIENT_ID);
   console.log("EDIRECT_UR I=", REDIRECT_URI);
