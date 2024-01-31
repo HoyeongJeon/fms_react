@@ -62,7 +62,7 @@ const ProfileImageWrapper = styled.div`
   }
 `;
 
-const EditProfile = () => {
+const Profile = () => {
   const { name } = useUserStore();
   const { id, gender, preferredPosition, height, weight, imageUUID } =
     useProfileStore();
@@ -117,4 +117,4 @@ const EditProfile = () => {
   );
 };
 
-export default EditProfile;
+export default Profile;
