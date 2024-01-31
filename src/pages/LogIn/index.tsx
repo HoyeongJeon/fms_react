@@ -39,7 +39,10 @@ const LogIn = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await basicAxios.post("/auth/sign-in", { email, password });
+      const res = await basicAxios.post(`${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/auth/sign-in`, { email, password });
+      // const res = await axios.post("http://localhost:3000/api/auth/sign-in", { email, password });
       console.log(res.data.data.accessToken);
       localStorage.setItem("accessToken", res.data.data.accessToken);
       localStorage.setItem("refreshToken", res.data.data.refreshToken);
