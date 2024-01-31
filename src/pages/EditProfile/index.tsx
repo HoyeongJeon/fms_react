@@ -111,8 +111,6 @@ const EditProfile = () => {
   // const { accessToken } = useTokenStore();
   const accessToken = localStorage.getItem("accessToken");
   const { id: profileId } = useProfileStore();
-  const { age, height, weight, preferredPosition } = profile;
-  const [image, setImage] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
@@ -124,39 +122,6 @@ const EditProfile = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData();
-
-    for (let key in profile) {
-      formData.append(key, profile[key]);
-    }
-
-    const value = {
-      age,
-      height,
-      weight,
-      preferredPosition,
-    };
-
-    axios({
-      method: "post",
-      url: `http://localhost:3000/api/profile/${userId}/register`,
-      data: value,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-      .then((res) => {
-        console.log(res);
-        if (res.status === 201) {
-          navigate("/home");
-        }
-      })
-      .catch((err) => {
-        console.error(err.response);
-      });
-  };
   const [selectedFile, setSelectedFile] = useState<File | null>();
 
   const [validationMessage, setValidationMessage] = useState<string>("");
