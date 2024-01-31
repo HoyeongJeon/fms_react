@@ -31,7 +31,7 @@ import MemberDetail from "./pages/memberDetail";
 import PlayerStatistics from "./pages/playerStat";
 import ResetPassword from "./pages/resetPassword";
 import SendCode from "./pages/sendCode";
-import KakaoSuccess from "pages/KakaoSuccess";
+import KakaoSuccess from "./pages/KakaoSuccess";
 import "./styles.module.css";
 
 const Trail: React.FC<{ open: boolean }> = ({
@@ -89,7 +89,10 @@ const Trail: React.FC<{ open: boolean }> = ({
   });
 
   return (
-    <div className="container" style={{ position: 'relative', height: '100vh' }}>
+    <div
+      className="container"
+      style={{ position: "relative", height: "100vh" }}
+    >
       {trail.map(({ height, ...style }) => (
         <a.div
           key="initial"
@@ -120,8 +123,8 @@ const Trail: React.FC<{ open: boolean }> = ({
           width: "200px",
           height: "200px",
           borderRadius: "50%",
-          position: 'absolute',
-          transform: 'translateX(-50%)', // Center horizontally
+          position: "absolute",
+          transform: "translateX(-50%)", // Center horizontally
           zIndex: -2,
         }}
       ></div>
@@ -140,9 +143,7 @@ const Trail: React.FC<{ open: boolean }> = ({
       </div> */}
     </div>
   );
-  
-  
-    }
+};
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -201,9 +202,8 @@ const App: React.FC = () => {
         }
       />
       <Route path="/kakaoSuccess" element={<KakaoSuccess />} />
-
       {/* ... (로그인 이후에 접근 가능한 라우트들) ... */}
-      {isLoggedIn && (
+      {isLoggedIn ? (
         <>
           <Route path="/home" element={<Home />} />
           <Route path="/team" element={<Team />} />
@@ -237,9 +237,53 @@ const App: React.FC = () => {
           <Route path="/teamTable" element={<TeamTable />} />
           <Route path="/memberTable" element={<MemberTable />} />
         </>
+      ) : (
+        <>
+          <Route path="/*" element={<Navigate replace to="/login" />} />
+        </>
       )}
     </Routes>
   );
 };
 
 export default App;
+
+{
+  /* <>
+<Route path="/home" element={<Home />} />
+<Route path="/team" element={<Team />} />
+<Route path="/team/create" element={<CreateTeam />} />
+<Route path="/team/:teamId" element={<TeamDetail />} />
+<Route path="/player" element={<Player />} />
+<Route path="/strategy" element={<Strategy />} />
+<Route path="/calendar" element={<Calendar />} />
+<Route path="/profile/:userId/edit" element={<EditProfile />} />
+<Route path="/profile/:userId" element={<Profile />} />
+<Route
+  path="/profile/:userId/register"
+  element={<RegisterProfile />}
+/>
+<Route path="/memberDetail" element={<MemberDetail />} />
+<Route path="/match" element={<Match />} />
+<Route path="/match/:matchId/result" element={<MatchResult />} />
+<Route path="/match/:matchId/input" element={<InputMatchResult />} />
+<Route
+  path="/match/:matchId/input/detail"
+  element={<InputMatchResultDetail />}
+/>
+<Route path="/match/:matchId/preview" element={<MatchPreview />} />
+<Route path="/match/:matchId/review" element={<MatchReview />} />
+<Route path="/match/book" element={<MatchBook />} />
+<Route path="/match/calendar" element={<MatchCalendar />} />
+<Route path="/match/formation" element={<Formation />} />
+<Route path="/admin/users" element={<AdminUsers />} />
+<Route path="/admin/teams" element={<AdminTeams />} />
+<Route path="/playerStat" element={<PlayerStatistics />} />
+<Route path="/teamTable" element={<TeamTable />} />
+<Route path="/memberTable" element={<MemberTable />} />
+</> */
+}
+
+{
+  /* <Route path="/*" element={<Navigate replace to="/login" />} /> */
+}

@@ -98,7 +98,7 @@ const MemberDetail = () => {
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await axios.get(
-          `http://localhost:${
+          `${process.env.REACT_APP_SERVER_HOST}:${
             process.env.REACT_APP_SERVER_PORT || 3000
           }/api/match/member/${memberId}`,
           {

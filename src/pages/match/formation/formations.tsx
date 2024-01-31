@@ -15,6 +15,8 @@ export interface Position {
       attackers: string[];
       goalkeeper: string;
     };
+    advantages: string[]; 
+    disadvantages: string[]; 
   }
   
   const formations: { [key: string]: Formation } = {
@@ -41,7 +43,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'RCM', 'RM'],
           attackers: ['LF', 'ST', 'RF'],
           goalkeeper: 'GK',
-        }
+        },
+        advantages: [
+          "상대 수비진을 넓게 펼쳐 공간을 만들 수 있음."
+        ],
+        disadvantages: [
+          "측면 수비가 약해 상대팀의 측면 공격에 취약함."
+        ]
       },
       '3-4-1-2': {
         attackers: [
@@ -66,7 +74,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'CAM', 'RCM', 'RM'],
           attackers: ['LS', 'RS'],
           goalkeeper: 'GK'
-        }
+        },
+        advantages: [
+          "공격적 미드필더가 공격과 수비 사이의 연결고리 역할을 함.",
+        ],
+        disadvantages: [
+          "중앙 수비가 부족하여 대형 공격에 취약할 수 있음.",
+        ]
       },
       '4-1-4-1': {
         attackers: [
@@ -91,7 +105,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'CDM', 'RCM', 'RM'],
           attackers: ['ST'],
           goalkeeper: 'GK'
-        }
+        },
+        advantages: [
+          "중앙 수비형 미드필더가 수비 안정성을 높임.",
+        ],
+        disadvantages: [
+          "공격 전환 시 공격력이 다소 약할 수 있음.",
+        ]
       },
       '4-2-3-1': {
         attackers: [
@@ -116,7 +136,13 @@ export interface Position {
           midfielders: ['LDM', 'RDM', 'CAM', 'LAM', 'RAM'],
           attackers: ['ST'],
           goalkeeper: 'GK'
-        }
+        },
+        advantages: [
+          "중앙과 측면을 균형 있게 커버할 수 있음.",
+        ],
+        disadvantages: [
+          "공격 선수가 고립될 수 있는 위험이 있음.",
+        ]
       },
       '4-2-4': {
         attackers: [
@@ -141,7 +167,13 @@ export interface Position {
             midfielders: ['LCM', 'RCM'],
             attackers: ['LW', 'LS', 'RS', 'RW'],
             goalkeeper: 'GK'
-          }
+          },
+          advantages: [
+            "강력한 공격력을 발휘할 수 있음.",
+          ],
+          disadvantages: [
+            "수비진이 적어 역습에 취약함.",
+          ]
     },
     '4-3-3': {
         attackers: [
@@ -160,14 +192,19 @@ export interface Position {
             { x: '53%', y: '65%' }, // CB
             { x: '80%', y: '65%' }, // RB
           ],
-          goalkeeper: { x: '40%', y: '85%' }, // GK
-          positionNames: {
-            defenders: ['LB', 'LCB', 'RCB', 'RB'],
-            midfielders: ['LCM', 'CM', 'RCM'],
-            attackers: ['LW', 'ST', 'RW'],
-            goalkeeper: 'GK'
-          }
-          
+        goalkeeper: { x: '40%', y: '85%' }, // GK
+        positionNames: {
+          defenders: ['LB', 'LCB', 'RCB', 'RB'],
+          midfielders: ['LCM', 'CM', 'RCM'],
+          attackers: ['LW', 'ST', 'RW'],
+          goalkeeper: 'GK'
+        },
+        advantages: [
+          "공격과 수비에서 균형을 맞출 수 있음.",
+        ],
+        disadvantages: [
+          "측면 수비가 약해질 수 있음.",
+        ]
     },
     '4-4-1-1': {
         attackers: [
@@ -192,7 +229,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'RCM', 'RM'],
           attackers: ['CAM','ST'],
           goalkeeper: 'GK'
-        }
+        },
+        advantages: [
+          "중앙을 탄탄하게 지킬 수 있음.",
+        ],
+        disadvantages: [
+          "측면 공격이 약해질 수 있음.",
+        ]
         
       },
       '4-4-2': {
@@ -218,7 +261,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'RCM', 'RM'],
           attackers: ['ST', 'CF'],
           goalkeeper: 'GK'
-        }
+        },
+        advantages: [
+          "전통적인 구조로 안정성이 높음.",
+        ],
+        disadvantages: [
+          "창의적인 공격 전술이 부족할 수 있음.",
+        ]
         
       },
     '4-5-1': {
@@ -245,7 +294,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'CM', 'RCM', 'RM'],
           attackers: ['ST'],
           goalkeeper: 'GK',
-        }
+        },
+        advantages: [
+          "중앙 미드필드에서 우세를 점할 수 있음.",
+        ],
+        disadvantages: [
+          "단일 공격수로 인해 공격 옵션이 제한될 수 있음.",
+        ]
     },
     '5-3-2': {
         attackers: [
@@ -270,7 +325,13 @@ export interface Position {
           midfielders: ['LCM', 'CM', 'RCM'],
           attackers: ['LS', 'RS'],
           goalkeeper: 'GK',
-        }
+        },
+        advantages: [
+          "강력한 수비 라인을 구축할 수 있음.",
+        ],
+        disadvantages: [
+          "공격 전환 시 공격 옵션이 제한적임.",
+        ]
         
     },
     '5-4-1': {
@@ -296,7 +357,13 @@ export interface Position {
           midfielders: ['LM', 'LCM', 'RCM', 'RM'],
           attackers: ['ST'],
           goalkeeper: 'GK',
-        }
+        },
+        advantages: [
+          "수비에 집중할 수 있어 상대의 강력한 공격을 막을 수 있음.",
+        ],
+        disadvantages: [
+          "공격 전환 시 공격수가 고립될 수 있음.",
+        ]
         
     },
   };

@@ -1,7 +1,7 @@
 import axios from "axios";
-import useAuthStore from "store/useAuthStore";
+import useAuthStore from "../store/useAuthStore";
 
-export const BASE_URL = `http://localhost:${
+export const BASE_URL = `${process.env.REACT_APP_SERVER_HOST}:${
   process.env.REACT_APP_SERVER_PORT || 3000
 }/api`;
 
@@ -37,7 +37,7 @@ export const updateAccessToken = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
 
   const { data } = await axios.post(
-    `http://localhost:${
+    `${process.env.REACT_APP_SERVER_HOST}:${
       process.env.REACT_APP_SERVER_PORT || 3000
     }/api/auth/refresh`,
     {},
@@ -92,7 +92,7 @@ axios.interceptors.response.use(
           "/api/auth/refresh",
           {},
           {
-            baseURL: `http://localhost:${
+            baseURL: `${process.env.REACT_APP_SERVER_HOST}:${
               process.env.REACT_APP_SERVER_PORT || 3000
             }`,
             headers: {

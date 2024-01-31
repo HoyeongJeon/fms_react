@@ -28,7 +28,7 @@ const TeamTable: React.FC = () => {
 
   const fetchTeams = async (page: number = 1) => {
     try {
-      let apiUrl = `http://localhost:${
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
         process.env.REACT_APP_SERVER_PORT || 3000
       }/api/team/?page=${page}`;
 
@@ -70,7 +70,7 @@ const TeamTable: React.FC = () => {
       const accessToken = localStorage.getItem("accessToken");
 
       const response = await axios.get(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/team/?page=${page || 1}&name=${searchQuery}`,
         {
@@ -104,7 +104,7 @@ const TeamTable: React.FC = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.post(
-        `http://localhost:${
+        `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/team/${teamId}/user/${id}`,
         {

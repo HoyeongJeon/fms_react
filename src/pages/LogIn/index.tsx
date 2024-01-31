@@ -56,11 +56,10 @@ const LogIn = () => {
     }
   };
 
-  // const CLIENT_ID = `${process.env.KAKAO_API_KEY}`;
-  // const REDIRECT_URI = `${process.env.KAKAO_CALLBACK_URL}`;
-
-  const CLIENT_ID = "87e81e12dd9ec54f482031c186a83318";
-  const REDIRECT_URI = "http://localhost:3000/api/auth/kakao/callback";
+  const CLIENT_ID = `${process.env.REACT_APP_KAKAO_LOGIN_API_KEY}`;
+  const REDIRECT_URI = `${process.env.REACT_APP_SERVER_HOST}:${
+    process.env.REACT_APP_SERVER_PORT || 3000
+  }/api/auth/kakao/callback`;
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   const onKakaoLoginClick = async () => {

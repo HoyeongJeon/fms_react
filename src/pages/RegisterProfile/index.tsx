@@ -185,7 +185,7 @@ const RegisterProfile = () => {
 
     axios({
       method: "post",
-      url: `http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/profile/`,
+      url: `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}/api/profile/`,
       data: value,
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -226,8 +226,7 @@ const RegisterProfile = () => {
                     name={key}
                     value={profile[key]}
                     onChange={handleChange}
-                    required
-                  >
+                    required>
                     <option value="">포지션 선택</option>
 
                     {Position.map((position) => (
@@ -257,8 +256,7 @@ const RegisterProfile = () => {
                     name={key}
                     value={profile[key]}
                     onChange={handleChange}
-                    required
-                  >
+                    required>
                     <option value="">성별</option>
 
                     {Genders.map((gender) => (
