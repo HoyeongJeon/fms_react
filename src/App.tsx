@@ -33,6 +33,7 @@ import ResetPassword from "./pages/resetPassword";
 import SendCode from "./pages/sendCode";
 import KakaoSuccess from "./pages/KakaoSuccess";
 import "./styles.module.css";
+import { useUserStore } from "store/userStore";
 
 const Trail: React.FC<{ open: boolean }> = ({
   open,
@@ -151,6 +152,7 @@ interface ProtectedRouteProps {
 
 const App: React.FC = () => {
   const { isLoggedIn } = useAuthStore();
+  const { role } = useUserStore();
   const navigate = useNavigate();
   const [open, set] = useState(true);
 
@@ -166,6 +168,22 @@ const App: React.FC = () => {
         navigate("/home");
       }
     }, [isLoggedIn, navigate]);
+
+    return <>{children}</>;
+  };
+
+  // ADMIN 전용 페이지를 위한 라우터
+  const AdminOnlyRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+    useEffect(() => {
+      const link = document.createElement("link");
+      link.href =
+        "https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+      if (role !== "ADMIN") {
+        navigate("/login");
+      }
+    }, [role, navigate]);
 
     return <>{children}</>;
   };

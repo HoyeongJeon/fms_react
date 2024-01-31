@@ -36,7 +36,7 @@ type User = {
   id: number;
   email: string;
   name: string;
-  team?: string; // team은 선택적 프로퍼티로, 값이 없을 수도 있습니다.
+  team?: {}; // team은 선택적 프로퍼티로, 값이 없을 수도 있습니다.
   phone?: string; // phone도 선택적 프로퍼티입니다.
   birthdate?: string; // birthdate도 선택적 프로퍼티입니다.
 };
@@ -94,6 +94,7 @@ const AdminUsers = () => {
     const getUsers = async () => {
       try {
         const { data } = await authAxios.get(`/admin/users?page=${page || 1}`);
+        console.log(data);
         setUsers(data.data); // 받아온 데이터 저징
         setTotal(data.total); // 전체 개수 저장
         setError(""); // 에러 상태를 초기화
@@ -121,10 +122,12 @@ const AdminUsers = () => {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
+  users.map((aUser: any) => {
+    console.log(aUser.team?.name || "무소속");
+  });
 
   return (
     <AdminLayout>
-      <span>admin 만 들어올 수 있도록 프론트 로직 추가해야함</span>
       {error && <div className="error-message">{error}</div>}{" "}
       <Table>
         <TableHead>
@@ -138,7 +141,7 @@ const AdminUsers = () => {
           </tr>
         </TableHead>
         <TableBody>
-          {users.map((aUser) => (
+          {users.map((aUser: any) => (
             <tr key={aUser.id}>
               <td>
                 <Button variant="Light" onClick={() => handleShow(aUser.id)}>
@@ -161,7 +164,7 @@ const AdminUsers = () => {
               </td>
               <td>{aUser.email}</td>
               <td>{aUser.name}</td>
-              <td>{aUser.team || "N/A"}</td>
+              <td>{aUser.team?.name || "무소속"}</td>
               <td>{aUser.phone || "N/A"}</td>
               <td>{aUser.birthdate || "N/A"}</td>
             </tr>

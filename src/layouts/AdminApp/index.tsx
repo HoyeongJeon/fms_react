@@ -29,7 +29,7 @@ const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
           <StyledLink to="/home">HOME</StyledLink>
         </MenuItem>
         <MenuItem>
-          <StyledLink to="/admin/members">회원관리</StyledLink>
+          <StyledLink to="/admin/users">회원관리</StyledLink>
         </MenuItem>
         <MenuItem>
           <StyledLink to="/admin/teams">팀 관리</StyledLink>
@@ -62,6 +62,7 @@ const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
             <Button onClick={() => navigate("/team/join")}>팀 참가하기</Button>
           </ErrorContainer>
         )} */}
+        <h1>(배포 전 AdminOnlyRoute 적용하기)</h1>
         {children}
       </Card>
     </PageContainer>

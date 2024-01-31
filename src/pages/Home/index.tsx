@@ -19,13 +19,39 @@ import {
 import axios from "axios";
 import dayjs from "dayjs";
 import styled from "styled-components";
+import makeSections from "utils/makeSections";
 
 export const Section = styled.section`
   margin-top: 20px;
   border-top: 1px solid #eee;
 `;
 
-interface Message {
+export const StickyHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  position: sticky;
+  top: 14px;
+  & button {
+    font-weight: bold;
+    font-size: 13px;
+    height: 28px;
+    line-height: 27px;
+    padding: 0 16px;
+    z-index: 2;
+    --saf-0: rgba(var(--sk_foreground_low, 29, 28, 29), 0.13);
+    box-shadow: 0 0 0 1px var(--saf-0), 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    position: relative;
+    top: -13px;
+    background: white;
+    border: none;
+    outline: none;
+  }
+`;
+
+export interface Message {
   id: number;
   message: string;
   createdAt: string;
@@ -52,7 +78,9 @@ const Home = () => {
     mutate: mutateChat,
     setSize,
     isValidating,
-  } = useSWRInfinite(getKey, fetcher);
+  } = useSWRInfinite(getKey, fetcher, {
+    revalidateOnFocus: false,
+  });
   const isEmpty = chatData?.[0]?.data?.length === 0;
   const isReachingEnd =
     isEmpty || (chatData && chatData[chatData.length - 1]?.data?.length < 20);
@@ -62,7 +90,6 @@ const Home = () => {
   const [chat, setChat] = useState("");
 
   const [messages, setMessages] = useState<any[]>([]);
-  console.log("chatId= ", chatId);
   const [socket] = useSocket(chatId);
   const [nextUrl, setNextUrl] = useState<string>("");
 
@@ -73,15 +100,12 @@ const Home = () => {
       const scrollable = e.currentTarget;
       if (scrollable.scrollTop === 0 && !isReachingEnd && !isValidating) {
         setSize((size) => size + 1); // This will load the next page
-        console.log(
-          "chatData?.flat().reverse()= ",
-          chatData?.flat().reverse()[0] // 데이터
-        );
         const data = chatData?.flat().reverse()[0];
-        console.log("data=", data);
         const formattedData = data.data.map((msg: any) => {
           return {
             ...msg,
+            // createdAt: msg.createdAt,
+
             createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
           };
         });
@@ -111,12 +135,14 @@ const Home = () => {
   // 채팅 입력시
   const onSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let time = new Date();
+    const curr = new Date();
+    const utc =
+      curr.getTime() + curr.getTimezoneOffset() * 60 * 1000 + 3 * 60 * 1000;
+    let time = new Date(utc);
     let messageData = {
       chatId: teamId,
       message: chat,
     };
-    console.log("socket= ", socket);
     if (socket && typeof socket !== "boolean" && typeof socket !== "function") {
       socket.emit("send_message", messageData);
       const tempMsg = {
@@ -124,10 +150,11 @@ const Home = () => {
         author: {
           id: userId,
         },
-        createdAt: dayjs(time).add(3, "minutes").format("h:mm A"),
+        createdAt: time,
+        // createdAt: dayjs(time).add(3, "minutes").format("h:mm A"),
       };
       console.log(tempMsg);
-      setMessages((messages) => [tempMsg, ...messages]);
+      setMessages((messages) => [...messages, tempMsg]);
     }
     setChat("");
   };
@@ -150,14 +177,13 @@ const Home = () => {
           const formattedData = data.map((msg) => {
             return {
               ...msg,
-              createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"), // 여기 !!!!
+              createdAt: msg.createdAt,
+              //  dayjs(msg.createdAt).add(9, "hour").format("h:mm A"), // 여기 !!!!
             };
           });
           setMessages((currentMessages) => {
             const messageIds = new Set(currentMessages.map((msg) => msg.id));
-            const newMessages = formattedData.filter(
-              (msg) => !messageIds.has(msg.id)
-            );
+            const newMessages = data.filter((msg) => !messageIds.has(msg.id));
             return [...currentMessages, ...newMessages];
           });
         })
@@ -174,7 +200,7 @@ const Home = () => {
         ...data,
         createdAt: dayjs(data.createdAt).add(9, "hour").format("h:mm A"),
       };
-      setMessages((messages) => [formattedData, ...messages]);
+      setMessages((messages) => [...messages, data]);
     });
   }, [socket]);
 
@@ -185,6 +211,9 @@ const Home = () => {
     }
   }, [show]);
 
+  const chatSections = makeSections(messages ? [...messages].reverse() : []);
+
+  console.log(chatSections);
   return (
     <Layout>
       {teamId ? (
@@ -211,14 +240,77 @@ const Home = () => {
               }}
               onScroll={onScroll}
             >
-              {messages &&
+              {Object.entries(chatSections).map(([date, messages]) => {
+                return (
+                  <Section className={`section-${date}`} key={date}>
+                    <StickyHeader>
+                      <button>{date}</button>
+                    </StickyHeader>
+                    {messages &&
+                      [...messages].reverse().map((message) => (
+                        <>
+                          {Number(userId) === message?.author?.id ? (
+                            <ChatWrapper>
+                              <MyChatMessage>
+                                {message.message}
+                                <MyTime>
+                                  {
+                                    // message.createdAt
+
+                                    dayjs(message.createdAt)
+                                      .add(9, "hour")
+                                      .format("h:mm A")
+                                  }
+                                </MyTime>
+                              </MyChatMessage>
+                            </ChatWrapper>
+                          ) : (
+                            <ChatWrapper>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "flex-start",
+                                }}
+                              >
+                                <ChatMessage>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {message?.author?.name}
+                                  </span>
+                                  : {message.message}
+                                  <OthersTime>
+                                    {
+                                      // message.createdAt
+
+                                      dayjs(message.createdAt)
+                                        .add(9, "hour")
+                                        .format("h:mm A")
+                                    }
+                                  </OthersTime>
+                                </ChatMessage>
+                              </div>
+                            </ChatWrapper>
+                          )}
+                        </>
+                      ))}
+                  </Section>
+                );
+              })}
+              {/* {messages &&
                 [...messages].reverse().map((message) => (
                   <>
                     {userId === message?.author?.id ? (
                       <ChatWrapper>
                         <MyChatMessage>
                           {message.message}
-                          <MyTime>{message.createdAt}</MyTime>
+                          <MyTime>
+                            {
+                              // message.createdAt
+
+                              dayjs(message.createdAt)
+                                .add(9, "hour")
+                                .format("h:mm A")
+                            }
+                          </MyTime>
                         </MyChatMessage>
                       </ChatWrapper>
                     ) : (
@@ -234,13 +326,21 @@ const Home = () => {
                               {message?.author?.name}
                             </span>
                             : {message.message}
-                            <OthersTime>{message.createdAt}</OthersTime>
+                            <OthersTime>
+                              {
+                                // message.createdAt
+
+                                dayjs(message.createdAt)
+                                  .add(9, "hour")
+                                  .format("h:mm A")
+                              }
+                            </OthersTime>
                           </ChatMessage>
                         </div>
                       </ChatWrapper>
                     )}
                   </>
-                ))}
+                ))} */}
 
               <div ref={messagesEndRef} />
             </Modal.Body>
