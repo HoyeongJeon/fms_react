@@ -61,9 +61,9 @@ const LogIn = () => {
     process.env.REACT_APP_SERVER_PORT || 3000
   }/api/auth/kakao/callback`;
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-  console.log("CLIENT_ID=", CLIENT_ID);
-  console.log("EDIRECT_URI=", REDIRECT_URI);
-  console.log("kakaoURL=", kakaoURL);
+  console.log("CLIENT_ID =", CLIENT_ID);
+  console.log("EDIRECT_UR I=", REDIRECT_URI);
+  console.log("kakaoURL =", kakaoURL);
 
   const onKakaoLoginClick = async () => {
     window.location.href = kakaoURL;
