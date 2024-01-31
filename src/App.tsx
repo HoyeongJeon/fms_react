@@ -13,7 +13,7 @@ import AdminUsers from "./pages/AdminUsers";
 import TeamTable from "./pages/TeamTable";
 import MemberTable from "./pages/memberTable";
 import Match from "./pages/match";
-import EditProfile from "./pages/RegisterProfile";
+import EditProfile from "./pages/EditProfile";
 import Profile from "./pages/Profile";
 import RegisterProfile from "./pages/RegisterProfile";
 import useAuthStore from "./store/useAuthStore";

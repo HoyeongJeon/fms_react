@@ -55,6 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.chat?.id
       );
     }
+    console.log("data=", data);
     if (data?.data.profile) {
       setProfile(data.data.profile);
     }
@@ -77,7 +78,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               profileId
                 ? `/profile/${profileId}`
                 : `/profile/${userId}/register`
-            }>
+            }
+          >
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -105,7 +107,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}>
+          }}
+        >
           LOGOUT
         </MenuItem>
       </Menu>

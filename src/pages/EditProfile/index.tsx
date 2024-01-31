@@ -5,16 +5,14 @@ import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTokenStore } from "store/tokenStore";
 import { useProfileStore } from "store/profileStore";
+import { Alert } from "antd";
+import FileUploader from "components/file/FileUploader";
 
 type Profile = {
-  // name: string;
   age: string;
   height: string;
   weight: string;
   preferredPosition: string;
-  gender: string;
-  // password: string;
-  // confirmPassword: string;
   [key: string]: string; // 인덱스 서명 추가
 };
 
@@ -100,42 +98,20 @@ const Position = [
   "Left Winger",
 ];
 
-const Genders = ["Male", "Female", "Mixed"];
-
 const EditProfile = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState<File | null | string>(null); // 이미지 파일 상태를 추가
   const [profile, setProfile] = useState<Profile>({
-    // name: "",
     age: "",
     height: "", // 키
     weight: "", // 몸무게
-    gender: "", // 성별
     preferredPosition: "", // 포지션
-    // password: "", // 비밀번호
-    // confirmPassword: "", // 비밀번호 확인
   });
   const { userId } = useParams<{ userId: string }>();
   // const { accessToken } = useTokenStore();
   const accessToken = localStorage.getItem("accessToken");
-
-  const {
-    // name,
-    age,
-    height,
-    weight,
-    gender,
-    preferredPosition,
-    // password,
-    // confirmPassword,
-  } = profile;
-  const {
-    id,
-    gender: savedGender,
-    preferredPosition: savedPreferredPosition,
-    height: savedHeight,
-    weight: savedWeight,
-  } = useProfileStore();
+  const { id: profileId } = useProfileStore();
+  const { age, height, weight, preferredPosition } = profile;
   const [image, setImage] = useState("");
 
   const handleChange = (
@@ -147,19 +123,6 @@ const EditProfile = () => {
       [name]: value,
     }));
   };
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageUrl(e.target.files[0]); // 파일 객체 저
-      const fileReader = new FileReader();
-      fileReader.onload = (ev) => {
-        if (ev.target?.result) {
-          setImage(ev.target.result as string);
-        }
-      };
-      fileReader.readAsDataURL(e.target.files[0]);
-      // setImageUrl(e.target.files[0].name); // 이미지 파일 상태 업데이트
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -169,25 +132,12 @@ const EditProfile = () => {
       formData.append(key, profile[key]);
     }
 
-    // if (password !== confirmPassword) {
-    //   alert("비밀번호가 일치하지 않습니다.");
-    //   return;
-    // }
-
     const value = {
-      // name,
       age,
       height,
       weight,
-      gender,
       preferredPosition,
-      // password,
-      // confirmPassword,
     };
-    // const blob = new Blob([JSON.stringify(value)], {
-    //   type: "application/json",
-    // });
-    // formData.append("profile", blob);
 
     axios({
       method: "post",
@@ -198,6 +148,7 @@ const EditProfile = () => {
       },
     })
       .then((res) => {
+        console.log(res);
         if (res.status === 201) {
           navigate("/home");
         }
@@ -206,90 +157,126 @@ const EditProfile = () => {
         console.error(err.response);
       });
   };
+  const [selectedFile, setSelectedFile] = useState<File | null>();
+
+  const [validationMessage, setValidationMessage] = useState<string>("");
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+
+    console.log("파일이 입력되었습니다 : ", file);
+    if (file) {
+      setSelectedFile(file);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (
+      !profile.age ||
+      !profile.height ||
+      !profile.weight ||
+      !profile.preferredPosition
+    ) {
+      setValidationMessage("필수 입력값을 입력해주세요");
+    }
+
+    const formData = new FormData();
+    formData.append("height", profile.height);
+    formData.append("weight", profile.weight);
+    formData.append("preferredPosition", profile.preferredPosition);
+    formData.append("age", profile.age);
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+
+      const response = await axios.put(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/profile/${profileId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setProfile(response.data.data);
+        alert("프로필 수정이 완료되었습니다.");
+        navigate("/home");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data.message);
+        return;
+      }
+    }
+  };
 
   return (
     <Layout>
-      <Wrapper>
-        <ProfileContainer>
-          {image ? (
-            <ProfileImage src={image} alt="Profile" />
-          ) : (
-            <ProfileImagePlaceholder as="label">
-              <input
-                type="file"
-                onChange={handleImageChange}
-                style={{ display: "none" }} // 파일 입력을 숨깁니다
-              />
-              {image && <ProfileImage src={image} alt="Profile" />}
-            </ProfileImagePlaceholder>
-          )}
-          <Form onSubmit={handleSubmit}>
+      {
+        <Wrapper>
+          <ProfileContainer>
             <h2>프로필 수정</h2>
-            {Object.keys(profile).map((key) => {
-              if (key === "preferredPosition") {
-                return (
-                  <Select
-                    name={key}
-                    value={profile[key]}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">포지션 선택</option>
+            <Form>
+              {validationMessage && (
+                <Alert
+                  message="에러"
+                  description={validationMessage}
+                  type="error"
+                  showIcon
+                  closable
+                  onClose={() => setValidationMessage("")}
+                ></Alert>
+              )}
+              <FileUploader
+                descLabel="프로필 사진을 등록해주세요"
+                changedFunc={handleFileChange}
+              />
+              {Object.keys(profile).map((key) => {
+                if (key === "preferredPosition") {
+                  return (
+                    <Select
+                      name={key}
+                      value={profile[key]}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">포지션 선택</option>
 
-                    {Position.map((position) => (
-                      <option value={position}>{position}</option>
-                    ))}
-                  </Select>
-                );
-              }
-              // else if (key === "password" || key === "confirmPassword") {
-              //   return (
-              //     <Input
-              //       key={key}
-              //       name={key}
-              //       type="password"
-              //       placeholder={
-              //         key === "password" ? "비밀번호" : "비밀번호 확인"
-              //       }
-              //       value={profile[key]}
-              //       onChange={handleChange}
-              //       required={key === "password" || key === "confirmPassword"}
-              //     />
-              //   );
-              // }
-              else if (key === "gender") {
-                return (
-                  <Select
-                    name={key}
-                    value={profile[key]}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">성별</option>
-
-                    {Genders.map((gender) => (
-                      <option value={gender}>{gender}</option>
-                    ))}
-                  </Select>
-                );
-              } else {
-                return (
-                  <Input
-                    key={key}
-                    name={key}
-                    type="text"
-                    placeholder={`${key}를 입력해주세요`}
-                    value={profile[key]}
-                    onChange={handleChange}
-                    required
-                  />
-                );
-              }
-            })}
-            <Button type="submit">저장</Button>
-          </Form>
-        </ProfileContainer>
-      </Wrapper>
+                      {Position.map((position) => (
+                        <option value={position}>{position}</option>
+                      ))}
+                    </Select>
+                  );
+                } else {
+                  return (
+                    <Input
+                      key={key}
+                      name={key}
+                      type="text"
+                      placeholder={`${key}를 입력해주세요`}
+                      value={profile[key]}
+                      onChange={handleChange}
+                      required
+                    />
+                  );
+                }
+              })}
+              <Button onClick={onClickAddButton}>저장</Button>
+            </Form>
+          </ProfileContainer>
+        </Wrapper>
+      }
     </Layout>
   );
 };
