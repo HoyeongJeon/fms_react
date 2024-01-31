@@ -13,7 +13,7 @@ const MyResponsiveRadar = ({ data }: any) => {
     return (
         <div className="radar-container">
             <ResponsiveRadar
-                data={data}
+                data={data.data}
                 keys={['myTeam', 'avgTeam']}
                 indexBy="stats"
                 maxValue={100}

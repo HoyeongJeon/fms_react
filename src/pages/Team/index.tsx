@@ -66,6 +66,7 @@ export interface TeamStatsType {
     totalGames: number;
     goals: number;
     conceded: number;
+    cleanSheet: number;
 }
 
 export interface MemberListType {
@@ -91,27 +92,8 @@ const Team = () => {
     const { teamId } = useTeamStore();
     const [memberList, setMemberList] = useState<MemberListType[]>([]);
     const [teamStats, setTeamStats] = useState<TeamStatsType>();
+    const [teamGraphData, setTeamGraphData] = useState<MyResponsiveRadarType>({ data: [] });
     const navigate = useNavigate();
-
-    const test2: MyResponsiveRadarType = {
-        data: [
-            {
-                stats: '골',
-                myTeam: 44,
-                avgTeam: 66,
-            },
-            {
-                stats: '실점',
-                myTeam: 91,
-                avgTeam: 66,
-            },
-            {
-                stats: '무실점',
-                myTeam: 91,
-                avgTeam: 66,
-            },
-        ],
-    };
 
     const test3: MyResponsiveLineType = {
         data: [
@@ -229,7 +211,7 @@ const Team = () => {
             return members;
         };
 
-        const getTemaStats = async () => {
+        const getTeamStats = async () => {
             const getStats = await axios.get<TeamStatsType>(
                 `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}`,
                 {
@@ -240,7 +222,6 @@ const Team = () => {
             );
 
             setTeamStats(getStats.data);
-            console.log(teamStats?.wins);
         };
 
         const loadPage = async () => {
@@ -248,13 +229,27 @@ const Team = () => {
                 await getTeam();
                 await checkIfIsCreator();
                 const getMembers = await getMemberList();
-                await getTemaStats();
+                await getTeamStats();
                 setMemberList(getMembers.data);
             }
         };
 
         loadPage(); // 데이터를 불러오는 함수 호출
     }, []);
+
+    useEffect(() => {
+        setTeamGraphData({
+            data: [
+                { stats: '골', myTeam: teamStats?.goals ?? 0, avgTeam: 66 },
+                { stats: '실점', myTeam: teamStats?.conceded ?? 0, avgTeam: 66 },
+                { stats: '무실점', myTeam: teamStats?.cleanSheet ?? 0, avgTeam: 66 },
+            ],
+        });
+    }, [teamStats]);
+
+    useEffect(() => {
+        console.log(teamGraphData);
+    }, [teamGraphData]);
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
@@ -323,9 +318,7 @@ const Team = () => {
                 <Card className="card-div">
                     <TitleText title="시즌통계" />
                     <div className="team-info-graph">
-                        <MyResponsiveRadar data={test2.data}></MyResponsiveRadar>
-                        <MyResponsiveRadar data={test2.data}></MyResponsiveRadar>
-                        {/* <MyResponsiveLine data={test3.data}></MyResponsiveLine> */}
+                        {/* <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar> */}
                     </div>
                 </Card>
                 <Card className="card-div">
