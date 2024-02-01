@@ -14,6 +14,9 @@ import {
 } from "./styles";
 import ComparisonBarChart from "components/CustomBarChart";
 import { Button } from "antd";
+import { useTeamStore } from "store/teamStore";
+import useSWR from "swr";
+import fetcher from "utils/fetcher";
 const mockData = [
   { label: "goal", home: 2, away: 1 },
   { label: "passes", home: 5, away: 6 },
@@ -31,6 +34,14 @@ const MatchResult = () => {
 
   const { matchId } = useParams();
   const navigate = useNavigate();
+  const { teamId } = useTeamStore();
+
+  const { data: matchResult } = useSWR(
+    `/match/${matchId}/result/team/${teamId}`,
+    fetcher
+  );
+
+  console.log("matchResult", matchResult);
 
   const handleNext = () => {
     navigate("/home");

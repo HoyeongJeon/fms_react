@@ -6,7 +6,6 @@ const AddressInput = () => {
 
     const handleAddress = (data: any) => {
         // 여기서 주소 처리
-        console.log(data);
         setIsPopupOpen(false); // 팝업 닫기
     };
 

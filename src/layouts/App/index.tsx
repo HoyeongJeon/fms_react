@@ -56,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // setMember(data.data.member[0]?.id);
       setMemberId(data.data.member[0]?.id);
     }
-    console.log("data=", data);
+    
     if (data?.data.profile) {
       setProfile(data.data.profile);
     }
@@ -95,9 +95,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </MenuItem>
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
-            </MenuItem>
-            <MenuItem>
-              <StyledLink to="/strategy">STRATEGY</StyledLink>
             </MenuItem>
           </>
         ) : (

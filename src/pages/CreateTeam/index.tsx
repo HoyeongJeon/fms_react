@@ -50,7 +50,6 @@ const CreateTeam = () => {
   // 주소 입력시 이벤트
   useEffect(() => {
     searchLocation(addressValues.roadAddress);
-    console.log(addressValues);
   }, [addressValues.roadAddress]);
 
   const searchLocation = (address: string) => {
@@ -111,7 +110,6 @@ const CreateTeam = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
 
-    console.log("파일이 입력되었습니다 : ", file);
     if (file) {
       setSelectedFile(file);
     } else {
@@ -160,7 +158,6 @@ const CreateTeam = () => {
       );
 
       if (response.status === 201) {
-        console.log(response.data.data.id);
         setTeamId(response.data.data.id);
         alert("팀등록이 완료되었습니다.");
         navigate("/home");

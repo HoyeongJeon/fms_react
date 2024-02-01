@@ -33,6 +33,7 @@ import ResetPassword from "./pages/resetPassword";
 import SendCode from "./pages/sendCode";
 import KakaoSuccess from "./pages/KakaoSuccess";
 import "./styles.module.css";
+import HomePreview from "pages/HomePreview";
 
 const Trail: React.FC<{ open: boolean }> = ({
   open,
@@ -161,7 +162,6 @@ const App: React.FC = () => {
         "https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap";
       link.rel = "stylesheet";
       document.head.appendChild(link);
-      console.log("font loaded");
       if (isLoggedIn) {
         navigate("/home");
       }
@@ -182,6 +182,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       {/* 로그인 안해도 접근 가능한 url */}
+      <Route path="/home/preview" element={<HomePreview />} />
       <Route path="/" element={<Trail open={open} />} />
       <Route path="/emailCode" element={<SendCode />} />
       <Route path="/password" element={<ResetPassword />} />
