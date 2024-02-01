@@ -1,7 +1,7 @@
 import Layout from "layouts/App";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
 
@@ -50,8 +50,6 @@ interface Profile {
 const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
   profileData,
 }) => {
-
-
   return (
     <div>
       {profileData && (
@@ -94,12 +92,13 @@ const MemberDetail = () => {
   const [error, setError] = useState(null);
   const [playerData, setPlayerData] = useState<PlayerData[] | null>(null);
   const [profileData, setProfileData] = useState<Profile | null>(null);
-  //const { data: presignedURL } = useSWR(`/image/${imageUrl}`, fetcher);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { data: presignedURL } = useSWR(`/image/${imageUrl}`, fetcher);
+ 
+  const { memberId } = useParams();
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
-        // const  memberId  = useParams();
-        const memberId = 1;
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await axios.get(
@@ -113,9 +112,7 @@ const MemberDetail = () => {
             withCredentials: true,
           }
         );
-
-
-
+        setImageUrl(response.data.data.user.profile.imageUrl);
         const { playerstats, user } = response.data.data;
 
         // Check if user property exists in the response
@@ -138,7 +135,7 @@ const MemberDetail = () => {
     };
 
     fetchMemberData();
-  }, []);
+  }, [memberId]);
 
   return (
     <Layout>

@@ -190,12 +190,6 @@ const TeamTable: React.FC = () => {
                   <td>{team.team.id}</td>
                   <td>{team.team.name}</td>
                   <td>{team.team.description}</td>
-                  <td>
-                    {/* <img
-                      src={team.team.imageUUID}
-                      alt={`${team.team.name} 로고`}
-                    /> */}
-                  </td>
                   <td>{team.team.is_mixed_gender ? "혼성" : "단일 성별"}</td>
                   <td>{team.team.gender}</td>
                   <td>{team.totalMember}</td>
