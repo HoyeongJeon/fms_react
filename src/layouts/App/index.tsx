@@ -96,9 +96,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
             </MenuItem>
-            <MenuItem>
-              <StyledLink to="/strategy">STRATEGY</StyledLink>
-            </MenuItem>
           </>
         ) : (
           <></>
