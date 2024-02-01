@@ -178,6 +178,7 @@ const CreateTeam = () => {
       {
         <ScoreboardContainer>
           <form className="create-team-form">
+          <div className="left-section">
             {validationMessage && (
               <Alert
                 message="에러"
@@ -210,7 +211,8 @@ const CreateTeam = () => {
               label="혼성 여부"
               onToggle={(value) => setSelectedToggle(value)}
             />
-
+            </div>
+            <div className="right-section">
             <div className="location-container">
               <label htmlFor="">연고지</label>
               <KakaoLocation center={addressValues.center} />
@@ -224,6 +226,7 @@ const CreateTeam = () => {
             <Button variant="dark" onClick={onClickAddButton}>
               Add
             </Button>
+            </div>
           </form>
         </ScoreboardContainer>
       }

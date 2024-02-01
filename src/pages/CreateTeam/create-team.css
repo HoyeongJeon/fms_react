@@ -1,6 +1,6 @@
 .create-team-form {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
 }
 
@@ -19,4 +19,16 @@
 
 .location-container {
     display: flex;
+}
+
+.left-section {
+flex: 3;
+margin-top : 50px;
+/* 필요한 경우 추가 스타일링 */
+}
+
+.right-section {
+flex: 1;
+margin-top : 50px;
+/* 필요한 경우 추가 스타일링 */
 }
