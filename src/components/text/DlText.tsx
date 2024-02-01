@@ -10,7 +10,7 @@ interface DlTextType {
 
 const DlText = (props: DlTextType) => {
     let winRate = 0;
-    if (props.data) {
+    if (props.data?.wins && props.data?.totalGames) {
         winRate = Math.floor((props.data?.wins / props.data?.totalGames) * 100);
     }
 

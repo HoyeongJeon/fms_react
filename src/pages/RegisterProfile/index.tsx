@@ -204,6 +204,7 @@ const RegisterProfile = () => {
       setSelectedFile(null);
     }
   };
+
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
@@ -263,7 +264,7 @@ const RegisterProfile = () => {
         <>
           <ScoreboardContainer>
             <h2>프로필(사용자)</h2>
-            <Form onSubmit={handleSubmit}>
+            <Form>
               {validationMessage && (
                 <Alert
                   message="에러"
