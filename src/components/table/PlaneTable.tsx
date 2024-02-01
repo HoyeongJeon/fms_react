@@ -1,10 +1,10 @@
 import { Card } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import './table.css';
-import { MemberListType } from 'pages/Team';
+import { PlayersType } from 'pages/Team';
 
 interface PlaneTableType {
-    data: MemberListType[];
+    data: PlayersType;
 }
 
 const PlaneTable = (props: PlaneTableType) => {
@@ -24,24 +24,24 @@ const PlaneTable = (props: PlaneTableType) => {
                 </tr>
             </thead>
             <tbody>
-                {props.data.map((member) => (
+                {props.data.players.map((player) => (
                     <tr>
                         <td style={{ width: '100px' }}>
                             <Card.Img
                                 variant="top"
-                                src={member.profile ? member.profile.imageUrl : '/img/empty_profile_iamge.png'}
+                                src={player.image ? player.image : '/img/empty_profile_iamge.png'}
                                 style={{ width: '35px', height: '35px' }}
                             />
-                            {member.user.name}
+                            {player.userName}
                         </td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
+                        <td>{player.totalGames}</td>
+                        <td>{player.totalGoals}</td>
+                        <td>{player.totalAssists}</td>
+                        <td>{player.attactPoint}</td>
+                        <td>{player.totalYellowCards}</td>
+                        <td>{player.totalRedCards}</td>
+                        <td>{player.totalÇleanSheet}</td>
+                        <td>{player.totalSave}</td>
                     </tr>
                 ))}
             </tbody>

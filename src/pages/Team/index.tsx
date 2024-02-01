@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MyResponsiveLine, { MyResponsiveLineType } from 'components/graph/MyResponsiveLine';
+import { MyResponsiveLineType } from 'components/graph/MyResponsiveLine';
 import MyResponsiveRadar, { MyResponsiveRadarType } from 'components/graph/MyResponsiveRadar';
 import ImageView from 'components/image/ImageView';
 import PlaneTable from 'components/table/PlaneTable';
@@ -13,9 +13,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from 'store/teamStore';
 import styled from 'styled-components';
 import './team.css';
-import useSWR from 'swr';
-import fetcher from 'utils/fetcher';
-import MyResponsivePie, { MyResponsivePieType } from 'components/graph/MyResponsePie';
 
 const Button = styled.button`
     padding: 10px 20px;
@@ -59,6 +56,43 @@ interface TeamDetailType {
     };
 }
 
+interface TopPlayerType {
+    topGoals: Array<{
+        teamId: number;
+        memberId: number;
+        userName: string;
+        totalGoals: number;
+    }>;
+
+    topAssists: Array<{
+        teamId: number;
+        memberId: number;
+        userName: string;
+        totalAssists: number;
+    }>;
+
+    topJoining: Array<{
+        teamId: number;
+        memberId: number;
+        userName: string;
+        joining: number;
+    }>;
+
+    topSave: Array<{
+        teamId: number;
+        memberId: number;
+        userName: string;
+        totalSave: number;
+    }>;
+
+    topAttactPoint: Array<{
+        teamId: number;
+        memberId: number;
+        userName: string;
+        attactPoint: number;
+    }>;
+}
+
 export interface TeamStatsType {
     wins: number;
     loses: number;
@@ -67,22 +101,28 @@ export interface TeamStatsType {
     goals: number;
     conceded: number;
     cleanSheet: number;
+    assists: number;
+    otherTeam: {
+        totalGoals: number;
+        totalAssists: number;
+        totalCleanSheet: number;
+    };
 }
 
-export interface MemberListType {
-    id: number;
-    isStaff: boolean;
-    joinDate: Date;
-    profile: {
-        preferredPosition: string;
-        imageUrl: string;
-        age: number;
-    };
-    user: {
-        id: number;
-        name: string;
-        email: string;
-    };
+export interface PlayersType {
+    players: Array<{
+        memberId: number;
+        userName: string;
+        image: string | null;
+        totalGames: number;
+        totalGoals: number;
+        totalAssists: number;
+        attactPoint: number;
+        totalYellowCards: number;
+        totalRedCards: number;
+        totalÇleanSheet: number;
+        totalSave: number;
+    }>;
 }
 
 const Team = () => {
@@ -90,68 +130,12 @@ const Team = () => {
     const [loading, setLoading] = useState(true);
     const [temaData, setTeamData] = useState<TeamDetailType | null>(null);
     const { teamId } = useTeamStore();
-    const [memberList, setMemberList] = useState<MemberListType[]>([]);
+    const [players, setPlayers] = useState<PlayersType>();
     const [teamStats, setTeamStats] = useState<TeamStatsType>();
     const [teamGraphData, setTeamGraphData] = useState<MyResponsiveRadarType>({ data: [] });
+    const [topPlaeyr, setTopPlayer] = useState<TopPlayerType>();
+    const [validationMsg, setValidationMsg] = useState<string>('');
     const navigate = useNavigate();
-
-    const test3: MyResponsiveLineType = {
-        data: [
-            {
-                id: 'japan',
-                data: [
-                    {
-                        x: '1월',
-                        y: 3,
-                    },
-                    {
-                        x: '2월',
-                        y: 2,
-                    },
-                    {
-                        x: '3월',
-                        y: 5,
-                    },
-                    {
-                        x: '4월',
-                        y: 6,
-                    },
-                    {
-                        x: '5월',
-                        y: 5,
-                    },
-                    {
-                        x: '6월',
-                        y: 5,
-                    },
-                    {
-                        x: '7월',
-                        y: 5,
-                    },
-                    {
-                        x: '8월',
-                        y: 5,
-                    },
-                    {
-                        x: '9월',
-                        y: 5,
-                    },
-                    {
-                        x: '10월',
-                        y: 5,
-                    },
-                    {
-                        x: '11월',
-                        y: 5,
-                    },
-                    {
-                        x: '12월',
-                        y: 5,
-                    },
-                ],
-            },
-        ],
-    };
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -204,11 +188,11 @@ const Team = () => {
         };
 
         const getMemberList = async () => {
-            const members = await axios.get<MemberListType[]>(
-                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/members`
+            const players = await axios.get<PlayersType>(
+                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/players`
             );
 
-            return members;
+            setPlayers(players.data);
         };
 
         const getTeamStats = async () => {
@@ -224,13 +208,26 @@ const Team = () => {
             setTeamStats(getStats.data);
         };
 
+        const getTopPlayer = async () => {
+            const getTopMembers = await axios.get<TopPlayerType>(
+                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}/top-player`,
+                {
+                    params: {
+                        teamId,
+                    },
+                }
+            );
+
+            setTopPlayer(getTopMembers.data);
+        };
+
         const loadPage = async () => {
             if (teamId) {
                 await getTeam();
                 await checkIfIsCreator();
                 const getMembers = await getMemberList();
                 await getTeamStats();
-                setMemberList(getMembers.data);
+                await getTopPlayer();
             }
         };
 
@@ -240,16 +237,40 @@ const Team = () => {
     useEffect(() => {
         setTeamGraphData({
             data: [
-                { stats: '골', myTeam: teamStats?.goals ?? 0, avgTeam: 66 },
-                { stats: '실점', myTeam: teamStats?.conceded ?? 0, avgTeam: 66 },
-                { stats: '무실점', myTeam: teamStats?.cleanSheet ?? 0, avgTeam: 66 },
+                { stats: '골', myTeam: teamStats?.goals ?? 0, avgTeam: teamStats?.otherTeam.totalGoals ?? 0 },
+                {
+                    stats: '어시스트',
+                    myTeam: teamStats?.assists ?? 0,
+                    avgTeam: teamStats?.otherTeam.totalAssists ?? 0,
+                },
+                {
+                    stats: '무실점',
+                    myTeam: teamStats?.cleanSheet ?? 0,
+                    avgTeam: teamStats?.otherTeam.totalCleanSheet ?? 0,
+                },
             ],
         });
     }, [teamStats]);
 
     useEffect(() => {
-        console.log(teamGraphData);
-    }, [teamGraphData]);
+        if (teamStats?.totalGames === 0) {
+            setValidationMsg('경기 통계를 위한 게임수가 부족합니다.');
+        } else if (!teamStats?.otherTeam) {
+            setValidationMsg('경기 통계를 위한 다른팀들의 통계가 부족합니다.');
+        }
+    }, [teamStats?.totalGames]);
+
+    // useEffect(() => {
+    //     const normalizedData = teamGraphData.data.map((item: any) => {
+    //         const maxValue = Math.max(item.myTeam, item.avgTeam);
+
+    //         return {
+    //             stats: item.stats,
+    //             myTeam: (item.myTeam / maxValue) * 100,
+    //             avgTeam: (item.avgTeam / maxValue) * 100,
+    //         };
+    //     });
+    // }, [teamGraphData]);
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
@@ -315,10 +336,11 @@ const Team = () => {
                         </div>
                     </div>
                 </Card>
+                {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                 <Card className="card-div">
                     <TitleText title="시즌통계" />
                     <div className="team-info-graph">
-                        {/* <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar> */}
+                        <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar>
                     </div>
                 </Card>
                 <Card className="card-div">
@@ -326,71 +348,117 @@ const Team = () => {
                     <CardGroup>
                         <Card className="team-card">
                             <p className="card-p-title">득점</p>
-                            <p>1</p>
-                            <Card.Img
-                                variant="top"
-                                src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                            />
-                            <Card.Body>
-                                <Card.Text className="card-p-text">2. 래시포드</Card.Text>
-                                <Card.Text className="card-p-text">3. 페르난데스</Card.Text>
-                            </Card.Body>
+                            {topPlaeyr?.topGoals.map((item, index) =>
+                                index === 0 ? (
+                                    <div>
+                                        <p>
+                                            {index + 1}. {item.userName} {item.totalGoals}득점
+                                        </p>
+                                        <Card.Img
+                                            variant="top"
+                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
+                                        />
+                                    </div>
+                                ) : (
+                                    <Card.Body>
+                                        <Card.Text className="card-p-text">
+                                            {index + 1}. {item.userName} {item.totalGoals}득점
+                                        </Card.Text>
+                                    </Card.Body>
+                                )
+                            )}
                         </Card>
                         <Card className="team-card">
                             <p className="card-p-title">도움</p>
-                            <p>1</p>
-                            <Card.Img
-                                variant="top"
-                                src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F288205.jpg&scode=default_face_profile_big_p"
-                            />
-                            <Card.Body>
-                                <Card.Text className="card-p-text">2. 래시포드</Card.Text>
-                                <Card.Text className="card-p-text">3. 페르난데스</Card.Text>
-                            </Card.Body>
+                            {topPlaeyr?.topAssists.map((item, index) =>
+                                index === 0 ? (
+                                    <div>
+                                        <p>
+                                            {index + 1}. {item.userName} {item.totalAssists}도움
+                                        </p>
+                                        <Card.Img
+                                            variant="top"
+                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
+                                        />
+                                    </div>
+                                ) : (
+                                    <Card.Body>
+                                        <Card.Text className="card-p-text">
+                                            {index + 1}. {item.userName} {item.totalAssists}도움
+                                        </Card.Text>
+                                    </Card.Body>
+                                )
+                            )}
                         </Card>
                         <Card className="team-card">
                             <p className="card-p-title">공격P</p>
-                            <p>1</p>
-                            <Card.Img
-                                variant="top"
-                                src="https://img1.daumcdn.net/thumb/S76x76/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F903830.jpg&scode=default_face_profile_big_p"
-                            />
-                            <Card.Body>
-                                <Card.Text className="card-p-text">2. 래시포드</Card.Text>
-                                <Card.Text className="card-p-text">3. 페르난데스</Card.Text>
-                            </Card.Body>
+                            {topPlaeyr?.topAttactPoint.map((item, index) =>
+                                index === 0 ? (
+                                    <div>
+                                        <p>
+                                            {index + 1}. {item.userName} {item.attactPoint}공격P
+                                        </p>
+                                        <Card.Img
+                                            variant="top"
+                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
+                                        />
+                                    </div>
+                                ) : (
+                                    <Card.Body>
+                                        <Card.Text className="card-p-text">
+                                            {index + 1}. {item.userName} {item.attactPoint}공격P
+                                        </Card.Text>
+                                    </Card.Body>
+                                )
+                            )}
                         </Card>
                         <Card className="team-card">
                             <p className="card-p-title">출전수</p>
-                            <p>1</p>
-                            <Card.Img
-                                variant="top"
-                                src="https://img1.daumcdn.net/thumb/S76x76/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F772389.jpg&scode=default_face_profile_big_p"
-                            />
-                            <Card.Body>
-                                <Card.Text>
-                                    <Card.Text className="card-p-text">2. 래시포드</Card.Text>
-                                    <Card.Text className="card-p-text">3. 페르난데스</Card.Text>
-                                </Card.Text>
-                            </Card.Body>
+                            {topPlaeyr?.topJoining.map((item, index) =>
+                                index === 0 ? (
+                                    <div>
+                                        <p>
+                                            {index + 1}. {item.userName} {item.joining}경기
+                                        </p>
+                                        <Card.Img
+                                            variant="top"
+                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
+                                        />
+                                    </div>
+                                ) : (
+                                    <Card.Body>
+                                        <Card.Text className="card-p-text">
+                                            {index + 1}. {item.userName} {item.joining}경기
+                                        </Card.Text>
+                                    </Card.Body>
+                                )
+                            )}
                         </Card>
                         <Card className="team-card">
                             <p className="card-p-title">세이브</p>
-                            <p>1</p>
-                            <Card.Img
-                                variant="top"
-                                src="https://img1.daumcdn.net/thumb/S76x76/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F772389.jpg&scode=default_face_profile_big_p"
-                            />
-                            <Card.Body>
-                                <Card.Text>
-                                    <Card.Text className="card-p-text">2. 래시포드</Card.Text>
-                                    <Card.Text className="card-p-text">3. 페르난데스</Card.Text>
-                                </Card.Text>
-                            </Card.Body>
+                            {topPlaeyr?.topSave.map((item, index) =>
+                                index === 0 ? (
+                                    <div>
+                                        <p>
+                                            {index + 1}. {item.userName} {item.totalSave}세이브
+                                        </p>
+                                        <Card.Img
+                                            variant="top"
+                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
+                                        />
+                                    </div>
+                                ) : (
+                                    <Card.Body>
+                                        <Card.Text className="card-p-text">
+                                            {index + 1}. {item.userName} {item.totalSave}세이브
+                                        </Card.Text>
+                                    </Card.Body>
+                                )
+                            )}
                         </Card>
                     </CardGroup>
                 </Card>
-                <Card className="card-div">{memberList && <PlaneTable data={memberList} />}</Card>
+                <Card className="card-div">{players && <PlaneTable data={players} />}</Card>
             </ScoreboardContainer>
             <Button onClick={() => navigate('/match/calendar')}>경기 일정</Button>
             <br />

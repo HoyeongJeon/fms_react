@@ -10,10 +10,20 @@ export interface MyResponsiveRadarType {
 }
 
 const MyResponsiveRadar = ({ data }: any) => {
+    const normalizedData = data.data.map((item: any) => {
+        const maxValue = Math.max(item.myTeam, item.avgTeam);
+
+        return {
+            stats: item.stats,
+            myTeam: (item.myTeam / maxValue) * 100 || 0,
+            avgTeam: (item.avgTeam / maxValue) * 100 || 0,
+        };
+    });
+
     return (
         <div className="radar-container">
             <ResponsiveRadar
-                data={data.data}
+                data={normalizedData}
                 keys={['myTeam', 'avgTeam']}
                 indexBy="stats"
                 maxValue={100}
