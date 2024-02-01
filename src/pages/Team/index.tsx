@@ -290,23 +290,23 @@ const Team = () => {
 
     useEffect(() => {
         const setImage = async () => {
-            if (topPlaeyr?.topGoals[0].image) {
+            if (topPlaeyr?.topGoals[0]?.image) {
                 const imageUrl = await getImageUrl(topPlaeyr?.topGoals[0].image);
                 setTopGoalsPlayer(imageUrl);
             }
-            if (topPlaeyr?.topAssists[0].image) {
+            if (topPlaeyr?.topAssists[0]?.image) {
                 const imageUrl = await getImageUrl(topPlaeyr?.topAssists[0].image);
                 setTopAssistsPlayer(imageUrl);
             }
-            if (topPlaeyr?.topAttactPoint[0].image) {
+            if (topPlaeyr?.topAttactPoint[0]?.image) {
                 const imageUrl = await getImageUrl(topPlaeyr?.topAttactPoint[0].image);
                 setAttactPointPlayer(imageUrl);
             }
-            if (topPlaeyr?.topJoining[0].image) {
+            if (topPlaeyr?.topJoining[0]?.image) {
                 const imageUrl = await getImageUrl(topPlaeyr?.topJoining[0].image);
                 setTopGamesPlayer(imageUrl);
             }
-            if (topPlaeyr?.topSave[0].image) {
+            if (topPlaeyr?.topSave[0]?.image) {
                 const imageUrl = await getImageUrl(topPlaeyr?.topSave[0].image);
                 setTopSavePlayer(imageUrl);
             }
