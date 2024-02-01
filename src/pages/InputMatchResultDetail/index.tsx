@@ -17,7 +17,6 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 import { Space, Typography } from "antd";
-import { useMemberStore } from "store/memberStore";
 
 const { Text, Link } = Typography;
 
@@ -43,14 +42,13 @@ interface TransformedPlayer {
   goals: number;
   yellowCards: number;
   redCards: number;
-  save: number;
+  saves: number;
 }
 
 const InputMatchResultDetail = () => {
   const { matchId } = useParams();
   const { teamId } = useTeamStore();
-  const { id: memberId } = useMemberStore();
-  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌x
+  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher);
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [show, setShow] = useState(false);
 
@@ -71,15 +69,14 @@ const InputMatchResultDetail = () => {
     e.preventDefault();
 
     const playersWithIds: TransformedPlayer[] = players.map((player) => ({
-      memberId: getPlayerIdByName(player.name, memberData?.data || []),
       name: player.name,
+      memberId: getPlayerIdByName(player.name, memberData?.data || []),
       assists: player.assist,
       goals: player.goal,
       yellowCards: player.yellowCards,
       redCards: player.redCards,
-      save: player.saves,
+      saves: player.saves,
     }));
-
     const validPlayers = playersWithIds.filter(
       (player) => player.memberId != null
     );
@@ -105,13 +102,14 @@ const InputMatchResultDetail = () => {
     }
 
     const dataToSubmit = {
-      results: validPlayers.map(({ name, ...rest }) => rest),
+      results: validPlayers,
     };
 
-    console.log(dataToSubmit);
     axios
       .post(
-        `http://localhost:3000/api/match/${matchId}/result/member`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/result/member`,
         dataToSubmit
       )
       .then((res) => {

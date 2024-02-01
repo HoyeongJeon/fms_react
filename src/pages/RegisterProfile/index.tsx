@@ -159,7 +159,7 @@ const RegisterProfile = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("clicked");
+
     const formData = new FormData();
 
     for (let key in profile) {
@@ -197,7 +197,7 @@ const RegisterProfile = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
 
-    console.log("파일이 입력되었습니다 : ", file);
+
     if (file) {
       setSelectedFile(file);
     } else {
@@ -243,9 +243,9 @@ const RegisterProfile = () => {
         }
       );
 
-      console.log(response);
+
       if (response.status === 201) {
-        console.log(response.data.data);
+
         setProfile(response.data.data);
         alert("프로필 등록이 완료되었습니다.");
         navigate("/home");
