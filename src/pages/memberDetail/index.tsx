@@ -94,7 +94,7 @@ const MemberDetail = () => {
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { data: presignedURL } = useSWR(`/image/${imageUrl}`, fetcher);
- 
+
   const { memberId } = useParams();
   useEffect(() => {
     const fetchMemberData = async () => {

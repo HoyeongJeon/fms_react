@@ -261,7 +261,7 @@ const Home = () => {
               팀을 생성하거나 팀에 참가하세요.
             </ErrorMessage>
             <CustomButton to="/team/create">팀 생성</CustomButton>
-            <CustomButton to="/team/join">팀 참가하기</CustomButton>
+            <CustomButton to="/teamTable">팀 참가하기</CustomButton>
           </ErrorContainer>
         )}
       </Layout>
