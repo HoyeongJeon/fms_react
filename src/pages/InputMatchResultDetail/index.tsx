@@ -105,21 +105,22 @@ const InputMatchResultDetail = () => {
       results: validPlayers,
     };
 
-    console.log(dataToSubmit);
-    // axios
-    //   .post(
-    //     `http://localhost:3000/api/match/${matchId}/result/member`,
-    //     dataToSubmit
-    //   )
-    //   .then((res) => {
-    //     console.log(res);
-    //     navigate(`/team`);
-    //   })
-    //   .catch((err) => {
-    //     alert("오류가 발생했습니다.");
-    //     console.log(err);
-    //     navigate(`/match/${matchId}`);
-    //   });
+    axios
+      .post(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/result/member`,
+        dataToSubmit
+      )
+      .then((res) => {
+        console.log(res);
+        navigate(`/team`);
+      })
+      .catch((err) => {
+        alert("오류가 발생했습니다.");
+        console.log(err);
+        navigate(`/match/${matchId}`);
+      });
   };
 
   const handlePlayerChange = (

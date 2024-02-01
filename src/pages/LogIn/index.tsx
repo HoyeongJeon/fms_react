@@ -43,7 +43,6 @@ const LogIn = () => {
         process.env.REACT_APP_SERVER_PORT || 3000
       }/api/auth/sign-in`, { email, password });
       // const res = await axios.post("http://localhost:3000/api/auth/sign-in", { email, password });
-      console.log(res.data.data.accessToken);
       localStorage.setItem("accessToken", res.data.data.accessToken);
       localStorage.setItem("refreshToken", res.data.data.refreshToken);
       login();
@@ -65,9 +64,6 @@ const LogIn = () => {
   }/api/auth/kakao/callback`;
   
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-  console.log("CLIENT_ID =", CLIENT_ID);
-  console.log("EDIRECT_UR I=", REDIRECT_URI);
-  console.log("kakaoURL =", kakaoURL);
 
   const onKakaoLoginClick = async () => {
     window.location.href = kakaoURL;
@@ -132,7 +128,7 @@ const LogIn = () => {
             {" "}
             {/* Apply the CenterAlign class here */}
             &nbsp;
-            <Link to="/home">메인화면으로 돌아가기</Link>
+            <Link to="/home/preview">프리뷰 화면 둘러보기</Link>
           </LinkContainer>
           <div
             className="ms-auto kakao-login-container"

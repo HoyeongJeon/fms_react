@@ -136,7 +136,6 @@ const TeamDetail = () => {
           alert("일치하는 데이터가 없습니다");
         }
 
-        console.log(response.data);
         setTeamData(response.data);
       } catch (err) {
         alert(err);

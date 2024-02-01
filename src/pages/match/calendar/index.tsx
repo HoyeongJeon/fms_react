@@ -193,8 +193,6 @@ const MatchCalendar = () => {
 
         setEventDates(newEventDates); // 상태 업데이트
         setScheldules(newSchelduleInfo);
-      } else {
-        console.log("resultTeam is not an array:", resultTeam);
       }
     } catch (error) {
       console.error("데이터 불러오기 실패:", error);

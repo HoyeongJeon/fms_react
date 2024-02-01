@@ -48,7 +48,7 @@ export const updateAccessToken = async () => {
       },
     }
   );
-  console.log("data: ", data.data.newAccessToken);
+
   localStorage.setItem("accessToken", data.data.newAccessToken);
   updateAuthToken();
 };
@@ -83,7 +83,6 @@ axios.interceptors.response.use(
     const { logout } = useAuthStore.getState();
     if (error.response.status === 401) {
       try {
-        console.log("roatate token");
         const refreshToken = localStorage.getItem("refreshToken");
         if (!refreshToken) {
           throw new Error("Refresh token not available.");
@@ -116,7 +115,6 @@ axios.interceptors.response.use(
       }
     } else if (error.response.status === 400) {
       // 여기 바꿀 예정..
-      console.log("팀이 없는듯?");
     }
 
     // localStorage.clear();

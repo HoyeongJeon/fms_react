@@ -45,8 +45,7 @@ const TeamTable: React.FC = () => {
       });
       setTeams(response.data.data);
       setTotal(response.data.total);
-      console.log("response.data.data=", response.data.data);
-      console.log("esponse.data.total=", response.data.total);
+
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
       // Clear the teams array in case of an error
@@ -59,7 +58,7 @@ const TeamTable: React.FC = () => {
     const delay = setTimeout(() => {
       fetchTeams();
     }, 500);
-    console.log("teams= ", teams);
+
 
     // Clear the timeout on component unmount or when the dependencies change
     return () => clearTimeout(delay);
@@ -82,8 +81,7 @@ const TeamTable: React.FC = () => {
       );
       setTeams(response.data.data);
       setTotal(response.data.total);
-      console.log("response.data.data=", response.data.data);
-      console.log("esponse.data.total=", response.data.total);
+
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
@@ -92,7 +90,7 @@ const TeamTable: React.FC = () => {
   const [show, setShow] = useState(false);
 
   const handleApplyButton = (team: Team) => {
-    console.log("apply button clicked!");
+
     setSelectedTeam(team);
     setShowModal(true);
     setShow(true);
@@ -114,7 +112,7 @@ const TeamTable: React.FC = () => {
           withCredentials: true,
         }
       );
-      console.log("Invitation API response:", response.data);
+
 
       setShowModal(false);
       setSelectedTeam(null);
@@ -138,14 +136,7 @@ const TeamTable: React.FC = () => {
   const handleSearchButtonClick = () => {
     fetchTeams();
   };
-  teams.map((team) => {
-    console.log("team= ", team.team);
-    console.log("team.id= ", team.team.id);
-    console.log("team.name= ", team.team.name);
-    console.log("team.description= ", team.team.description);
-    console.log("team.logoImage= ", team.team.imageUUID);
-    console.log("team.totalMember", team.totalMember);
-  });
+
   return (
     <Layout>
       <div>
@@ -184,7 +175,7 @@ const TeamTable: React.FC = () => {
               <th>ID</th>
               <th>팀 이름</th>
               <th>팀 설명</th>
-              <th>로고 이미지</th>
+              {/* <th>로고 이미지</th> */}
               <th>혼성 여부</th>
               <th>성별</th>
               <th>인원수</th>
@@ -200,10 +191,10 @@ const TeamTable: React.FC = () => {
                   <td>{team.team.name}</td>
                   <td>{team.team.description}</td>
                   <td>
-                    <img
+                    {/* <img
                       src={team.team.imageUUID}
                       alt={`${team.team.name} 로고`}
-                    />
+                    /> */}
                   </td>
                   <td>{team.team.is_mixed_gender ? "혼성" : "단일 성별"}</td>
                   <td>{team.team.gender}</td>
