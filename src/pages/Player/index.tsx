@@ -58,8 +58,7 @@ const Player: React.FC = () => {
 
       setMembers(response.data);
       setTotal(response.data.total);
-      console.log("response.data=", response.data);
-      console.log("response.data.total=", response.data.total);
+
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
       // Clear the members array in case of an error
@@ -95,8 +94,7 @@ const Player: React.FC = () => {
         setMembers(response.data.data);
         setTotal(response.data.total);
 
-        console.log("response.data.data=", response.data.data);
-        console.log("response.data.total=", response.data.total);
+
       } catch (error) {
         console.error("팀 정보를 불러오는 데 실패했습니다.", error);
         // Clear the members array in case of an error
@@ -133,8 +131,7 @@ const Player: React.FC = () => {
       );
       setMembers(response.data);
       setTotal(response.data.total);
-      console.log("response.data=", response.data);
-      console.log("response.data.total=", response.data.total);
+
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
@@ -143,7 +140,7 @@ const Player: React.FC = () => {
   const [show, setShow] = useState(false);
 
   const handleApplyButton = (team: Member) => {
-    console.log("apply button clicked!");
+
     setSelectedMember(team);
     setShowModal(true);
     setShow(true);

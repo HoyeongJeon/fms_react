@@ -61,7 +61,7 @@ const SendCode = () => {
       );
 
       if (response.status === 200) {
-        console.log("인증번호 전송 성공");
+
         // Clear the verification code input
         setVerificationCode("");
 
@@ -102,7 +102,7 @@ const SendCode = () => {
       );
 
       if (response.status === 200) {
-        console.log("인증번호 확인 성공");
+
         showAlert("인증번호 확인 성공");
 
         // Clear the verification code input

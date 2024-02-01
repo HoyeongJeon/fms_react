@@ -46,7 +46,7 @@ const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
       <Card>
         <h2>
           <StyledLink to="/home">
-            Football Management System (FMS) ⚽🔥
+          Football Management System (FMS) ⚽🔥
           </StyledLink>
         </h2>
         {/* {teamId ? (

@@ -342,7 +342,6 @@ const MatchBook = () => {
         // 전체 팀 데이터 저장
         setAllTeams(resultTeam);
 
-        console.log("resultTeam:", resultTeam);
 
         if (Array.isArray(resultTeam)) {
           // resultTeam 배열을 이용해 dropdownItems 배열 생성
@@ -360,9 +359,7 @@ const MatchBook = () => {
             setSelectedTeam(resultTeam[0]);
             setOpponentTeamLogo(resultTeam[0].imageUrl);
           }
-        } else {
-          console.log("resultTeam is not an array:", resultTeam);
-        }
+        } 
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
@@ -463,16 +460,7 @@ const MatchBook = () => {
       return;
     }
 
-    // 날짜가 선택되었을 경우 로그 출력 및 다른 처리
-    console.log({
-      save: "경기 요청",
-      date: selectedDate.toISOString().split("T")[0],
-      time: selectedTime ? selectedTime : "시간 미선택",
-      team: selectedItem ? selectedItem : "팀 미선택",
-      location_id: locationId,
-      homeTeamId: homeTeamId,
-      awayTeamId: selectedTeam?.id,
-    });
+
 
     const sendMatchMessage = async () => {
       try {

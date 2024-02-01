@@ -48,7 +48,7 @@ interface Profile {
 const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
   profileData,
 }) => {
-  console.log("Profile Data:", profileData);
+
 
   return (
     <div>
@@ -110,7 +110,7 @@ const MemberDetail = () => {
           }
         );
 
-        console.log("response.data=", response.data);
+
 
         const { playerstats, user } = response.data.data;
 

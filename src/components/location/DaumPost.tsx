@@ -3,7 +3,6 @@ import DaumPostCode from 'react-daum-postcode';
 
 const DaumPost = () => {
     const handleComplete = (data: any) => {
-        console.log(data);
     };
 
     return <DaumPostCode onComplete={handleComplete} className="post-code" />;

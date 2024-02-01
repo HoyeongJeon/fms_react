@@ -109,7 +109,7 @@ const ProfileTable = () => {
   const [show, setShow] = useState(false);
 
   const handleInviteButton = (profile: Profile) => {
-    console.log("Invite button clicked!");
+
     setSelectedProfile(profile);
     setShowModal(true);
     setShow(true);
@@ -137,7 +137,7 @@ const ProfileTable = () => {
         }
       );
 
-      console.log("Invitation API response:", response.data);
+
 
       setShowModal(false);
       setSelectedProfile(null);
