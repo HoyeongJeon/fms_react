@@ -17,6 +17,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 import { Space, Typography } from "antd";
+import { useMemberStore } from "store/memberStore";
 
 const { Text, Link } = Typography;
 
@@ -42,13 +43,14 @@ interface TransformedPlayer {
   goals: number;
   yellowCards: number;
   redCards: number;
-  saves: number;
+  save: number;
 }
 
 const InputMatchResultDetail = () => {
   const { matchId } = useParams();
   const { teamId } = useTeamStore();
-  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher);
+  const { id: memberId } = useMemberStore();
+  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌x
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [show, setShow] = useState(false);
 
@@ -69,14 +71,15 @@ const InputMatchResultDetail = () => {
     e.preventDefault();
 
     const playersWithIds: TransformedPlayer[] = players.map((player) => ({
-      name: player.name,
       memberId: getPlayerIdByName(player.name, memberData?.data || []),
+      name: player.name,
       assists: player.assist,
       goals: player.goal,
       yellowCards: player.yellowCards,
       redCards: player.redCards,
-      saves: player.saves,
+      save: player.saves,
     }));
+
     const validPlayers = playersWithIds.filter(
       (player) => player.memberId != null
     );
@@ -102,24 +105,24 @@ const InputMatchResultDetail = () => {
     }
 
     const dataToSubmit = {
-      results: validPlayers,
+      results: validPlayers.map(({ name, ...rest }) => rest),
     };
 
     console.log(dataToSubmit);
-    // axios
-    //   .post(
-    //     `http://localhost:3000/api/match/${matchId}/result/member`,
-    //     dataToSubmit
-    //   )
-    //   .then((res) => {
-    //     console.log(res);
-    //     navigate(`/team`);
-    //   })
-    //   .catch((err) => {
-    //     alert("오류가 발생했습니다.");
-    //     console.log(err);
-    //     navigate(`/match/${matchId}`);
-    //   });
+    axios
+      .post(
+        `http://localhost:3000/api/match/${matchId}/result/member`,
+        dataToSubmit
+      )
+      .then((res) => {
+        console.log(res);
+        navigate(`/team`);
+      })
+      .catch((err) => {
+        alert("오류가 발생했습니다.");
+        console.log(err);
+        navigate(`/match/${matchId}`);
+      });
   };
 
   const handlePlayerChange = (

@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetcher
     // { dedupingInterval: 1000 * 60 * 60 * 24 }
   );
-  const { setMember } = useMemberStore();
+  const { id: memberId, setMemberId } = useMemberStore();
   const { teamId, setTeamInfo, chatId } = useTeamStore();
   const { id: userId, setUser } = useUserStore();
   const { logout } = useAuthStore();
@@ -47,13 +47,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (data) {
       resetProfile();
       setUser(data.data);
-      console.log("data=", data.data);
       setTeamInfo(
         data.data.member[0]?.team?.id,
         data.data.member[0]?.team?.name,
         data.data.member[0]?.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id
       );
+      // setMember(data.data.member[0]?.id);
+      setMemberId(data.data.member[0]?.id);
     }
     console.log("data=", data);
     if (data?.data.profile) {
