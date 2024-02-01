@@ -11,7 +11,8 @@ import Modal from "react-bootstrap/Modal";
 const responsiveWidth = "768px";
 
 const Sidebar = styled.div`
-  width: 58%;
+  width: 95%;
+  height : 98%;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
@@ -50,7 +51,8 @@ const Button = styled.button`
 
 const ImageContainer = styled.div`
   position: relative;
-  height: 67vh;
+  margin-top : 10px;
+  height: 70vh;
   background-image: url("../../img/field.png"); // 배경 이미지로 경기장 이미지를 설정합니다.
   background-size: cover; // 배경 이미지가 컨테이너를 꽉 채우도록 합니다.
   background-position: center; // 배경 이미지를 중앙에 위치시킵니다.
@@ -83,25 +85,23 @@ const Player = styled.div`
   color: white; // 텍스트 색상
 `;
 
-// const PlayerList = styled.ul`
-// list-style: none;
-// padding: 0;
-// `;
-
-// const PlayerListItem = styled.li`
-// padding: 10px;
-// border-bottom: 1px solid #ddd;
-// `;
-
 const PlayerList = styled.ul`
     list-style: none;
-    width: 30%;
+    width: 80%;
+    height : 98%;
     padding: 0;
-    margin: 0;
+    margin-left: 10px;
     justify-content: center;
     overflow-y: auto; /* 목록이 길어질 경우 스크롤 가능하도록 설정 */
     max-height: 90vh; /* 화면 크기에 따라 최대 높이 설정 */
     overflow: visible;
+
+    //background: #f8f9fa;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #d6d6d6; /* 선명한 회색 테두리를 추가 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 
     > h3 {
       margin-top:20px;
@@ -109,6 +109,7 @@ const PlayerList = styled.ul`
 `;
 
 const PlayerListItem = styled.li`
+    justify-content: space-between;
     padding: 10px 20px; /* 좌우 여백 추가 */
     border-bottom: 1px solid #ddd;
     text-align: left; /* 텍스트를 왼쪽 정렬합니다 */
@@ -122,7 +123,7 @@ const RightContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    //justify-content: flex-start;
 `;
 
 const TacticalAdvantages = styled.ul`
@@ -147,6 +148,43 @@ const TacticalWeakness = styled(TacticalPoint)`
     content: '• ';
     color: red; // 단점은 적색
   }
+`;
+
+const TableContainer = styled.div`
+  width: 100%;
+  max-width: 600px; // 테이블의 최대 너비 설정
+  margin: 20px auto; // 페이지 중앙에 위치
+  border-collapse: collapse;
+`;
+
+const SectionTitle = styled.h3`
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+`;
+
+const FormationTable = styled.table`
+  width: 100%;
+  border: 1px solid #ddd;
+`;
+
+const TableRow = styled.tr``;
+
+const TableCell = styled.td`
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 10px;
+`;
+
+const PlayerNamePosition = styled.div`
+  flex-basis: 50%; // 부모 컨테이너의 50% 공간을 차지하도록 설정
+  text-align: left;
+`;
+
+const PlayerDropdownContainer = styled.div`
+  flex-basis: 50%; // 부모 컨테이너의 50% 공간을 차지하도록 설정
 `;
 
 const Formation = () => {
@@ -217,7 +255,9 @@ const Formation = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/formation/${homeTeamId}/${matchId}`,
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/formation/${homeTeamId}/match/${matchId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
@@ -252,6 +292,8 @@ const Formation = () => {
   }, [homeTeamId]);
 
   const [modalData, setModalData] = useState<SimplifiedMemberInfo[]>([]);
+  const [formationData, setFormationData] = useState<PopulerFormationInfo[]>([]);
+  const [warningMember, setWarningMemberData] = useState<WarningMemberInfo[]>([]);
 
   interface User {
     name: string; // 사용자의 이름
@@ -273,6 +315,21 @@ const Formation = () => {
     position: string; // 매치 포메이션의 포지션
   }
 
+  interface PopulerFormationInfo {
+    cnt: number; 
+    formation: string; 
+  }
+
+  interface MemberData {
+    user: User; 
+  }
+
+  interface WarningMemberInfo {
+    member_id: number; 
+    yellowCards: number;
+    memberData: MemberData; 
+  }
+
   useEffect(() => {
     // 모달창에서 멤버 목록 조회
     const getTeamFormation = async () => {
@@ -280,14 +337,16 @@ const Formation = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/team/${homeTeamId}/members`,
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/match/${matchId}/team/${homeTeamId}/members`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
             },
           }
         );
-        const members: Member[] = response.data?.data;
+        const members: Member[] = response.data;
 
         const newModalData = members.map((member: Member) => {
           const position =
@@ -309,6 +368,100 @@ const Formation = () => {
 
     getTeamFormation();
   }, [homeTeamId]);
+
+
+
+  /************** 인기 포메이션 기능 ***************/
+
+  useEffect(() => {
+    // 인기 포메이션 조회
+    const getPopularFormation = async () => {
+      if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
+
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/formation/popular`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+            },
+          }
+        );
+        const resultData: PopulerFormationInfo[] = response.data;
+
+        console.log('resultData:',resultData);
+
+        setFormationData(resultData); 
+      } catch (error) {
+        console.error("데이터 불러오기 실패:", error);
+      }
+    };
+
+    getPopularFormation();
+  }, [homeTeamId]);
+
+  // 3개씩 분할하는 함수
+  const chunkArray = (arr:PopulerFormationInfo [], size:number): PopulerFormationInfo[][]  =>
+  arr.reduce((acc: PopulerFormationInfo[][] , val: PopulerFormationInfo, i:number) => {
+    let idx = Math.floor(i / size);
+    let page = acc[idx] || (acc[idx] = []);
+    page.push(val);
+    return acc;
+  }, []);
+
+  // 인기 포메이션 데이터를 3개씩 분할
+  const groupedFormationData: PopulerFormationInfo[][] = chunkArray(formationData, 3);
+
+
+
+    /************** 최근 3경기간 최다 누적 경고 인원 ***************/
+
+    useEffect(() => {
+      // 최근 3경기간 최다 누적 경고 인원 조회
+      const getPopularFormation = async () => {
+        if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
+  
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_SERVER_HOST}:${
+              process.env.REACT_APP_SERVER_PORT || 3000
+            }/api/formation/warning/${homeTeamId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+              },
+            }
+          );
+          const resultData: WarningMemberInfo[] = response.data;
+  
+          console.log('resultData warning:',resultData);
+  
+          setWarningMemberData(resultData); 
+        } catch (error) {
+          console.error("데이터 불러오기 실패:", error);
+        }
+      };
+  
+      getPopularFormation();
+    }, [homeTeamId]);
+  
+    // 3개씩 분할하는 함수
+    const warningChunkArray = (arr:WarningMemberInfo [], size:number): WarningMemberInfo[][]  =>
+    arr.reduce((acc: WarningMemberInfo[][] , val: WarningMemberInfo, i:number) => {
+      let idx = Math.floor(i / size);
+      let page = acc[idx] || (acc[idx] = []);
+      page.push(val);
+      return acc;
+    }, []);
+  
+    // 인기 포메이션 데이터를 3개씩 분할
+    const warningGroupedData: WarningMemberInfo[][] = warningChunkArray(warningMember, 3);
+
+
+
+
 
   const setPosition = (position: string, playerName: string) => {
     setSelectedPlayerNames((prevNames) => ({
@@ -670,7 +823,9 @@ const Formation = () => {
   const saveFormation = async (data: SaveFormationDto) => {
     try {
       await axios.post(
-        `http://localhost:3001/api/formation/${homeTeamId}/${matchId}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/formation/${homeTeamId}/${matchId}`,
         data,
         {
           headers: {
@@ -872,6 +1027,8 @@ const Formation = () => {
     setFormationDetailsFromName(currentFormation);
   }, [currentFormation]);
 
+  console.log('warningGroupedData:',warningGroupedData);
+
   return (
     <Layout>
       <TripleContainer>
@@ -901,22 +1058,28 @@ const Formation = () => {
             {renderFormation(currentFormation)}
           </ImageContainer>
         </Sidebar>
-        <PlayerList>
+      </div>
+      <div>
+      <PlayerList>
           <h3>선수명단</h3>
             {modalData.map(player => (
-                <PlayerListItem key={player.id}>
-                {`${player.name} ${player.position}`}
-                <PlayerDropdown
-                  player={player}
-                  onSelectPosition={handleSelectPosition}
-                />
-              </PlayerListItem>
+              <PlayerListItem key={player.id}>
+                <PlayerNamePosition>
+                  {(player.name + ' ' + player.position).padEnd(40, ' ')}
+                </PlayerNamePosition>
+                <PlayerDropdownContainer>
+                  <PlayerDropdown
+                    player={player}
+                    onSelectPosition={handleSelectPosition}
+                  />
+                </PlayerDropdownContainer>
+            </PlayerListItem>
             ))}
         </PlayerList>
       </div>
       <div>
           <RightContainer>
-              <h2 style={{marginTop:"20px"}}>전술 소개</h2>
+              <h2 style={{marginTop:"20px"}}><span>{currentFormation}</span> 전술 공략</h2>
             <TacticalAdvantages>
               {formationDetails.advantages.map((advantage, index) => (
                 <TacticalPoint key={`advantage-${index}`}><b>장점</b> : {advantage}</TacticalPoint>
@@ -927,9 +1090,53 @@ const Formation = () => {
                 <TacticalWeakness key={`disadvantage-${index}`}><b>단점</b> : {disadvantage}</TacticalWeakness>
               ))}
             </TacticalDisadvantages>
-            <h3>추천 포메이션?</h3>
-            <h3>인기 포메이션?</h3>
-            <h3>해당 포메이션으로 승리한 확률</h3>
+              <br/>
+            <TableContainer>
+              <SectionTitle>최근 3경기간 최다 누적 경고자</SectionTitle>
+              <FormationTable>
+                <tbody>
+                {warningGroupedData.map((group, index) => (
+                    <TableRow key={index}>
+                      {group.map((warningMember) => (
+                        <TableCell key={warningMember.member_id}>
+                          {warningMember.memberData.user.name} - {warningMember.yellowCards} 경고
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                  <TableCell colSpan={3}> 
+                    <p style={{fontSize:"15px"}}>*최근 3경기간 최다 누적 경고자 명단</p>
+                  </TableCell>
+                </tbody>
+              </FormationTable>
+              <br/>
+              <SectionTitle>추천 포메이션</SectionTitle>
+              <FormationTable>
+                <tbody>
+                  <TableRow>
+                    <TableCell>4-3-3</TableCell>
+                    <TableCell>5-2-3</TableCell>
+                    <TableCell>4-1-4-1</TableCell>
+                  </TableRow>
+                </tbody>
+              </FormationTable>
+              <br/>
+              <SectionTitle>인기 포메이션</SectionTitle>
+              <FormationTable>
+                <tbody>
+                  {groupedFormationData.map((group, index) => (
+                    <TableRow key={index}>
+                      {group.map((formation) => (
+                        <TableCell key={formation.formation}>{formation.formation}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                  <TableCell colSpan={3}> 
+                    <p style={{fontSize:"15px"}}>*전체 경기 중 가장 많은 경기에 사용된 포메이션 상위 3개</p>
+                  </TableCell>
+                </tbody>
+              </FormationTable>
+            </TableContainer>
           </RightContainer>
       </div>
     </TripleContainer>
