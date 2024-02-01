@@ -47,6 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (data) {
       resetProfile();
       setUser(data.data);
+      console.log("data=", data.data);
       setTeamInfo(
         data.data.member[0]?.team?.id,
         data.data.member[0]?.team?.name,
@@ -54,6 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.chat?.id
       );
     }
+    console.log("data=", data);
     if (data?.data.profile) {
       setProfile(data.data.profile);
     }

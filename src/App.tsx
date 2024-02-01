@@ -13,7 +13,7 @@ import AdminUsers from "./pages/AdminUsers";
 import TeamTable from "./pages/TeamTable";
 import MemberTable from "./pages/memberTable";
 import Match from "./pages/match";
-import EditProfile from "./pages/RegisterProfile";
+import EditProfile from "./pages/EditProfile";
 import Profile from "./pages/Profile";
 import RegisterProfile from "./pages/RegisterProfile";
 import useAuthStore from "./store/useAuthStore";
@@ -91,15 +91,13 @@ const Trail: React.FC<{ open: boolean }> = ({
   return (
     <div
       className="container"
-      style={{ position: "relative", height: "100vh" }}
-    >
+      style={{ position: "relative", height: "100vh" }}>
       {trail.map(({ height, ...style }) => (
         <a.div
           key="initial"
           className="trailsText"
           style={style}
-          onClick={handleItemClick}
-        >
+          onClick={handleItemClick}>
           <a.div
             className="trailsTextInner"
             style={{
@@ -108,8 +106,7 @@ const Trail: React.FC<{ open: boolean }> = ({
               fontSize: "150px",
               fontWeight: "bold",
               fontFamily: "'Gowun Batang', sans-serif",
-            }}
-          >
+            }}>
             {initialItem}
           </a.div>
         </a.div>
@@ -126,8 +123,7 @@ const Trail: React.FC<{ open: boolean }> = ({
           position: "absolute",
           transform: "translateX(-50%)", // Center horizontally
           zIndex: -2,
-        }}
-      ></div>
+        }}></div>
       {/* Background with animation */}
       {/* <div id="background" className="background" style={{
      position: "absolute",
@@ -218,7 +214,7 @@ const App: React.FC = () => {
             path="/profile/:userId/register"
             element={<RegisterProfile />}
           />
-          <Route path="/memberDetail" element={<MemberDetail />} />
+          <Route path="/member/:memberId" element={<MemberDetail />} />
           <Route path="/match" element={<Match />} />
           <Route path="/match/:matchId/result" element={<MatchResult />} />
           <Route path="/match/:matchId/input" element={<InputMatchResult />} />

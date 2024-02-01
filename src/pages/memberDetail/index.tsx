@@ -1,6 +1,7 @@
 import Layout from "layouts/App";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 interface PlayerData {
   match_id: number;
@@ -70,8 +71,8 @@ const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
                 <td> {profileData.name}</td>
                 <td>{profileData.age}</td>
                 <td>{profileData.gender}</td>
-                <td>{profileData.height}kg</td>
-                <td>{profileData.weight}cm</td>
+                <td>{profileData.height}cm</td>
+                <td>{profileData.weight}kg</td>
                 <td> {profileData.preferredPosition}</td>
                 {/* <td> {profileData.skillLevel}/10</td> */}
               </tr>
@@ -91,10 +92,10 @@ const MemberDetail = () => {
   const [profileData, setProfileData] = useState<Profile | null>(null);
 
   useEffect(() => {
-    const memberId = 74;
-
     const fetchMemberData = async () => {
       try {
+        // const  memberId  = useParams();
+        const memberId = 1;
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await axios.get(

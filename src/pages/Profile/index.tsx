@@ -8,6 +8,8 @@ import { useProfileStore } from "store/profileStore";
 import { useUserStore } from "store/userStore";
 import ListGroup from "react-bootstrap/ListGroup";
 import { LinkContainer } from "pages/SignUp/styles";
+import useSWR from "swr";
+import fetcher from "utils/fetcher";
 
 type Profile = {
   // name: string;
@@ -44,13 +46,34 @@ const styledDiv = styled.div`
   display: flex;
 `;
 
-const EditProfile = () => {
+const ProfileImageWrapper = styled.div`
+  background-color: white;
+  box-shadow: 10px 10px 10px black;
+  border-radius: 100px;
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+
+  & img {
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    object-fit: cover;
+  }
+`;
+
+const Profile = () => {
   const { name } = useUserStore();
-  const { id, gender, preferredPosition, height, weight } = useProfileStore();
+  const { id, gender, preferredPosition, height, weight, imageUUID } =
+    useProfileStore();
+  const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
   return (
     <Layout>
       <Wrapper>
         <ProfileContainer>
+          <ProfileImageWrapper>
+            <img src={presignedURL} alt="프로필 이미지" />
+          </ProfileImageWrapper>
           {id ? (
             <ListGroup>
               <ListGroup.Item>
@@ -94,4 +117,4 @@ const EditProfile = () => {
   );
 };
 
-export default EditProfile;
+export default Profile;

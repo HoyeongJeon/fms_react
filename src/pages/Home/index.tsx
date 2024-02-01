@@ -62,7 +62,6 @@ const Home = () => {
   const [chat, setChat] = useState("");
 
   const [messages, setMessages] = useState<any[]>([]);
-  console.log("chatId= ", chatId);
   const [socket] = useSocket(chatId);
   const [nextUrl, setNextUrl] = useState<string>("");
 
