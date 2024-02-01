@@ -28,7 +28,7 @@ const PlaneTable = (props: PlaneTableType) => {
 
     const getImageUrl = async (url: string) => {
         const getUrl = await axios.get<string>(
-            `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
+            `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
             {
                 params: {
                     url,

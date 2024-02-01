@@ -160,7 +160,7 @@ const Team = () => {
         const checkIfIsCreator = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/match/creator`,
+                    `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/match/creator`,
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
@@ -179,7 +179,7 @@ const Team = () => {
         const getTeam = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}`,
+                    `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}`,
                     {
                         params: {
                             teamId,
@@ -199,7 +199,7 @@ const Team = () => {
 
         const getMemberList = async () => {
             const players = await axios.get<PlayersType>(
-                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/players`
+                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/players`
             );
 
             setPlayers(players.data);
@@ -207,7 +207,7 @@ const Team = () => {
 
         const getTeamStats = async () => {
             const getStats = await axios.get<TeamStatsType>(
-                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}`,
+                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}`,
                 {
                     params: {
                         teamId,
@@ -220,7 +220,7 @@ const Team = () => {
 
         const getTopPlayer = async () => {
             const getTopMembers = await axios.get<TopPlayerType>(
-                `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}/top-player`,
+                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}/top-player`,
                 {
                     params: {
                         teamId,
@@ -277,7 +277,7 @@ const Team = () => {
 
     const getImageUrl = async (url: string) => {
         const getUrl = await axios.get<string>(
-            `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
+            `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
             {
                 params: {
                     url,
