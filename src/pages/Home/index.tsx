@@ -62,7 +62,6 @@ const Home = () => {
   const [chat, setChat] = useState("");
 
   const [messages, setMessages] = useState<any[]>([]);
-  console.log("chatId= ", chatId);
   const [socket] = useSocket(chatId);
   const [nextUrl, setNextUrl] = useState<string>("");
 
@@ -73,12 +72,7 @@ const Home = () => {
       const scrollable = e.currentTarget;
       if (scrollable.scrollTop === 0 && !isReachingEnd && !isValidating) {
         setSize((size) => size + 1); // This will load the next page
-        console.log(
-          "chatData?.flat().reverse()= ",
-          chatData?.flat().reverse()[0] // 데이터
-        );
         const data = chatData?.flat().reverse()[0];
-        console.log("data=", data);
         const formattedData = data.data.map((msg: any) => {
           return {
             ...msg,
@@ -116,7 +110,6 @@ const Home = () => {
       chatId: teamId,
       message: chat,
     };
-    console.log("socket= ", socket);
     if (socket && typeof socket !== "boolean" && typeof socket !== "function") {
       socket.emit("send_message", messageData);
       const tempMsg = {
@@ -126,7 +119,6 @@ const Home = () => {
         },
         createdAt: dayjs(time).add(3, "minutes").format("h:mm A"),
       };
-      console.log(tempMsg);
       setMessages((messages) => [tempMsg, ...messages]);
     }
     setChat("");

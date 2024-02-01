@@ -177,7 +177,7 @@ const Formation = () => {
           }
         );
         const homeTeamId = response.data?.data[0]?.id;
-        console.log("homeTeamId:", homeTeamId);
+
         setHomeTeamId(homeTeamId);
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
@@ -232,7 +232,6 @@ const Formation = () => {
           position: item.position,
         }));
 
-        console.log("newFormationInfo why:", newFormationInfo);
 
         formation.map((item: FormationItem) =>
           setPosition(item.position, item.member.user.name)
@@ -244,7 +243,6 @@ const Formation = () => {
 
         setFormationInfo(newFormationInfo);
 
-        console.log("newFormationInfo:", newFormationInfo);
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
@@ -376,7 +374,7 @@ const Formation = () => {
     [key: string]: string;
   }>({});
 
-  console.log("selectedPlayerNames:", selectedPlayerNames);
+
 
   const handleClickOnPlayer = (player: Player) => {
     setSelectedPlayer(player);
@@ -630,7 +628,7 @@ const Formation = () => {
       }
     }
 
-    console.log("newPlayerPositions:", newPlayerPositions);
+
     setFormationInfo(newPlayerPositions);
     // playerPositions 업데이트
     //fillPlayerPositions();
@@ -640,11 +638,6 @@ const Formation = () => {
     // 상태 업데이트가 완료되기를 기다립니다.
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    console.log("----------save-----------");
-    console.log("selectedPlayerNames:", selectedPlayerNames);
-    console.log("playerPositions:", playerPositions);
-    console.log("playerPositions:", playerPositions.length);
-    console.log("currentFormation:", currentFormation);
 
     // confirm 대화 상자를 사용하여 사용자 확인 요청
     if (window.confirm(`포메이션 및 포지션 정보 저장하시겠습니까?`)) {
@@ -653,7 +646,7 @@ const Formation = () => {
         currentFormation: currentFormation,
       };
 
-      console.log("confirm data:", data);
+
 
       try {
         if (playerPositions.length === 0) {
@@ -686,7 +679,7 @@ const Formation = () => {
         }
       );
 
-      console.log("data:", data);
+
 
         // API 호출 성공 시
         alert("포메이션 및 포지션 정보 저장되었습니다.");
@@ -723,7 +716,7 @@ const Formation = () => {
 
     setFormationInfo(newPlayerPositions);
 
-    console.log("playerPositions:", playerPositions);
+
   };
 
     // 초기화 함수

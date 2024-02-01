@@ -105,7 +105,6 @@ const InputMatchResultDetail = () => {
       results: validPlayers,
     };
 
-    console.log(dataToSubmit);
     // axios
     //   .post(
     //     `http://localhost:3000/api/match/${matchId}/result/member`,

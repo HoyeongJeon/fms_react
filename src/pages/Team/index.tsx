@@ -254,7 +254,7 @@ const Team = () => {
       );
 
       setTeamStats(getStats.data);
-      console.log(teamStats?.wins);
+
     };
 
     const loadPage = async () => {
