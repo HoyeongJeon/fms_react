@@ -92,13 +92,15 @@ const Trail: React.FC<{ open: boolean }> = ({
   return (
     <div
       className="container"
-      style={{ position: "relative", height: "100vh" }}>
+      style={{ position: "relative", height: "100vh" }}
+    >
       {trail.map(({ height, ...style }) => (
         <a.div
           key="initial"
           className="trailsText"
           style={style}
-          onClick={handleItemClick}>
+          onClick={handleItemClick}
+        >
           <a.div
             className="trailsTextInner"
             style={{
@@ -107,7 +109,8 @@ const Trail: React.FC<{ open: boolean }> = ({
               fontSize: "150px",
               fontWeight: "bold",
               fontFamily: "'Gowun Batang', sans-serif",
-            }}>
+            }}
+          >
             {initialItem}
           </a.div>
         </a.div>
@@ -124,7 +127,8 @@ const Trail: React.FC<{ open: boolean }> = ({
           position: "absolute",
           transform: "translateX(-50%)", // Center horizontally
           zIndex: -2,
-        }}></div>
+        }}
+      ></div>
       {/* Background with animation */}
       {/* <div id="background" className="background" style={{
      position: "absolute",
@@ -223,7 +227,7 @@ const App: React.FC = () => {
             path="/match/:matchId/input/detail"
             element={<InputMatchResultDetail />}
           />
-          <Route path="/match/:matchId/preview" element={<MatchPreview />} />
+          <Route path="/match/preview" element={<MatchPreview />} />
           <Route path="/match/:matchId/review" element={<MatchReview />} />
           <Route path="/match/book" element={<MatchBook />} />
           <Route path="/match/calendar" element={<MatchCalendar />} />

@@ -178,90 +178,92 @@ const Home = () => {
   }, [show]);
 
   return (
-    <Layout>
-      {teamId ? (
-        <>
-          <Button
-            variant="outline-light"
-            onClick={() => setShow(true)}
-            style={{
-              border: "none",
-              backgroundColor: "transparent",
-              outline: "none",
-              cursor: "pointer",
-            }}
-          >
-            <AiTwotoneMessage />
-          </Button>
-          <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>{teamName}의 채팅방</Modal.Title>
-            </Modal.Header>
-            <Modal.Body
-              style={{
-                overflow: "scroll",
-              }}
-              onScroll={onScroll}
-            >
-              {messages &&
-                [...messages].reverse().map((message) => (
-                  <>
-                    {userId === message?.author?.id ? (
-                      <ChatWrapper>
-                        <MyChatMessage>
-                          {message.message}
-                          <MyTime>{message.createdAt}</MyTime>
-                        </MyChatMessage>
-                      </ChatWrapper>
-                    ) : (
-                      <ChatWrapper>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "flex-start",
-                          }}
-                        >
-                          <ChatMessage>
-                            <span style={{ fontWeight: "bold" }}>
-                              {message?.author?.name}
-                            </span>
-                            : {message.message}
-                            <OthersTime>{message.createdAt}</OthersTime>
-                          </ChatMessage>
-                        </div>
-                      </ChatWrapper>
-                    )}
-                  </>
-                ))}
+    <>
+      <Layout>
+        <Button
+          variant="outline-light"
+          onClick={() => setShow(true)}
+          style={{
+            border: "none",
+            backgroundColor: "transparent",
+            outline: "none",
+            cursor: "pointer",
+          }}
+        >
+          <AiTwotoneMessage />
+        </Button>
+        {teamId ? (
+          <>
+            <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>{teamName}의 채팅방</Modal.Title>
+              </Modal.Header>
+              <Modal.Body
+                style={{
+                  overflow: "scroll",
+                }}
+                onScroll={onScroll}
+              >
+                {messages &&
+                  [...messages].reverse().map((message) => (
+                    <>
+                      {userId === message?.author?.id ? (
+                        <ChatWrapper>
+                          <MyChatMessage>
+                            {message.message}
+                            <MyTime>{message.createdAt}</MyTime>
+                          </MyChatMessage>
+                        </ChatWrapper>
+                      ) : (
+                        <ChatWrapper>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <ChatMessage>
+                              <span style={{ fontWeight: "bold" }}>
+                                {message?.author?.name}
+                              </span>
+                              : {message.message}
+                              <OthersTime>{message.createdAt}</OthersTime>
+                            </ChatMessage>
+                          </div>
+                        </ChatWrapper>
+                      )}
+                    </>
+                  ))}
 
-              <div ref={messagesEndRef} />
-            </Modal.Body>
-            <ChatBox
-              chat={chat}
-              teamId={teamId}
-              onChangeChat={onChangeChat}
-              onSubmitForm={onSubmitForm}
-            />
-            <Modal.Footer>
-              <Button variant="outline-dark" onClick={handleClose}>
-                닫기
-              </Button>
-            </Modal.Footer>
-          </Modal>
-          <div>Your content here</div>
-        </>
-      ) : (
-        <ErrorContainer>
-          <ErrorMessage>
-            속한 팀이 없습니다.
-            <br />
-            팀을 생성하거나 팀에 참가하세요.
-          </ErrorMessage>
-          <CustomButton to="/team/create">팀 생성</CustomButton>
-          <CustomButton to="/team/join">팀 참가하기</CustomButton>
-        </ErrorContainer>
-      )}
-    </Layout>
+                <div ref={messagesEndRef} />
+              </Modal.Body>
+              <ChatBox
+                chat={chat}
+                teamId={teamId}
+                onChangeChat={onChangeChat}
+                onSubmitForm={onSubmitForm}
+              />
+              <Modal.Footer>
+                <Button variant="outline-dark" onClick={handleClose}>
+                  닫기
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            <div>Your content here</div>
+          </>
+        ) : (
+          <ErrorContainer>
+            <ErrorMessage>
+              속한 팀이 없습니다.
+              <br />
+              팀을 생성하거나 팀에 참가하세요.
+            </ErrorMessage>
+            <CustomButton to="/team/create">팀 생성</CustomButton>
+            <CustomButton to="/team/join">팀 참가하기</CustomButton>
+          </ErrorContainer>
+        )}
+      </Layout>
+    </>
   );
 };
 
