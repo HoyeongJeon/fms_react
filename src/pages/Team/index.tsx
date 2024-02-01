@@ -62,6 +62,7 @@ interface TopPlayerType {
         memberId: number;
         userName: string;
         totalGoals: number;
+        image: string;
     }>;
 
     topAssists: Array<{
@@ -69,6 +70,7 @@ interface TopPlayerType {
         memberId: number;
         userName: string;
         totalAssists: number;
+        image: string;
     }>;
 
     topJoining: Array<{
@@ -76,6 +78,7 @@ interface TopPlayerType {
         memberId: number;
         userName: string;
         joining: number;
+        image: string;
     }>;
 
     topSave: Array<{
@@ -83,6 +86,7 @@ interface TopPlayerType {
         memberId: number;
         userName: string;
         totalSave: number;
+        image: string;
     }>;
 
     topAttactPoint: Array<{
@@ -90,6 +94,7 @@ interface TopPlayerType {
         memberId: number;
         userName: string;
         attactPoint: number;
+        image: string;
     }>;
 }
 
@@ -135,6 +140,11 @@ const Team = () => {
     const [teamGraphData, setTeamGraphData] = useState<MyResponsiveRadarType>({ data: [] });
     const [topPlaeyr, setTopPlayer] = useState<TopPlayerType>();
     const [validationMsg, setValidationMsg] = useState<string>('');
+    const [topGoalsPlayer, setTopGoalsPlayer] = useState<string>('/img/empty_profile_iamge.png');
+    const [topGamesPlayer, setTopGamesPlayer] = useState<string>('/img/empty_profile_iamge.png');
+    const [topAssistsPlayer, setTopAssistsPlayer] = useState<string>('/img/empty_profile_iamge.png');
+    const [topAttactPointPlayer, setAttactPointPlayer] = useState<string>('/img/empty_profile_iamge.png');
+    const [topSavePlayer, setTopSavePlayer] = useState<string>('/img/empty_profile_iamge.png');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -260,22 +270,50 @@ const Team = () => {
         }
     }, [teamStats?.totalGames]);
 
-    // useEffect(() => {
-    //     const normalizedData = teamGraphData.data.map((item: any) => {
-    //         const maxValue = Math.max(item.myTeam, item.avgTeam);
-
-    //         return {
-    //             stats: item.stats,
-    //             myTeam: (item.myTeam / maxValue) * 100,
-    //             avgTeam: (item.avgTeam / maxValue) * 100,
-    //         };
-    //     });
-    // }, [teamGraphData]);
-
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         navigate('/login');
     };
+
+    const getImageUrl = async (url: string) => {
+        const getUrl = await axios.get<string>(
+            `http://localhost:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
+            {
+                params: {
+                    url,
+                },
+            }
+        );
+
+        return getUrl.data;
+    };
+
+    useEffect(() => {
+        const setImage = async () => {
+            if (topPlaeyr?.topGoals[0].image) {
+                const imageUrl = await getImageUrl(topPlaeyr?.topGoals[0].image);
+                setTopGoalsPlayer(imageUrl);
+            }
+            if (topPlaeyr?.topAssists[0].image) {
+                const imageUrl = await getImageUrl(topPlaeyr?.topAssists[0].image);
+                setTopAssistsPlayer(imageUrl);
+            }
+            if (topPlaeyr?.topAttactPoint[0].image) {
+                const imageUrl = await getImageUrl(topPlaeyr?.topAttactPoint[0].image);
+                setAttactPointPlayer(imageUrl);
+            }
+            if (topPlaeyr?.topJoining[0].image) {
+                const imageUrl = await getImageUrl(topPlaeyr?.topJoining[0].image);
+                setTopGamesPlayer(imageUrl);
+            }
+            if (topPlaeyr?.topSave[0].image) {
+                const imageUrl = await getImageUrl(topPlaeyr?.topSave[0].image);
+                setTopSavePlayer(imageUrl);
+            }
+        };
+
+        setImage();
+    }, [topPlaeyr]);
 
     return (
         <Layout>
@@ -354,10 +392,7 @@ const Team = () => {
                                         <p>
                                             {index + 1}. {item.userName} {item.totalGoals}득점
                                         </p>
-                                        <Card.Img
-                                            variant="top"
-                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                                        />
+                                        <Card.Img variant="top" src={topGoalsPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
@@ -376,10 +411,7 @@ const Team = () => {
                                         <p>
                                             {index + 1}. {item.userName} {item.totalAssists}도움
                                         </p>
-                                        <Card.Img
-                                            variant="top"
-                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                                        />
+                                        <Card.Img variant="top" src={topAssistsPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
@@ -398,10 +430,7 @@ const Team = () => {
                                         <p>
                                             {index + 1}. {item.userName} {item.attactPoint}공격P
                                         </p>
-                                        <Card.Img
-                                            variant="top"
-                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                                        />
+                                        <Card.Img variant="top" src={topAttactPointPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
@@ -420,10 +449,7 @@ const Team = () => {
                                         <p>
                                             {index + 1}. {item.userName} {item.joining}경기
                                         </p>
-                                        <Card.Img
-                                            variant="top"
-                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                                        />
+                                        <Card.Img variant="top" src={topGamesPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
@@ -442,10 +468,7 @@ const Team = () => {
                                         <p>
                                             {index + 1}. {item.userName} {item.totalSave}세이브
                                         </p>
-                                        <Card.Img
-                                            variant="top"
-                                            src="https://img1.daumcdn.net/thumb/S200x200/?fname=https%3A%2F%2Ft1.daumcdn.net%2Fsports%2Fplayer%2F300%2F14%2F908372.jpg&scode=default_face_profile_big_p"
-                                        />
+                                        <Card.Img variant="top" src={topSavePlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
