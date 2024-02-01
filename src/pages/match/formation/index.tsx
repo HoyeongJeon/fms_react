@@ -339,26 +339,31 @@ const Formation = () => {
         const response = await axios.get(
           `${process.env.REACT_APP_SERVER_HOST}:${
             process.env.REACT_APP_SERVER_PORT || 3000
-          }/api/match/${matchId}/team/${homeTeamId}/members`,
+          }/api/match/team/${homeTeamId}/members`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
             },
           }
         );
-        const members: Member[] = response.data;
+        const members: Member[] = response.data.data;
+
+        console.log('members:',members);
 
         const newModalData = members.map((member: Member) => {
-          const position =
-            member.matchformation.length > 0
-              ? member.matchformation[0].position
-              : "";
+          // const position =
+          //   member.matchformation.length > 0
+          //     ? member.matchformation[0].position
+          //     : "";
+          const position = '';
           return {
             id: member.id,
             name: member.user.name,
             position: position,
           };
         });
+
+        console.log('newModalData:',newModalData);
 
         setModalData(newModalData);
       } catch (error) {
