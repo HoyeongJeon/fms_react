@@ -14,12 +14,18 @@ import {
   Title,
 } from "pages/MatchResult/styles";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTeamStore } from "store/teamStore";
 import { useUserStore } from "store/userStore";
-import { Input, Typography, Button, Flex } from "antd";
+import { Input, Typography } from "antd";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
+import { BASE_URL } from "utils/axios";
+import { useMemberStore } from "store/memberStore";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import { BiFootball } from "react-icons/bi";
+
 const { Text, Link } = Typography;
 //
 
@@ -43,8 +49,17 @@ interface Member {
 const InputMatchResult = () => {
   const [homeScore, setHomeScore] = useState(0);
   const { matchId } = useParams();
+  const location = useLocation();
+  const { matchDate } = location.state || {};
+  console.log("matchDate", matchDate);
   const { teamId, name, imageUUID } = useTeamStore();
-  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌
+  const { id: memberId } = useMemberStore();
+  const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌x
+
+  const [show, setShow] = useState(false);
+  console.log("memberData", memberData);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
   const { id: userId } = useUserStore();
   const navigate = useNavigate();
@@ -65,6 +80,7 @@ const InputMatchResult = () => {
     name: string,
     members: Member[]
   ): number | null => {
+    if (!name) return null;
     const player = members.find((member) => member.name === name);
     return player ? player.memberId : null;
   };
@@ -96,12 +112,14 @@ const InputMatchResult = () => {
   };
 
   const handleNext = async () => {
-    const substitutionsWithIds = substitution.map((sub) => ({
-      in: sub.in,
-      out: sub.out,
-      inPlayerId: getPlayerIdByName(sub.in, memberData?.data || []),
-      outPlayerId: getPlayerIdByName(sub.out, memberData?.data || []),
-    }));
+    const substitutionsWithIds = substitution
+      .filter((sub) => sub.in || sub.out) // in과 out 중 하나라도 값이 있어야 처리
+      .map((sub) => ({
+        in: sub.in,
+        out: sub.out,
+        inPlayerId: getPlayerIdByName(sub.in, memberData?.data || []),
+        outPlayerId: getPlayerIdByName(sub.out, memberData?.data || []),
+      }));
 
     const invalidSubstitution = substitutionsWithIds.find(
       (sub) =>
@@ -127,28 +145,71 @@ const InputMatchResult = () => {
     }
 
     const validSubstitutions = substitutionsWithIds
-      .filter((sub) => sub.inPlayerId && sub.outPlayerId)
+      .filter((sub) => sub.in && sub.out && sub.inPlayerId && sub.outPlayerId)
       .map(({ inPlayerId, outPlayerId }) => ({ inPlayerId, outPlayerId }));
 
     const dataToSend = {
       ...matchInfo,
       ...(validSubstitutions.length > 0 && {
-        substitutions: JSON.stringify(validSubstitutions),
+        substitions: validSubstitutions,
       }),
     };
     try {
-      //const response = await axios.post("/api/match-result", dataToSend);
-      // 성공적으로 전송되면 다음 페이지로 이동
+      console.log("dataToSend", dataToSend);
+      const response = await axios.post(
+        `${BASE_URL}/match/${matchId}/result`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("response", response);
+
       navigate(`/match/${matchId}/input/detail`);
     } catch (error) {
-      console.error("Error sending match result data", error);
+      console.log(error);
     }
   };
 
   return (
     <Layout>
+      <Button
+        variant="
+      outline-dark
+      "
+        onClick={handleShow}
+      >
+        선수 목록 <BiFootball />
+      </Button>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>선수 명단</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {memberData?.data.map((member: Member) => (
+            <div
+              key={member.memberId}
+              onClick={() => {
+                // addPlayerByName(member);
+                handleClose();
+              }}
+              style={{ cursor: "pointer", margin: "5px 0" }}
+            >
+              {member.name}
+            </div>
+          ))}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-dark" onClick={handleClose}>
+            닫기
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <ScoreboardContainer>
-        <Title>XX년 XX월 XX일 (경기장 이름) MatchID {matchId}</Title>
+        <Title>{matchDate}</Title>
         <TeamsContainer>
           <TeamBadge>
             <TeamLogo src={presignedURL} alt="작성자가 속한 팀 로고 넣어야함" />
