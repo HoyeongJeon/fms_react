@@ -56,13 +56,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // setMember(data.data.member[0]?.id);
       setMemberId(data.data.member[0]?.id);
     }
-    
+
     if (data?.data.profile) {
       setProfile(data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {
-    // clearTeamInfo();
     logout();
     navigate("/login");
   };
@@ -78,8 +77,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to={
               profileId
                 ? `/profile/${profileId}`
-                : `/profile/${userId}/register`
+                : userId
+                ? `/profile/${userId}/register`
+                : "/home"
             }
+            onClick={() => {
+              if (!profileId && !userId) {
+                alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
+                navigate("/home");
+              }
+            }}
           >
             MY PROFILE
           </StyledLink>
@@ -124,6 +131,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-function clearTeamInfo() {
-  throw new Error("Function not implemented.");
-}

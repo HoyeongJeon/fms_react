@@ -10,7 +10,7 @@ interface PlayerInfo {
   assist: number;
   yellowCards: number;
   redCards: number;
-  saves: number;
+  save: number;
 }
 
 interface PlayerInputRowProps {
@@ -81,8 +81,8 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
       <td>
         <Input
           type="number"
-          value={player.saves}
-          onChange={(e) => onPlayerChange(player.id, "saves", e.target.value)}
+          value={player.save}
+          onChange={(e) => onPlayerChange(player.id, "save", e.target.value)}
         />
       </td>
     </tr>

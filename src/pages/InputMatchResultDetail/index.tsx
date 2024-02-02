@@ -17,6 +17,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 import { Space, Typography } from "antd";
+import constructWithOptions from "styled-components/dist/constructors/constructWithOptions";
 
 const { Text, Link } = Typography;
 
@@ -27,7 +28,7 @@ interface PlayerInfo {
   assist: number;
   yellowCards: number;
   redCards: number;
-  saves: number;
+  save: number;
 }
 
 interface Member {
@@ -42,7 +43,7 @@ interface TransformedPlayer {
   goals: number;
   yellowCards: number;
   redCards: number;
-  saves: number;
+  save: number;
 }
 
 const InputMatchResultDetail = () => {
@@ -71,12 +72,13 @@ const InputMatchResultDetail = () => {
     const playersWithIds: TransformedPlayer[] = players.map((player) => ({
       name: player.name,
       memberId: getPlayerIdByName(player.name, memberData?.data || []),
-      assists: player.assist,
-      goals: player.goal,
-      yellowCards: player.yellowCards,
-      redCards: player.redCards,
-      saves: player.saves,
+      assists: player.assist, // ensure the key names match the required format
+      goals: player.goal, // ensure the key names match the required format
+      yellowCards: player.yellowCards, // ensure the key names match the required format
+      redCards: player.redCards, // ensure the key names match the required format
+      save: player.save, // ensure the key names match the required format
     }));
+
     const validPlayers = playersWithIds.filter(
       (player) => player.memberId != null
     );
@@ -101,15 +103,18 @@ const InputMatchResultDetail = () => {
       return;
     }
 
+    const playersData = validPlayers.map(({ name, ...rest }) => rest);
+
     const dataToSubmit = {
-      results: validPlayers,
+      results: playersData,
     };
+    console.log("dataToSubmit", dataToSubmit);
 
     axios
       .post(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/result/member`,
+        }/api/match/${matchId}/result/member`,
         dataToSubmit
       )
       .then((res) => {
@@ -119,6 +124,12 @@ const InputMatchResultDetail = () => {
       .catch((err) => {
         alert("오류가 발생했습니다.");
         console.log(err);
+        console.log(dataToSubmit);
+        console.log(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/match/${matchId}/result/member`
+        );
         navigate(`/match/${matchId}`);
       });
   };
@@ -146,7 +157,7 @@ const InputMatchResultDetail = () => {
         assist: 0,
         yellowCards: 0,
         redCards: 0,
-        saves: 0,
+        save: 0,
       },
     ]);
   };
@@ -173,7 +184,7 @@ const InputMatchResultDetail = () => {
         assist: 0,
         yellowCards: 0,
         redCards: 0,
-        saves: 0,
+        save: 0,
       },
     ]);
   };
