@@ -256,7 +256,8 @@ const MatchCalendar = () => {
           justifyContent: "space-between",
           alignItems: "center",
           height: "90px",
-        }}>
+        }}
+      >
         <span style={{ margin: "0 0 0 10px", alignSelf: "flex-start" }}>
           {day}
         </span>
@@ -289,6 +290,10 @@ const MatchCalendar = () => {
     return date < today;
   };
 
+  const handleMatchPreview = () => {
+    navigate("/match/preview", { state: { matchId: selectedMatchId } });
+  };
+
   return (
     <Layout>
       <h3>경기 일정</h3>
@@ -309,6 +314,9 @@ const MatchCalendar = () => {
         </Modal.Header>
         <Modal.Body>{modalContent}</Modal.Body>
         <Modal.Footer>
+          <Button variant="primary" onClick={handleMatchPreview}>
+            매치 프리뷰
+          </Button>
           <Button variant="primary" onClick={handleTacticSetting}>
             전술 설정
           </Button>

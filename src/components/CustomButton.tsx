@@ -21,9 +21,11 @@ const Button = styled.button`
   }
 `;
 
+// After
 type CustomButtonProps = {
   children: React.ReactNode;
   to: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void; // 이 부분을 변경
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({

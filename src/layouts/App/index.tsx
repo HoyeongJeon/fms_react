@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetcher
     // { dedupingInterval: 1000 * 60 * 60 * 24 }
   );
-  const { setMember } = useMemberStore();
+  const { id: memberId, setMemberId } = useMemberStore();
   const { teamId, setTeamInfo, chatId } = useTeamStore();
   const { id: userId, setUser } = useUserStore();
   const { logout } = useAuthStore();
@@ -53,14 +53,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id
       );
+      // setMember(data.data.member[0]?.id);
+      setMemberId(data.data.member[0]?.id);
     }
-    console.log("data=", data);
+
     if (data?.data.profile) {
       setProfile(data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {
-    // clearTeamInfo();
     logout();
     navigate("/login");
   };
@@ -76,8 +77,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to={
               profileId
                 ? `/profile/${profileId}`
-                : `/profile/${userId}/register`
+                : userId
+                ? `/profile/${userId}/register`
+                : "/home"
             }
+            onClick={() => {
+              if (!profileId && !userId) {
+                alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
+                navigate("/home");
+              }
+            }}
           >
             MY PROFILE
           </StyledLink>
@@ -93,9 +102,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </MenuItem>
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
-            </MenuItem>
-            <MenuItem>
-              <StyledLink to="/strategy">STRATEGY</StyledLink>
             </MenuItem>
           </>
         ) : (
@@ -125,6 +131,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-function clearTeamInfo() {
-  throw new Error("Function not implemented.");
-}

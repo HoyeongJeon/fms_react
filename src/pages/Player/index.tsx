@@ -182,7 +182,7 @@ const Player: React.FC = () => {
             <th>이메일</th>
             <th>선호 포지션</th>
             <th>나이</th>
-            <th>사진</th>
+            {/* <th>사진</th> */}
             <th>더보기</th>
           </tr>
         </thead>
@@ -196,7 +196,7 @@ const Player: React.FC = () => {
                 <td>{member.user.email}</td>
                 <td>{member.user.profile.preferredPosition}</td>
                 <td>{member.user.profile.age}</td>
-                <td>{member.user.profile.imageUrl}</td>
+                {/* <td>{member.user.profile.imageUrl}</td> */}
                 <td>
                   <button onClick={() => handleApplyButton(member)}>
                     링크
