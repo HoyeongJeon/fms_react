@@ -102,7 +102,7 @@ const Position = [
   "Left Winger",
 ];
 
-const Genders = ["Male", "Female", "Mixed"];
+const Genders = ["Male", "Female"];
 
 const RegisterProfile = () => {
   const navigate = useNavigate();
@@ -197,7 +197,6 @@ const RegisterProfile = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
 
-
     if (file) {
       setSelectedFile(file);
     } else {
@@ -243,9 +242,7 @@ const RegisterProfile = () => {
         }
       );
 
-
       if (response.status === 201) {
-
         setProfile(response.data.data);
         alert("프로필 등록이 완료되었습니다.");
         navigate("/home");

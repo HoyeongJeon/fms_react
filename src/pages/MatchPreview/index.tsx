@@ -90,9 +90,12 @@ const MatchPreview = () => {
           const matchDate = new Date(
             res.data.data.date + " " + res.data.data.time
           );
+          console.log("now= ", now);
+          console.log("matchDate= ", matchDate);
           if (now > matchDate) {
             setGameOver(true);
           }
+
           setMatchDate(res.data.data.date);
           setSoccerFieldId(res.data.data.soccer_field_id);
           setHomeTeamId(res.data.data.home_team_id);
