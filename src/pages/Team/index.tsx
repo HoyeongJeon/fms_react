@@ -235,7 +235,7 @@ const Team = () => {
             if (teamId) {
                 await getTeam();
                 await checkIfIsCreator();
-                const getMembers = await getMemberList();
+                await getMemberList();
                 await getTeamStats();
                 await getTopPlayer();
             }
@@ -317,6 +317,20 @@ const Team = () => {
 
     return (
         <Layout>
+            <div>
+                <br />
+                {/* 데이터 로딩 중이면 로딩 메시지를 표시 */}
+                {loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    /* 구단주일 경우에만 항목 표시 */
+                    isCreator && (
+                        <>
+                            <Button onClick={() => navigate('/match')}>경기 예약</Button>
+                        </>
+                    )
+                )}
+            </div>
             <ScoreboardContainer>
                 <Card className="card-div">
                     <div className="team-info-preview">
@@ -483,20 +497,6 @@ const Team = () => {
                 </Card>
                 <Card className="card-div">{players && <PlaneTable data={players} />}</Card>
             </ScoreboardContainer>
-            <Button onClick={() => navigate('/match/calendar')}>경기 일정</Button>
-            <br />
-            {/* 데이터 로딩 중이면 로딩 메시지를 표시 */}
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                /* 구단주일 경우에만 항목 표시 */
-                isCreator && (
-                    <>
-                        <Button onClick={() => navigate('/match')}>경기 예약</Button>
-                        <p>구단주만 보이는 버튼</p>
-                    </>
-                )
-            )}
         </Layout>
     );
 };
