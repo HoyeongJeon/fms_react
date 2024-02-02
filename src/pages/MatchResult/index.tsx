@@ -102,7 +102,6 @@ const MatchResult = () => {
   //   { label: "saves", home: 8, away: 12 },
   // ];
   // console.log("homeTeamInfo", homeTeamInfo);
-  // console.log("awayTeamResult", awayTeamResult);
   let data = [
     {
       label: "goal",

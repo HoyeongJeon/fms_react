@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
+import { set } from "date-fns";
+import styled from "styled-components";
 
 interface PlayerData {
   match_id: number;
@@ -39,13 +41,28 @@ interface Profile {
   gender: string;
   height: number;
   id: number;
-  imageUrl: string;
+  presignedURL: string;
   name: string;
   phone: string;
   preferredPosition: string;
   skillLevel: number;
   weight: number;
 }
+const ProfileImageWrapper = styled.div`
+  background-color: white;
+  box-shadow: 10px 10px 10px black;
+  border-radius: 100px;
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+
+  & img {
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    object-fit: cover;
+  }
+`;
 
 const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
   profileData,
@@ -63,7 +80,7 @@ const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
                 <th>키</th>
                 <th>몸무게</th>
                 <th>선호 포지션</th>
-                {/* <th>사진</th> */}
+                <th>사진</th>
                 {/* <th>실력</th> */}
               </tr>
             </thead>
@@ -75,7 +92,11 @@ const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
                 <td>{profileData.height}cm</td>
                 <td>{profileData.weight}kg</td>
                 <td> {profileData.preferredPosition}</td>
-                {/* <td> {profileData.imageUrl}</td> */}
+                <td>
+                  <ProfileImageWrapper>
+                    <img src={profileData.presignedURL} alt="프로필 이미지" />
+                  </ProfileImageWrapper>
+                </td>
                 {/* <td> {profileData.skillLevel}/10</td> */}
               </tr>
             </tbody>
@@ -96,6 +117,7 @@ const MemberDetail = () => {
   const { data: presignedURL } = useSWR(`/image/${imageUrl}`, fetcher);
 
   const { memberId } = useParams();
+  console.log("presignedURL", presignedURL);
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
@@ -112,13 +134,18 @@ const MemberDetail = () => {
             withCredentials: true,
           }
         );
-        setImageUrl(response.data.data.user.profile.imageUrl);
+        // console.log("response", response.data.data.user.profile);
+        setImageUrl(response.data.data.user.profile.imageUUID);
         const { playerstats, user } = response.data.data;
 
         // Check if user property exists in the response
         if (user) {
           const { profile } = user;
           setProfileData(profile);
+          setProfileData(() => {
+            return { ...profile, presignedURL };
+          });
+          console.log("profileData", profileData);
         } else {
           console.warn("User property not found in the API response.");
           // Handle this case based on your requirements
@@ -135,7 +162,7 @@ const MemberDetail = () => {
     };
 
     fetchMemberData();
-  }, [memberId]);
+  }, [memberId, presignedURL]);
 
   return (
     <Layout>
