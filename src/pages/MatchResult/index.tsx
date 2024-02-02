@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "layouts/App";
 
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
@@ -27,6 +27,17 @@ const mockData = [
   { label: "saves", home: 8, away: 12 },
 ];
 
+type TeamInfo = {
+  goals: any;
+  corner_kick: number;
+  free_kick: number;
+  penalty_kick: number;
+  passes: number;
+  saves: any;
+  yellow_cards: any;
+  red_cards: any;
+};
+
 const MatchResult = () => {
   // matchId를 받아서 그 경기에 출전한 home, away 팀의 정보를 가져온다.
 
@@ -35,25 +46,112 @@ const MatchResult = () => {
   const { matchId } = useParams();
   const navigate = useNavigate();
   const { teamId } = useTeamStore();
-
+  const [homeTeamId, setHomeTeamId] = useState();
+  const [awayTeamId, setAwayTeamId] = useState();
+  const [homeTeamImageUUID, setHomeTeamImageUUID] = useState();
+  const [awayTeamImageUUID, setAwayTeamImageUUID] = useState();
+  const [homeTeamInfo, setHomeTeamInfo] = useState<TeamInfo | null>();
   const { data: matchResult } = useSWR(
     `/match/${matchId}/result/team/${teamId}`,
     fetcher
   );
 
-  console.log("matchResult", matchResult);
+  const { data: awayTeamResult } = useSWR(
+    `/match/${matchId}/result/team/${awayTeamId}`,
+    fetcher
+  );
+
+  console.log("awayTeamResult", awayTeamResult);
+  const { data: homeTeam } = useSWR(`/team/${homeTeamId}`, fetcher);
+  const { data: awayTeam } = useSWR(`/team/${awayTeamId}`, fetcher);
+  const { data: homeTeamImage } = useSWR(
+    `/image/${homeTeamImageUUID}`,
+    fetcher
+  );
+  const { data: awayTeamImage } = useSWR(
+    `/image/${awayTeamImageUUID}`,
+    fetcher
+  );
+
+  useEffect(() => {
+    if (matchResult) {
+      setHomeTeamId(matchResult.data.match.home_team_id);
+      setAwayTeamId(matchResult.data.match.away_team_id);
+      setHomeTeamInfo(matchResult.data);
+    }
+  }, [matchResult, setHomeTeamId, setAwayTeamId]);
+
+  useEffect(() => {
+    setHomeTeamImageUUID(homeTeam?.team?.imageUUID);
+    setAwayTeamImageUUID(awayTeam?.team?.imageUUID);
+  }, [homeTeam, awayTeam, setHomeTeamImageUUID, setAwayTeamImageUUID]);
 
   const handleNext = () => {
     navigate("/home");
   };
+
+  // 여기부터... 골 갯수 확인하기
+
+  // const mockData = [
+  //   { label: "goal", home: 2, away: 1 },
+  //   { label: "passes", home: 5, away: 6 },
+  //   { label: "freeKick", home: 2, away: 5 },
+  //   { label: "penaltyKick", home: 0, away: 0 },
+  //   { label: "yellowCards", home: 5, away: 2 },
+  //   { label: "redCards", home: 0, away: 0 },
+  //   { label: "saves", home: 8, away: 12 },
+  // ];
+  // console.log("homeTeamInfo", homeTeamInfo);
+  // console.log("awayTeamResult", awayTeamResult);
+  let data = [
+    {
+      label: "goal",
+      home: homeTeamInfo?.goals.length,
+      away: awayTeamResult?.data.goals?.length,
+    },
+    {
+      label: "passes",
+      home: homeTeamInfo?.passes,
+      away: awayTeamResult?.data.passes,
+    },
+    {
+      label: "freeKick",
+      home: homeTeamInfo?.free_kick,
+      away: awayTeamResult?.data.free_kick,
+    },
+    {
+      label: "penaltyKick",
+      home: homeTeamInfo?.penalty_kick,
+      away: awayTeamResult?.data.penalty_kick,
+    },
+    {
+      // 여기 수정 필요 Arryay로 받아옴
+      label: "yellowCards",
+      home: homeTeamInfo?.yellow_cards.length,
+      away: awayTeamResult?.data.yellow_cards.length,
+    },
+    {
+      // 여기 수정 필요 Arryay로 받아옴
+      label: "redCards",
+      home: homeTeamInfo?.red_cards.length,
+      away: awayTeamResult?.data.red_cards.length,
+    },
+    {
+      // 여기 수정 필요 Arryay로 받아옴
+      label: "saves",
+      home: homeTeamInfo?.saves.length,
+      away: awayTeamResult?.data.saves.length,
+    },
+  ];
+  console.log("data", data);
   return (
     <Layout>
       <ScoreboardContainer>
-        <Title>XX년 XX월 XX일 (경기장 이름) MatchID {matchId}</Title>
+        <Title>{matchResult?.data.match.date}</Title>
         <TeamsContainer>
           <TeamBadge>
-            <TeamLogo src="" alt="홈 팀 로고 넣어야함" />
-            <div>홈 팀 정보 받아와서 이름 넣어야함</div>
+            <TeamLogo src={homeTeamImage} alt="홈 팀 로고" />
+            <div>{homeTeam?.team.name}</div>
           </TeamBadge>
 
           <div>
@@ -61,13 +159,12 @@ const MatchResult = () => {
           </div>
 
           <TeamBadge>
-            {/* Replace with actual image paths */}
-            <TeamLogo src="" alt="어웨이 팀 로고 넣어야함" />
-            <div>어웨이 팀 정보 받아와서 이름 넣어야함</div>
+            <TeamLogo src={awayTeamImage} alt="어웨이 팀 로고" />
+            <div>{awayTeam?.team.name}</div>
           </TeamBadge>
         </TeamsContainer>
         <Button onClick={handleNext}>Next</Button>
-        <ComparisonBarChart data={mockData} />
+        <ComparisonBarChart data={data} />
       </ScoreboardContainer>
     </Layout>
   );

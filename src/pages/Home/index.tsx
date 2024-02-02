@@ -19,6 +19,7 @@ import {
 import axios from "axios";
 import dayjs from "dayjs";
 import styled from "styled-components";
+import { useProfileStore } from "store/profileStore";
 
 export const Section = styled.section`
   margin-top: 20px;
@@ -38,6 +39,7 @@ interface Message {
 
 const Home = () => {
   const { teamId, name: teamName, chatId } = useTeamStore();
+  const { setProfile, id: profileId, resetProfile } = useProfileStore();
   const { id: userId, setUser } = useUserStore();
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.data.length) return null;
@@ -129,15 +131,18 @@ const Home = () => {
   useEffect(() => {
     if (teamId) {
       axios
-        .get(`${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/chats/${teamId}/messages`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-type": "application/json",
-          },
-          withCredentials: true,
-        })
+        .get(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/chats/${teamId}/messages`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              "Content-type": "application/json",
+            },
+            withCredentials: true,
+          }
+        )
         .then((res: any) => {
           setNextUrl(res.data?.next);
           const data: any[] = res.data.data;
@@ -178,6 +183,8 @@ const Home = () => {
       scrollToBottom();
     }
   }, [show]);
+
+  console.log("profileId= ", profileId);
 
   return (
     <>
@@ -254,15 +261,46 @@ const Home = () => {
             <div>Your content here</div>
           </>
         ) : (
-          <ErrorContainer>
-            <ErrorMessage>
-              속한 팀이 없습니다.
-              <br />
-              팀을 생성하거나 팀에 참가하세요.
-            </ErrorMessage>
-            <CustomButton to="/team/create">팀 생성</CustomButton>
-            <CustomButton to="/teamTable">팀 참가하기</CustomButton>
-          </ErrorContainer>
+          <>
+            {/* profileId가 없는 경우,  */}
+            <ErrorContainer>
+              <ErrorMessage>
+                속한 팀이 없습니다.
+                <br />
+                팀을 생성하거나 팀에 참가하세요.
+              </ErrorMessage>
+
+              {profileId ? (
+                // profileId가 있는 경우 정상적으로 링크 작동
+                <>
+                  <CustomButton to="/team/create">팀 생성</CustomButton>
+                  <CustomButton to="/teamTable">팀 참가하기</CustomButton>
+                </>
+              ) : (
+                // profileId가 없는 경우
+                <>
+                  <CustomButton
+                    to="#"
+                    onClick={(e) => {
+                      e.preventDefault(); // 링크 기본 동작 방지
+                      alert("프로필을 생성해주세요.");
+                    }}
+                  >
+                    팀 생성
+                  </CustomButton>
+                  <CustomButton
+                    to="#"
+                    onClick={(e) => {
+                      e.preventDefault(); // 링크 기본 동작 방지
+                      alert("프로필을 생성해주세요.");
+                    }}
+                  >
+                    팀 참가하기
+                  </CustomButton>
+                </>
+              )}
+            </ErrorContainer>
+          </>
         )}
       </Layout>
     </>
