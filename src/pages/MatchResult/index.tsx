@@ -17,15 +17,19 @@ import { Button } from "antd";
 import { useTeamStore } from "store/teamStore";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
-const mockData = [
-  { label: "goal", home: 2, away: 1 },
-  { label: "passes", home: 5, away: 6 },
-  { label: "freeKick", home: 2, away: 5 },
-  { label: "penaltyKick", home: 0, away: 0 },
-  { label: "yellowCards", home: 5, away: 2 },
-  { label: "redCards", home: 0, away: 0 },
-  { label: "saves", home: 8, away: 12 },
-];
+import axios from "axios";
+import { BASE_URL } from "utils/axios";
+
+// 데이터 형식
+// const mockData = [
+//   { label: "goal", home: 2, away: 1 },
+//   { label: "passes", home: 5, away: 6 },
+//   { label: "freeKick", home: 2, away: 5 },
+//   { label: "penaltyKick", home: 0, away: 0 },
+//   { label: "yellowCards", home: 5, away: 2 },
+//   { label: "redCards", home: 0, away: 0 },
+//   { label: "saves", home: 8, away: 12 },
+// ];
 
 type TeamInfo = {
   goals: any;
@@ -36,6 +40,16 @@ type TeamInfo = {
   saves: any;
   yellow_cards: any;
   red_cards: any;
+};
+
+type MatchInfo = {
+  counted_goals: number;
+  counted_red_cards: number;
+  counted_yellow_cards: number;
+  counted_saves: number;
+  free_kick: number;
+  penalty_kick: number;
+  passes: number;
 };
 
 const MatchResult = () => {
@@ -50,7 +64,10 @@ const MatchResult = () => {
   const [awayTeamId, setAwayTeamId] = useState();
   const [homeTeamImageUUID, setHomeTeamImageUUID] = useState();
   const [awayTeamImageUUID, setAwayTeamImageUUID] = useState();
-  const [homeTeamInfo, setHomeTeamInfo] = useState<TeamInfo | null>();
+  const [homeTeamInfo, setHomeTeamInfo] = useState<TeamInfo>();
+  const [home, setHome] = useState<MatchInfo>();
+  const [away, setAway] = useState<MatchInfo>();
+
   const { data: matchResult } = useSWR(
     `/match/${matchId}/result/team/${teamId}`,
     fetcher
@@ -61,7 +78,6 @@ const MatchResult = () => {
     fetcher
   );
 
-  console.log("awayTeamResult", awayTeamResult);
   const { data: homeTeam } = useSWR(`/team/${homeTeamId}`, fetcher);
   const { data: awayTeam } = useSWR(`/team/${awayTeamId}`, fetcher);
   const { data: homeTeamImage } = useSWR(
@@ -86,63 +102,66 @@ const MatchResult = () => {
     setAwayTeamImageUUID(awayTeam?.team?.imageUUID);
   }, [homeTeam, awayTeam, setHomeTeamImageUUID, setAwayTeamImageUUID]);
 
+  // 첫 화면 로딩 시 match 정보 받아옴
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/match/${matchId}/result`)
+      .then((res) => {
+        setHome(res.data.home);
+        setAway(res.data.away);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [matchId, setHome, setAway]);
+
   const handleNext = () => {
     navigate("/home");
   };
 
-  // 여기부터... 골 갯수 확인하기
-
-  // const mockData = [
-  //   { label: "goal", home: 2, away: 1 },
-  //   { label: "passes", home: 5, away: 6 },
-  //   { label: "freeKick", home: 2, away: 5 },
-  //   { label: "penaltyKick", home: 0, away: 0 },
-  //   { label: "yellowCards", home: 5, away: 2 },
-  //   { label: "redCards", home: 0, away: 0 },
-  //   { label: "saves", home: 8, away: 12 },
-  // ];
-  // console.log("homeTeamInfo", homeTeamInfo);
   let data = [
     {
       label: "goal",
-      home: homeTeamInfo?.goals.length,
-      away: awayTeamResult?.data.goals?.length,
+      home: home?.counted_goals ?? 0,
+      away: away?.counted_goals ?? 0,
     },
     {
       label: "passes",
-      home: homeTeamInfo?.passes,
-      away: awayTeamResult?.data.passes,
+      home: home?.passes ?? 0,
+      away: away?.passes ?? 0,
     },
     {
       label: "freeKick",
-      home: homeTeamInfo?.free_kick,
-      away: awayTeamResult?.data.free_kick,
+      home: home?.free_kick ?? 0,
+      away: away?.free_kick ?? 0,
     },
     {
       label: "penaltyKick",
-      home: homeTeamInfo?.penalty_kick,
-      away: awayTeamResult?.data.penalty_kick,
+      home: home?.penalty_kick ?? 0,
+      away: away?.penalty_kick ?? 0,
     },
     {
       // 여기 수정 필요 Arryay로 받아옴
       label: "yellowCards",
-      home: homeTeamInfo?.yellow_cards.length,
-      away: awayTeamResult?.data.yellow_cards.length,
+      home: home?.counted_yellow_cards ?? 0,
+      away: away?.counted_yellow_cards ?? 0,
     },
     {
       // 여기 수정 필요 Arryay로 받아옴
       label: "redCards",
-      home: homeTeamInfo?.red_cards.length,
-      away: awayTeamResult?.data.red_cards.length,
+      home: home?.counted_red_cards ?? 0,
+      away: away?.counted_red_cards ?? 0,
     },
     {
       // 여기 수정 필요 Arryay로 받아옴
       label: "saves",
-      home: homeTeamInfo?.saves.length,
-      away: awayTeamResult?.data.saves.length,
+      home: home?.counted_saves ?? 0,
+      away: away?.counted_saves ?? 0,
     },
   ];
+
   console.log("data", data);
+
   return (
     <Layout>
       <ScoreboardContainer>
