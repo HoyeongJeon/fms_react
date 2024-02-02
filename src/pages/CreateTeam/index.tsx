@@ -209,10 +209,10 @@ const CreateTeam = () => {
               onToggle={(value) => setSelectedToggle(value)}
             />
             </div>
-            <div style={{ marginLeft: "30px"}} className="right-section">
+            <div className="right-section">
               <div className="location-container">
-                <label style={{fontSize:"20px"}}  htmlFor="">연고지</label>
-                <KakaoLocation center={addressValues.center} />
+                <label style={{ fontSize: "25px"}} htmlFor="">연고지</label>
+                <KakaoLocation center={addressValues.center}/>
                 <Button variant="dark" onClick={handleClick}>
                   주소 검색
                 </Button>
@@ -221,8 +221,8 @@ const CreateTeam = () => {
                 {validationMessage}
               </div>
               <br/>
-              <Button style={{ marginTop: "10px"}} variant="dark" onClick={onClickAddButton}>
-                저장
+              <Button variant="dark" onClick={onClickAddButton}>
+                Add
               </Button>
             </div>
           </form>

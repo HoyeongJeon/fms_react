@@ -21,16 +21,16 @@
     display: flex;
     flex-direction: column;
 }
-
+  
 .left-section {
-flex: 3;
-margin-top : 50px;
-/* 필요한 경우 추가 스타일링 */
+    flex: 3;
+    margin-top: 50px;
+    /* 필요한 경우 추가 스타일링 */
 }
-
+  
 .right-section {
-flex: 1;
-margin-top : 50px;
-flex-direction: column;
-/* 필요한 경우 추가 스타일링 */
+    flex: 1;
+    margin: 50px 0 0 50px;
+    flex-direction: column;
+    /* 필요한 경우 추가 스타일링 */
 }

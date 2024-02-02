@@ -2,7 +2,8 @@ import { Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 
-const backUrl = "http://localhost:3000";
+const backUrl =  `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}`;
+
 
 const useSocket = (chatId?: number): [Socket | null, () => void, boolean] => {
   const socket = useRef<Socket | null>(null);

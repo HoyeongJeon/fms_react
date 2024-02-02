@@ -25,6 +25,8 @@ const TeamTable: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   const fetchTeams = async (page: number = 1) => {
     try {
@@ -43,9 +45,9 @@ const TeamTable: React.FC = () => {
         },
         withCredentials: true,
       });
+      console.log("response=", response);
       setTeams(response.data.data);
       setTotal(response.data.total);
-
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
       // Clear the teams array in case of an error
@@ -58,7 +60,6 @@ const TeamTable: React.FC = () => {
     const delay = setTimeout(() => {
       fetchTeams();
     }, 500);
-
 
     // Clear the timeout on component unmount or when the dependencies change
     return () => clearTimeout(delay);
@@ -81,46 +82,80 @@ const TeamTable: React.FC = () => {
       );
       setTeams(response.data.data);
       setTotal(response.data.total);
-
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
   };
 
   const [show, setShow] = useState(false);
-
-  const handleApplyButton = (team: Team) => {
-
-    setSelectedTeam(team);
-    setShowModal(true);
-    setShow(true);
-  };
   const { teamId, setTeamId } = useTeamStore();
   const { id, setUser } = useUserStore();
 
-  const handleConfirmApply = async () => {
+  const handleApplyButton = async (teamData: Team) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.post(
+      // 팀 데이터를 불러올 비동기 작업 수행
+      const teamDetails = await axios.get(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamId}/user/${id}`,
+        }/api/team/${teamData.team.id}`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
           withCredentials: true,
         }
       );
+      // 불러온 팀 데이터로 setSelectedTeam 호출
+      setSelectedTeam(teamDetails.data.team);
+      setShowModal(true);
+      setShow(true);
+    } catch (error) {
+      console.error("팀 정보를 불러오는 데 실패했습니다.", error);
+    }
+  };
 
+  const handleConfirmApply = async () => {
+    try {
+      if (selectedTeam) {
+        const accessToken = localStorage.getItem("accessToken");
 
-      setShowModal(false);
-      setSelectedTeam(null);
+        const response = await axios.post(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/team/${selectedTeam.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        );
 
-      // Refresh the page after confirmation
-      window.location.reload();
+        setShowModal(false);
+        setSelectedTeam(null);
+        setShowSuccessAlert(true);
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setShowSuccessAlert(false);
+        }, 5000);
+
+        // Refresh the page after confirmation
+        window.location.reload();
+      } else {
+        console.error("Selected Team is undefined");
+        setShowErrorAlert(true);
+
+        // Hide error message after 5 seconds
+        setTimeout(() => {
+          setShowErrorAlert(false);
+        }, 5000);
+      }
     } catch (error) {
       console.error("Error inviting member:", error);
+      setShowErrorAlert(true);
+
+      // Hide error message after 3 seconds
+      setTimeout(() => {
+        setShowErrorAlert(false);
+      }, 3000);
     }
   };
 
@@ -152,6 +187,18 @@ const TeamTable: React.FC = () => {
             </Modal.Footer>
           </Modal>
         )}
+        <div className="alert-container">
+          {showSuccessAlert && (
+            <div className="alert alert-success" role="alert">
+              팀 신청이 성공했습니다!
+            </div>
+          )}
+          {showErrorAlert && (
+            <div className="alert alert-danger" role="alert">
+              팀 신청에 실패했습니다.
+            </div>
+          )}
+        </div>
         <h2>팀 정보</h2>
         <div>
           <div className="search-container">
@@ -182,25 +229,21 @@ const TeamTable: React.FC = () => {
               <th>신청</th>
             </tr>
           </thead>
-
           <tbody>
             {teams &&
-              teams.map((team, index) => (
+              teams.map((teamData, index) => (
                 <tr key={`teamData-${index}`}>
-                  <td>{team.team.id}</td>
-                  <td>{team.team.name}</td>
-                  <td>{team.team.description}</td>
+                  <td>{teamData.team.id}</td>
+                  <td>{teamData.team.name}</td>
+                  <td>{teamData.team.description}</td>
                   <td>
-                    {/* <img
-                      src={team.team.imageUUID}
-                      alt={`${team.team.name} 로고`}
-                    /> */}
+                    {teamData.team.is_mixed_gender ? "혼성" : "단일 성별"}
                   </td>
-                  <td>{team.team.is_mixed_gender ? "혼성" : "단일 성별"}</td>
-                  <td>{team.team.gender}</td>
-                  <td>{team.totalMember}</td>
+                  <td>{teamData.team.gender}</td>
+                  <td>{teamData.totalMember}</td>
                   <td>
-                    <button onClick={() => handleApplyButton(team)}>
+                    <button
+                      onClick={async () => await handleApplyButton(teamData)}>
                       신청
                     </button>
                   </td>
@@ -208,6 +251,7 @@ const TeamTable: React.FC = () => {
               ))}
           </tbody>
         </table>
+
         <Pagination
           defaultCurrent={currentPage} // 현재 클릭한 페이지
           total={total} // 데이터 총 개수
