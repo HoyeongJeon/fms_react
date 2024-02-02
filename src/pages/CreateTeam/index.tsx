@@ -175,6 +175,7 @@ const CreateTeam = () => {
       {
         <ScoreboardContainer>
           <form className="create-team-form">
+          <div className="left-section">
             {validationMessage && (
               <Alert
                 message="에러"
@@ -207,20 +208,23 @@ const CreateTeam = () => {
               label="혼성 여부"
               onToggle={(value) => setSelectedToggle(value)}
             />
-
-            <div className="location-container">
-              <label htmlFor="">연고지</label>
-              <KakaoLocation center={addressValues.center} />
-              <Button variant="dark" onClick={handleClick}>
-                주소 검색
+            </div>
+            <div className="right-section">
+              <div className="location-container">
+                <label style={{ fontSize: "25px"}} htmlFor="">연고지</label>
+                <KakaoLocation center={addressValues.center}/>
+                <Button variant="dark" onClick={handleClick}>
+                  주소 검색
+                </Button>
+              </div>
+              <div style={{ fontSize: "12px", color: "gray" }}>
+                {validationMessage}
+              </div>
+              <br/>
+              <Button variant="dark" onClick={onClickAddButton}>
+                Add
               </Button>
             </div>
-            <div style={{ fontSize: "12px", color: "gray" }}>
-              {validationMessage}
-            </div>
-            <Button variant="dark" onClick={onClickAddButton}>
-              Add
-            </Button>
           </form>
         </ScoreboardContainer>
       }
