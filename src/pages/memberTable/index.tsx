@@ -44,7 +44,6 @@ const ProfileTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProfiles, setSelectedProfiles] = useState<number[]>([]);
-
   const fetchProfiles = async () => {
     try {
       let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
@@ -109,7 +108,6 @@ const ProfileTable = () => {
   const [show, setShow] = useState(false);
 
   const handleInviteButton = (profile: Profile) => {
-
     setSelectedProfile(profile);
     setShowModal(true);
     setShow(true);
@@ -136,8 +134,6 @@ const ProfileTable = () => {
           withCredentials: true,
         }
       );
-
-
 
       setShowModal(false);
       setSelectedProfile(null);
