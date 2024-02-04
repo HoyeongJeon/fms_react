@@ -112,12 +112,14 @@ const MemberDetail = () => {
             withCredentials: true,
           }
         );
+        console.log("response=",response);
         setImageUrl(response.data.data.user.profile.imageUrl);
         const { playerstats, user } = response.data.data;
 
         // Check if user property exists in the response
         if (user) {
           const { profile } = user;
+          console.log("profile=",profile);
           setProfileData(profile);
         } else {
           console.warn("User property not found in the API response.");

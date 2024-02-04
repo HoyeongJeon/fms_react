@@ -6,6 +6,7 @@ import "./table.css";
 import Modal from "react-bootstrap/Modal";
 import { useTeamStore } from "store/teamStore";
 import { useUserStore } from "store/userStore";
+import Geolocation from "@react-native-community/geolocation";
 
 interface Team {
   id: number;
@@ -15,8 +16,27 @@ interface Team {
   is_mixed_gender: boolean;
   gender: string;
   totalMember: number;
-  team: Team;
+  team: {
+    id: number;
+    name: string;
+    description: string;
+    imageUUID: string;
+    is_mixed_gender: boolean;
+    gender: string;
+    totalMember: number;
+    location: {
+      address: string;
+      city: string;
+      district: string;
+      state: string;
+      latitude: number;
+      longitude: number;
+    };
+    createdAt: string;
+    updatedAt: string;
+  };
 }
+
 
 const TeamTable: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -28,51 +48,84 @@ const TeamTable: React.FC = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
-  const fetchTeams = async (page: number = 1) => {
+  const fetchTeams = async (page: number = 1, query: string = "") => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
-        process.env.REACT_APP_SERVER_PORT || 3000
-      }/api/team/?page=${page}`;
-
-      // 검색어가 있는 경우 검색 쿼리 추가
-      if (searchQuery.trim() !== "") {
-        apiUrl += `&name=${searchQuery}`;
-      }
+      const userLocation = await getUserLocation();
+      const apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}&name=${query}`;
       const accessToken = localStorage.getItem("accessToken");
+  
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         withCredentials: true,
       });
-      console.log("response=", response);
-      setTeams(response.data.data);
-      setTotal(response.data.total);
+      
+      console.log("response.data.data=", response.data.data);
+  
+      const teamsData = response.data.data;
+      const filteredTeams: Team[] = [];
+  
+      teamsData.forEach((teamData: Team) => {
+        const teamLocation = teamData.team.location;
+        
+        if (teamLocation && 
+            typeof teamLocation.latitude === 'number' &&
+            typeof teamLocation.longitude === 'number' &&
+            typeof userLocation.coords.latitude === 'number' &&
+            typeof userLocation.coords.longitude === 'number') {
+      
+          console.log("Valid coordinates for distance calculation.");
+      
+          const distance = calculateDistance(
+            userLocation.coords.latitude,
+            userLocation.coords.longitude,
+            teamLocation.latitude,
+            teamLocation.longitude
+          );
+      
+          console.log("Calculated Distance:", distance);
+  
+          // Check if distance is a valid number (not NaN)
+          if (!isNaN(distance)) {
+            if (distance <= 10) {
+              filteredTeams.push(teamData);
+            }
+          } else {
+            console.error("Invalid distance:", distance);
+          }
+        } else {
+          console.error("Invalid team location data:", teamLocation);
+        }
+      });
+  
+      setTeams(filteredTeams);
+      setTotal(filteredTeams.length);
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
-      // Clear the teams array in case of an error
       setTeams([]);
       setTotal(0);
     }
   };
-
+  
   useEffect(() => {
     const delay = setTimeout(() => {
+      console.log("Fetching teams...");
       fetchTeams();
     }, 500);
-
-    // Clear the timeout on component unmount or when the dependencies change
+  
     return () => clearTimeout(delay);
   }, [currentPage, searchQuery]);
+  console.log("Current Page:", currentPage);
+  console.log("Total Teams:", total);
+
 
   const changePage = async (page: number) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
 
       const response = await axios.get(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/?page=${page || 1}&name=${searchQuery}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page || 1}&name=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -87,6 +140,29 @@ const TeamTable: React.FC = () => {
     }
   };
 
+
+  const getUserLocation = () => {
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+      Geolocation.getCurrentPosition(resolve, reject);
+    });
+  };
+
+  const calculateDistance = (
+    lat1: number, lon1: number,
+    lat2: number, lon2: number
+  ): number => {
+    const R = 6371; // 지구 반지름 (단위: km)
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // 거리 (단위: km)
+    
+    return distance;
+  };
+  
   const [show, setShow] = useState(false);
   const { teamId, setTeamId } = useTeamStore();
   const { id, setUser } = useUserStore();
@@ -95,13 +171,12 @@ const TeamTable: React.FC = () => {
     try {
       // 팀 데이터를 불러올 비동기 작업 수행
       const teamDetails = await axios.get(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamData.team.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamData.team.id}`,
         {
           withCredentials: true,
         }
       );
+      console.log("Server Response:", teamDetails);
       // 불러온 팀 데이터로 setSelectedTeam 호출
       setSelectedTeam(teamDetails.data.team);
       setShowModal(true);
@@ -117,9 +192,7 @@ const TeamTable: React.FC = () => {
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await axios.post(
-          `${process.env.REACT_APP_SERVER_HOST}:${
-            process.env.REACT_APP_SERVER_PORT || 3000
-          }/api/team/${selectedTeam.id}`,
+          `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${selectedTeam.id}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -172,6 +245,15 @@ const TeamTable: React.FC = () => {
     fetchTeams();
   };
 
+  const handleLocationButtonClick = async () => {
+    try {
+      const userLocation = await getUserLocation();
+      console.log("User location:", userLocation);
+    } catch (error) {
+      console.error("Error getting user location:", error);
+    }
+  };
+
   return (
     <Layout>
       <div>
@@ -215,6 +297,7 @@ const TeamTable: React.FC = () => {
             />
             <button onClick={handleSearchButtonClick}>검색</button>
           </div>
+          <button onClick={handleLocationButtonClick}>내 위치 확인</button>
         </div>
         <table>
           <thead>
@@ -253,6 +336,7 @@ const TeamTable: React.FC = () => {
         </table>
 
         <Pagination
+        
           defaultCurrent={currentPage} // 현재 클릭한 페이지
           total={total} // 데이터 총 개수
           defaultPageSize={5} // 페이지 당 데이터 개수
