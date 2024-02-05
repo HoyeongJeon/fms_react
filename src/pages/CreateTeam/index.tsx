@@ -11,9 +11,10 @@ import styled from "styled-components";
 import axios from "axios";
 import Layout from "layouts/App";
 import { useNavigate } from "react-router-dom";
-import { Alert } from "antd";
+import { Alert, message } from "antd";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
 import { useTeamStore } from "store/teamStore";
+
 
 const CreateTeam = () => {
   const { kakao } = window;
@@ -53,24 +54,26 @@ const CreateTeam = () => {
   }, [addressValues.roadAddress]);
 
   const searchLocation = (address: string) => {
-    const geocoder = new kakao.maps.services.Geocoder();
-
-    geocoder.addressSearch(address, (result, status) => {
-      if (status === kakao.maps.services.Status.OK) {
-        setAddressValues({
-          ...addressValues,
-          center: {
-            lat: result[0].y,
-            lng: result[0].x,
-            level: 5,
-          },
-        });
-      } else {
-        console.error("주소를 변환할 수 없습니다.");
-      }
-    });
+    // 주소가 있는 경우에만 API 호출
+    if (address) {
+      const geocoder = new kakao.maps.services.Geocoder();
+      geocoder.addressSearch(address, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          setAddressValues({
+            ...addressValues,
+            center: {
+              lat: result[0].y,
+              lng: result[0].x,
+              level: 5,
+            },
+          });
+        } else {
+          console.error("주소를 변환할 수 없습니다.");
+        }
+      });
+    }
   };
-
+  
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     open({ onComplete: completeFunc });
     e.preventDefault();
@@ -98,6 +101,7 @@ const CreateTeam = () => {
     onChange,
   };
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -119,7 +123,7 @@ const CreateTeam = () => {
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
+  
     if (
       !teamInfo.name ||
       !teamInfo.description ||
@@ -130,7 +134,7 @@ const CreateTeam = () => {
     ) {
       setValidationMessage("필수 입력값을 입력해주세요");
     }
-
+  
     const formData = new FormData();
     formData.append("name", teamInfo.name);
     formData.append("description", teamInfo.description);
@@ -141,10 +145,10 @@ const CreateTeam = () => {
     if (selectedFile) {
       formData.append("file", selectedFile);
     }
-
+  
     try {
       const accessToken = localStorage.getItem("accessToken");
-
+  
       const response = await axios.post(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
@@ -156,15 +160,15 @@ const CreateTeam = () => {
           },
         }
       );
-
+  
       if (response.status === 201) {
         setTeamId(response.data.data.id);
-        alert("팀등록이 완료되었습니다.");
+        message.success("팀등록이 완료되었습니다.");
         navigate("/home");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data.message);
+        message.error(error.response?.data.message);
         return;
       }
     }
