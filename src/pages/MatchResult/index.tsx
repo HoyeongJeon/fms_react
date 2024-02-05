@@ -160,8 +160,6 @@ const MatchResult = () => {
     },
   ];
 
-  console.log("data", data);
-
   return (
     <Layout>
       <ScoreboardContainer>
@@ -173,7 +171,8 @@ const MatchResult = () => {
           </TeamBadge>
 
           <div>
-            <Score>1</Score>:<Score>2</Score>
+            <Score>{home?.counted_goals ?? 0}</Score>:
+            <Score>{away?.counted_goals ?? 0}</Score>
           </div>
 
           <TeamBadge>
