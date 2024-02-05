@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from 'store/teamStore';
 import styled from 'styled-components';
 import './team.css';
+import MyResponsivePie from 'components/graph/MyResponsePie';
 
 const Button = styled.button`
     padding: 10px 20px;
@@ -130,6 +131,19 @@ export interface PlayersType {
     }>;
 }
 
+export const getImageUrl = async (url: string) => {
+    const getUrl = await axios.get<string>(
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
+        {
+            params: {
+                url,
+            },
+        }
+    );
+
+    return getUrl.data;
+};
+
 const Team = () => {
     const [isCreator, setIsCreator] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -160,7 +174,9 @@ const Team = () => {
         const checkIfIsCreator = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/match/creator`,
+                    `${process.env.REACT_APP_SERVER_HOST}:${
+                        process.env.REACT_APP_SERVER_PORT || 3000
+                    }/api/match/creator`,
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
@@ -179,7 +195,9 @@ const Team = () => {
         const getTeam = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}`,
+                    `${process.env.REACT_APP_SERVER_HOST}:${
+                        process.env.REACT_APP_SERVER_PORT || 3000
+                    }/api/team/${teamId}`,
                     {
                         params: {
                             teamId,
@@ -199,7 +217,9 @@ const Team = () => {
 
         const getMemberList = async () => {
             const players = await axios.get<PlayersType>(
-                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/players`
+                `${process.env.REACT_APP_SERVER_HOST}:${
+                    process.env.REACT_APP_SERVER_PORT || 3000
+                }/api/team/${teamId}/players`
             );
 
             setPlayers(players.data);
@@ -207,7 +227,9 @@ const Team = () => {
 
         const getTeamStats = async () => {
             const getStats = await axios.get<TeamStatsType>(
-                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}`,
+                `${process.env.REACT_APP_SERVER_HOST}:${
+                    process.env.REACT_APP_SERVER_PORT || 3000
+                }/api/statistics/${teamId}`,
                 {
                     params: {
                         teamId,
@@ -220,7 +242,9 @@ const Team = () => {
 
         const getTopPlayer = async () => {
             const getTopMembers = await axios.get<TopPlayerType>(
-                `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/statistics/${teamId}/top-player`,
+                `${process.env.REACT_APP_SERVER_HOST}:${
+                    process.env.REACT_APP_SERVER_PORT || 3000
+                }/api/statistics/${teamId}/top-player`,
                 {
                     params: {
                         teamId,
@@ -275,19 +299,6 @@ const Team = () => {
         navigate('/login');
     };
 
-    const getImageUrl = async (url: string) => {
-        const getUrl = await axios.get<string>(
-            `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
-            {
-                params: {
-                    url,
-                },
-            }
-        );
-
-        return getUrl.data;
-    };
-
     useEffect(() => {
         const setImage = async () => {
             if (topPlaeyr?.topGoals[0]?.image) {
@@ -315,6 +326,21 @@ const Team = () => {
         setImage();
     }, [topPlaeyr]);
 
+    const data = [
+        {
+            id: 'ruby',
+            label: 'ruby',
+            value: 431,
+            color: 'hsl(126, 70%, 50%)',
+        },
+        {
+            id: 'c',
+            label: 'c',
+            value: 189,
+            color: 'hsl(116, 70%, 50%)',
+        },
+    ];
+
     return (
         <Layout>
             <div>
@@ -334,7 +360,7 @@ const Team = () => {
             <ScoreboardContainer>
                 <Card className="card-div">
                     <div className="team-info-preview">
-                        <ImageView />
+                        <ImageView imageUUID={temaData?.imageUUID} />
                         <div className="team-div">
                             <div className="team-child-div">
                                 {temaData && <TitleText title={temaData.name} />}
