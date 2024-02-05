@@ -134,6 +134,7 @@ const MemberDetail = () => {
             withCredentials: true,
           }
         );
+        console.log("response=",response);
         // console.log("response", response.data.data.user.profile);
         setImageUrl(response.data.data.user.profile.imageUUID);
         const { playerstats, user } = response.data.data;
@@ -141,6 +142,7 @@ const MemberDetail = () => {
         // Check if user property exists in the response
         if (user) {
           const { profile } = user;
+          console.log("profile=",profile);
           setProfileData(profile);
           setProfileData(() => {
             return { ...profile, presignedURL };

@@ -98,6 +98,7 @@ const CreateTeam = () => {
     onChange,
   };
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
