@@ -20,6 +20,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import styled from "styled-components";
 import { useProfileStore } from "store/profileStore";
+import constructWithOptions from "styled-components/dist/constructors/constructWithOptions";
 
 export const Section = styled.section`
   margin-top: 20px;
@@ -55,9 +56,9 @@ const Home = () => {
     setSize,
     isValidating,
   } = useSWRInfinite(getKey, fetcher);
-  const isEmpty = chatData?.[0]?.data?.length === 0;
+  const isEmpty = chatData?.[chatData?.length - 1].data.length === 0;
   const isReachingEnd =
-    isEmpty || (chatData && chatData[chatData.length - 1]?.data?.length < 20);
+    isEmpty || (chatData && chatData[chatData.length - 1].length < 30);
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -68,23 +69,35 @@ const Home = () => {
   const [nextUrl, setNextUrl] = useState<string>("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null); // 스크롤을 위한 ref 생성
+  const [total, setTotal] = useState(0);
 
   const onScroll = useCallback(
     (e: React.UIEvent<HTMLElement>) => {
       const scrollable = e.currentTarget;
       if (scrollable.scrollTop === 0 && !isReachingEnd && !isValidating) {
-        setSize((size) => size + 1); // This will load the next page
-        const data = chatData?.flat().reverse()[0];
+        setSize((size) => size + 1);
+
+        const data = chatData?.reverse()[0];
         const formattedData = data.data.map((msg: any) => {
           return {
             ...msg,
             createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
           };
         });
-        setMessages((messages) => [...messages, ...formattedData]);
+
+        // 중복되지 않는 메시지만 추가
+        setMessages((currentMessages) => {
+          const currentMessageIds = new Set(
+            currentMessages.map((msg) => msg.id)
+          );
+          const newMessages = formattedData.filter(
+            (msg: Message) => !currentMessageIds.has(msg.id)
+          );
+          return [...currentMessages, ...newMessages];
+        });
       }
     },
-    [setSize, isReachingEnd, isValidating]
+    [setSize, isReachingEnd, isValidating, chatData]
   );
 
   const scrollToBottom = () => {
@@ -157,14 +170,14 @@ const Home = () => {
             const newMessages = formattedData.filter(
               (msg) => !messageIds.has(msg.id)
             );
-            return [...currentMessages, ...newMessages];
+            return [...newMessages];
           });
         })
         .catch((err: any) => {
           console.log("err= ", err);
         });
     }
-  }, [teamId, setMessages]);
+  }, [teamId]);
 
   // 메세지 받은 경우 화면 리렌더링
   useEffect(() => {
@@ -183,8 +196,6 @@ const Home = () => {
       scrollToBottom();
     }
   }, [show]);
-
-  console.log("profileId= ", profileId);
 
   return (
     <>
