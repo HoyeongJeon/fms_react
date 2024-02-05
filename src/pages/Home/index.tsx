@@ -1,25 +1,27 @@
-import Layout from "layouts/App";
-import { useTeamStore } from "store/teamStore";
-import CustomButton from "components/CustomButton";
-import { ErrorContainer, ErrorMessage, MyTime, OthersTime } from "./styles";
-import { AiTwotoneMessage } from "react-icons/ai";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import axios from "axios";
 import ChatBox from "components/ChatBox";
-import useSocket from "utils/useSocket";
-import useSWRInfinite from "swr/infinite";
-import fetcher from "utils/fetcher";
-import { useUserStore } from "store/userStore";
 import {
   ChatMessage,
   ChatWrapper,
   MyChatMessage,
 } from "components/ChatList/styles";
-import axios from "axios";
+import CustomButton from "components/CustomButton";
 import dayjs from "dayjs";
-import styled from "styled-components";
+import Layout from "layouts/App";
+import { TeamStatsType } from "pages/Team";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import { AiTwotoneMessage } from "react-icons/ai";
 import { useProfileStore } from "store/profileStore";
+import { useTeamStore } from "store/teamStore";
+import { useUserStore } from "store/userStore";
+import styled from "styled-components";
+import useSWRInfinite from "swr/infinite";
+import fetcher from "utils/fetcher";
+import useSocket from "utils/useSocket";
+import { ErrorContainer, ErrorMessage, MyTime, OthersTime } from "./styles";
+import BasicPie from "components/graph/BasicPie";
 import constructWithOptions from "styled-components/dist/constructors/constructWithOptions";
 
 export const Section = styled.section`
@@ -40,6 +42,8 @@ interface Message {
 
 const Home = () => {
   const { teamId, name: teamName, chatId } = useTeamStore();
+  const [teamWinningRate, setTeamWinningRate] = useState<TeamStatsType>();
+  const [rate, setRate] = useState<number>(0);
   const { setProfile, id: profileId, resetProfile } = useProfileStore();
   const { id: userId, setUser } = useUserStore();
   const getKey = (pageIndex: number, previousPageData: any) => {
@@ -197,6 +201,35 @@ const Home = () => {
     }
   }, [show]);
 
+  console.log("profileId= ", profileId);
+
+  useEffect(() => {
+    const getWinningRate = async () => {
+      const resultRate = await axios.get<TeamStatsType>(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/statistics/${teamId}`,
+        {
+          params: {
+            teamId,
+          },
+        }
+      );
+
+      setTeamWinningRate(resultRate.data);
+    };
+
+    getWinningRate();
+  }, [teamId]);
+
+  useEffect(() => {
+    if (teamWinningRate?.wins && teamWinningRate?.totalGames) {
+      setRate(
+        Math.floor((teamWinningRate?.wins / teamWinningRate?.totalGames) * 100)
+      );
+    }
+  }, [teamWinningRate]);
+
   return (
     <>
       <Layout>
@@ -270,6 +303,16 @@ const Home = () => {
               </Modal.Footer>
             </Modal>
             <div>Your content here</div>
+            <div>
+              <div>
+                <h3>팀 승률</h3>
+                <h5>
+                  {teamWinningRate?.wins ?? 0}승 {teamWinningRate?.draws ?? 0}무{" "}
+                  {teamWinningRate?.loses ?? 0}패 {rate}%
+                </h5>
+                <BasicPie data={teamWinningRate} />
+              </div>
+            </div>
           </>
         ) : (
           <>
