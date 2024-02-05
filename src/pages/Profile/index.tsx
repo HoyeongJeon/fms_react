@@ -64,7 +64,7 @@ const ProfileImageWrapper = styled.div`
 
 const Profile = () => {
   const { name } = useUserStore();
-  const { id, gender, preferredPosition, height, weight, imageUUID } =
+  const { id, gender, preferredPosition, height, weight, imageUUID, age } =
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
   return (
@@ -84,6 +84,11 @@ const Profile = () => {
               <ListGroup.Item>
                 <span>성별: </span>
                 {gender}
+              </ListGroup.Item>
+              <br />
+              <ListGroup.Item>
+                <span>나이: </span>
+                {age}
               </ListGroup.Item>
               <br />
 
