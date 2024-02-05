@@ -60,44 +60,25 @@ const TeamTable: React.FC = () => {
         },
         withCredentials: true,
       });
-      
+  
       console.log("response.data.data=", response.data.data);
   
       const teamsData = response.data.data;
-      const filteredTeams: Team[] = [];
   
-      teamsData.forEach((teamData: Team) => {
-        const teamLocation = teamData.team.location;
-        
-        if (teamLocation && 
-            typeof teamLocation.latitude === 'number' &&
-            typeof teamLocation.longitude === 'number' &&
-            typeof userLocation.coords.latitude === 'number' &&
-            typeof userLocation.coords.longitude === 'number') {
-      
-          console.log("Valid coordinates for distance calculation.");
-      
-          const distance = calculateDistance(
-            userLocation.coords.latitude,
-            userLocation.coords.longitude,
-            teamLocation.latitude,
-            teamLocation.longitude
-          );
-      
-          console.log("Calculated Distance:", distance);
-  
-          // Check if distance is a valid number (not NaN)
-          if (!isNaN(distance)) {
-            if (distance <= 10) {
-              filteredTeams.push(teamData);
-            }
-          } else {
-            console.error("Invalid distance:", distance);
-          }
+      // teamsData 배열을 순회하면서 올바른 팀 데이터를 추출하여 teams 배열에 추가
+      const teams = teamsData.map((data: { team: any; totalMember: any; }) => {
+        if (data.team) {
+          return {
+            team: data.team,
+            totalMember: data.totalMember,
+          };
         } else {
-          console.error("Invalid team location data:", teamLocation);
+          return null; // team이 없는 경우, 적절한 처리를 수행할 수 있습니다.
         }
       });
+  
+      // teams 배열에 존재하는 유효한 팀 데이터만 필터링
+      const filteredTeams = teams.filter((team: null) => team !== null);
   
       setTeams(filteredTeams);
       setTotal(filteredTeams.length);
@@ -249,10 +230,30 @@ const TeamTable: React.FC = () => {
     try {
       const userLocation = await getUserLocation();
       console.log("User location:", userLocation);
+  
+      // 위도와 경도를 이용하여 주소로 변환하는 Kakao Maps API 요청
+      const apiUrl = `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${userLocation.coords.longitude}&y=${userLocation.coords.latitude}`;
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `KakaoAK ${process.env.REACT_APP_MAP_KEY}`,
+        },
+      });
+      const data = await response.json();
+  
+      if (data.documents && data.documents.length > 0) {
+        const address = data.documents[0].address_name;
+        alert('현재 위치: ' + address);
+      } else {
+        alert('주소를 찾을 수 없습니다.');
+      }
     } catch (error) {
       console.error("Error getting user location:", error);
+      alert('위치 정보를 가져오는 데 실패했습니다.');
     }
   };
+  
+  
+  
 
   return (
     <Layout>
@@ -309,6 +310,7 @@ const TeamTable: React.FC = () => {
               <th>혼성 여부</th>
               <th>성별</th>
               <th>인원수</th>
+              <th>주소</th>
               <th>신청</th>
             </tr>
           </thead>
@@ -324,6 +326,7 @@ const TeamTable: React.FC = () => {
                   </td>
                   <td>{teamData.team.gender}</td>
                   <td>{teamData.totalMember}</td>
+                  <td>{teamData.team.location.address}</td>
                   <td>
                     <button
                       onClick={async () => await handleApplyButton(teamData)}>

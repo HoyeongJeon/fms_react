@@ -205,7 +205,7 @@ const EditProfile = () => {
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
+  
     if (
       !profile.birthdate ||
       !profile.height ||
@@ -215,30 +215,28 @@ const EditProfile = () => {
       setValidationMessage("필수 입력값을 입력해주세요");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("height", profile.height);
-    formData.append("weight", profile.weight);
-    formData.append("preferredPosition", profile.preferredPosition);
-    formData.append("birthdate", profile.birthdate);
-
+  
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/profile/${profileId}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/${profileId}`,
         {
-          ...formData,
+          height: profile.height,
+          weight: profile.weight,
+          preferredPosition: profile.preferredPosition,
+          birthdate: profile.birthdate,
           latitude: profile.location.latitude,
           longitude: profile.location.longitude,
         },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json', 
           },
         }
       );
-      console.log("response=",response)
+  
+      console.log("response=", response);
+  
       if (response.status === 200) {
         setProfile(response.data.data);
         alert("프로필 수정이 완료되었습니다.");
@@ -251,6 +249,7 @@ const EditProfile = () => {
       }
     }
   };
+  
 
   useEffect(() => {
     // Kakao 지도 API 로드 여부 확인
