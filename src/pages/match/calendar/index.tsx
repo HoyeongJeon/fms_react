@@ -6,7 +6,7 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // 날짜 선택기 스타일
 import { ko } from "date-fns/locale";
-import { format } from "date-fns";
+import { format, isMatch } from "date-fns";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -111,7 +111,7 @@ const DatePickerContainer = styled.div`
 const MatchCalendar = () => {
   const navigate = useNavigate();
 
-  const [teamId, setTeamId] = useState<string>("");
+  const [teamId, setTeamId] = useState<number | undefined>();
   const [startDate, setStartDate] = useState(new Date());
   const [eventDates, setEventDates] = useState<EventDates>({});
   const [schedules, setScheldules] = useState<schelduleInfo[]>([]);
@@ -201,8 +201,31 @@ const MatchCalendar = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>("");
 
-  const handleDayClick = (date: Date) => {
+  const fetchMatchResult = async (matchId: number) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/match/${matchId}/result/exist`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+          },
+        }
+      );
+      const result = response.data.data;
+      return result;
+    } catch (error) {
+      console.error("데이터 불러오기 실패:", error);
+    }
+  };
+
+  const [isMatchEnd, setIsMatchEnd] = useState<boolean>(false);
+  const handleDayClick = async (date: Date) => {
     const formattedDate = format(date, "yyyy-MM-dd");
+
+    const isMatchEnd = await fetchMatchResult(selectedMatchId);
+    isMatchEnd ? setIsMatchEnd(true) : setIsMatchEnd(false);
 
     // 선택된 날짜에 해당하는 스케줄 찾기
     const daySchedules = schedules.filter((sch) => sch.date === formattedDate);
@@ -294,6 +317,10 @@ const MatchCalendar = () => {
     navigate("/match/preview", { state: { matchId: selectedMatchId } });
   };
 
+  const handleMatchReview = () => {
+    navigate("/match/result", { state: { matchId: selectedMatchId } });
+  };
+
   return (
     <Layout>
       <h3>경기 일정</h3>
@@ -315,7 +342,7 @@ const MatchCalendar = () => {
         <Modal.Body>{modalContent}</Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleMatchPreview}>
-            매치 프리뷰
+            매치 정보
           </Button>
           <Button variant="primary" onClick={handleTacticSetting}>
             전술 설정
