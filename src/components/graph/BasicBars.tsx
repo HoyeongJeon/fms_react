@@ -4,6 +4,8 @@ import { YellowAndRedCardsType } from 'pages/Team';
 export default function BasicBars(props: YellowAndRedCardsType) {
     const colors = ['#FFC107', '#FF0000'];
 
+    console.log('basic bar 진입');
+    console.log(props.yellowAndRedCards);
     const date = props.yellowAndRedCards.map((item) => {
         return item.created;
     });
