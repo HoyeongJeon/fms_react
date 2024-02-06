@@ -442,10 +442,14 @@ const Team = () => {
                 </Card>
                 <Card className="card-div">
                     <TitleText title="시즌통계" />
+                    {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                     <div className="team-info-graph">
-                        {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                         <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar>
-                        <BasicBars yellowAndRedCards={yellowAndRedCards?.yellowAndRedCards ?? []} />
+                        {yellowAndRedCards?.yellowAndRedCards ? (
+                            <BasicBars yellowAndRedCards={yellowAndRedCards?.yellowAndRedCards ?? []} />
+                        ) : (
+                            <p>카드 수집정보를 가져오고 있습니다.</p>
+                        )}
                     </div>
                 </Card>
                 <Card className="card-div">
