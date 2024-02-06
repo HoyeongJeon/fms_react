@@ -15,17 +15,25 @@ type Profile = {
   height: string;
   weight: string;
   preferredPosition: string;
-  birthdate: string;
+  //birthdate: string;
   location: {
-    latitude: number;
-    longitude: number;
+    latitude: string;
+    longitude: string;
+    // state:string;
+    city: string;
+    district: string;
+    address: string;
   };
-  [key: string]: string | { latitude: number; longitude: number } | undefined;
+  [key: string]: string | { latitude: string; longitude: string } | undefined;
 };
 
 type ProfileLocation = {
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
+  //state:string;
+  city: string;
+  district: string;
+  address: string;
 };
 
 type DaumPostcodeData = {
@@ -110,13 +118,20 @@ const EditProfile = () => {
     height: "",
     weight: "",
     preferredPosition: "",
-    birthdate: "",
-    location: { latitude: 0, longitude: 0 },
+    //birthdate: "",
+    location: {
+      latitude: "",
+      longitude: "",
+      //state: "",
+      city: "",
+      district: "",
+      address: "",
+    },
   } as Profile);
 
   const [location, setLocation] = useState<ProfileLocation>({
-    latitude: 0,
-    longitude: 0,
+    latitude: "",
+    longitude: "",
   } as ProfileLocation);
 
   const [kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
@@ -142,15 +157,15 @@ const EditProfile = () => {
     }));
   };
 
-  const handleDateChange = (date: Date | null) => {
-    if (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      setProfile((prevProfile) => ({
-        ...prevProfile,
-        birthdate: formattedDate,
-      }));
-    }
-  };
+  // const handleDateChange = (date: Date | null) => {
+  //   if (date) {
+  //     const formattedDate = date.toISOString().split("T")[0];
+  //     setProfile((prevProfile) => ({
+  //       ...prevProfile,
+  //       birthdate: formattedDate,
+  //     }));
+  //   }
+  // };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -177,20 +192,6 @@ const EditProfile = () => {
     console.log("Map clicked");
     console.log("Latitude:", lat);
     console.log("Longitude:", lng);
-
-    // Update the state or perform any other actions as needed
-    setLocation({
-      latitude: lat,
-      longitude: lng,
-    });
-
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      location: {
-        latitude: lat,
-        longitude: lng,
-      },
-    }));
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -201,42 +202,46 @@ const EditProfile = () => {
     open({ onComplete: completeFunc });
     e.preventDefault();
   };
-  
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-  
+    console.log("profile=", profile);
     if (
-      !profile.birthdate ||
+      //!profile.birthdate ||
       !profile.height ||
       !profile.weight ||
-      !profile.preferredPosition
+      !profile.preferredPosition ||
+      !profile.location
     ) {
       setValidationMessage("필수 입력값을 입력해주세요");
       return;
     }
-  
+
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/${profileId}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/profile/${profileId}`,
         {
           height: profile.height,
           weight: profile.weight,
           preferredPosition: profile.preferredPosition,
-          birthdate: profile.birthdate,
           latitude: profile.location.latitude,
           longitude: profile.location.longitude,
+          city: profile.location.city,
+          district: profile.location.district,
+          address: profile.location.address,
         },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json', 
+            "Content-Type": "application/json",
           },
         }
       );
-  
+
       console.log("response=", response);
-  
+
       if (response.status === 200) {
         setProfile(response.data.data);
         alert("프로필 수정이 완료되었습니다.");
@@ -249,7 +254,6 @@ const EditProfile = () => {
       }
     }
   };
-  
 
   useEffect(() => {
     // Kakao 지도 API 로드 여부 확인
@@ -290,9 +294,22 @@ const EditProfile = () => {
             },
           });
           setLocation({
-            latitude: Number(result[0].road_address.y),
-            longitude: Number(result[0].road_address.x),
+            latitude: result[0].road_address.y,
+            longitude: result[0].road_address.x,
+            city: result[0].road_address.region_1depth_name,
+            district: result[0].road_address.region_2depth_name,
+            address: result[0].road_address.address_name,
           });
+          setProfile((prevProfile) => ({
+            ...prevProfile,
+            location: {
+              latitude: result[0].road_address.y,
+              longitude: result[0].road_address.x,
+              city: result[0].road_address.region_1depth_name,
+              district: result[0].road_address.region_2depth_name,
+              address: result[0].road_address.address_name,
+            },
+          }));
         } else {
           console.error("주소를 변환할 수 없습니다.");
         }
@@ -319,10 +336,7 @@ const EditProfile = () => {
               descLabel="프로필 사진을 등록해주세요"
               changedFunc={handleFileChange}
             />
-            <Button
-              onClick={handleClick}
-              disabled={!kakaoMapLoaded} 
-            >
+            <Button onClick={handleClick} disabled={!kakaoMapLoaded}>
               Open Map
             </Button>
 
@@ -358,18 +372,6 @@ const EditProfile = () => {
                       </option>
                     ))}
                   </Select>
-                );
-              } else if (key === "birthdate") {
-                return (
-                  <DatePicker
-                    key={key}
-                    selected={
-                      profile.birthdate ? new Date(profile.birthdate) : null
-                    }
-                    onChange={(date) => handleDateChange(date)}
-                    dateFormat="yyyy-MM-dd"
-                    placeholderText="생일을 선택하세요"
-                  />
                 );
               } else if (key !== "location") {
                 // location 필드는 제외

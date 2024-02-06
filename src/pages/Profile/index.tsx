@@ -10,14 +10,22 @@ import ListGroup from "react-bootstrap/ListGroup";
 import { LinkContainer } from "pages/SignUp/styles";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
+import { Map, MapMarker } from "react-kakao-maps-sdk";
 
 type Profile = {
-  age: string;
   height: string;
   weight: string;
   preferredPosition: string;
-  gender: string;
-  [key: string]: string;
+  //birthdate: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    // state:string;
+    city: string;
+    district: string;
+    address: string;
+  };
+  [key: string]: string | { latitude: number; longitude: number } | undefined | number;
 };
 
 const Wrapper = styled.div`
@@ -62,26 +70,29 @@ const MapContainer = styled.div`
 
 const Profile = () => {
   const { name } = useUserStore();
-  const { id, gender, preferredPosition, height, weight, imageUUID } =
+  const { id, gender, preferredPosition, height, weight, imageUUID, location } =
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
 
   useEffect(() => {
+    const USER_LATITUDE = location.latitude;
+    const USER_LONGITUDE = location.longitude;
+
     const container = document.getElementById("kakao-map")!;
     const options = {
-      center: new window.kakao.maps.LatLng(37.5665, 126.9780), // Set initial coordinates
-      level: 3, // Set initial zoom level
+      center: new window.kakao.maps.LatLng( USER_LATITUDE,
+        USER_LONGITUDE), 
+      level: 3,
     };
     const map = new window.kakao.maps.Map(container, options);
-  
-    // Replace USER_LATITUDE and USER_LONGITUDE with actual coordinates
-    const USER_LATITUDE = 37.5665;
-    const USER_LONGITUDE = 126.9780;
-    const markerPosition = new window.kakao.maps.LatLng(USER_LATITUDE, USER_LONGITUDE);
+
+    const markerPosition = new window.kakao.maps.LatLng(
+      USER_LATITUDE,
+      USER_LONGITUDE
+    );
     const marker = new window.kakao.maps.Marker({ position: markerPosition });
     marker.setMap(map);
-  }, []);
-  
+  }, [location]);
 
   return (
     <Layout>
