@@ -1,7 +1,7 @@
 import { PieChart } from '@mui/x-charts/PieChart';
 
 export default function BasicPie(props: any) {
-    if (props.data && props.data.tatalGames) {
+    if (props.data && props.data.totalGames) {
         return (
             <PieChart
                 series={[
