@@ -19,3 +19,8 @@
 .team-info-preview {
     /* width: 300px; */
 }
+
+.team-info-graph {
+    display: flex;
+    justify-content: space-between;
+}
