@@ -12,6 +12,7 @@ interface ProfileStore {
     latitude: number;
     longitude: number;
     city: string;
+    dong: string;
     district: string;
     address: string;
   };
@@ -31,6 +32,7 @@ export const useProfileStore = create<ProfileStore>((set) => ({
     longitude: 0,
     //state: "",
     city: "",
+    dong: "",
     district: "",
     address: "",
   },

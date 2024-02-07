@@ -22,6 +22,7 @@ type Profile = {
     // state:string;
     city: string;
     district: string;
+    dong: string;
     address: string;
   };
   [key: string]: string | { latitude: string; longitude: string } | undefined;
@@ -33,6 +34,7 @@ type ProfileLocation = {
   //state:string;
   city: string;
   district: string;
+  dong: string;
   address: string;
 };
 
@@ -125,6 +127,7 @@ const EditProfile = () => {
       //state: "",
       city: "",
       district: "",
+      dong:"",
       address: "",
     },
   } as Profile);
@@ -230,6 +233,7 @@ const EditProfile = () => {
           longitude: profile.location.longitude,
           city: profile.location.city,
           district: profile.location.district,
+          dong: profile.location.dong,
           address: profile.location.address,
         },
         {
@@ -298,6 +302,7 @@ const EditProfile = () => {
             longitude: result[0].road_address.x,
             city: result[0].road_address.region_1depth_name,
             district: result[0].road_address.region_2depth_name,
+            dong: result[0].road_address.region_3depth_name,
             address: result[0].road_address.address_name,
           });
           setProfile((prevProfile) => ({
@@ -307,6 +312,7 @@ const EditProfile = () => {
               longitude: result[0].road_address.x,
               city: result[0].road_address.region_1depth_name,
               district: result[0].road_address.region_2depth_name,
+              dong: result[0].road_address.region_3depth_name,
               address: result[0].road_address.address_name,
             },
           }));
