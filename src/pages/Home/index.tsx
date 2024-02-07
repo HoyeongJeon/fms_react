@@ -69,7 +69,7 @@ const Home = () => {
     setSize,
     isValidating,
   } = useSWRInfinite(getKey, fetcher);
-  const isEmpty = chatData?.[chatData?.length - 1].data.length === 0;
+  const isEmpty = chatData?.[chatData?.length - 1].data?.length === 0;
   const isReachingEnd =
     isEmpty || (chatData && chatData[chatData.length - 1].length < 30);
 
@@ -240,29 +240,23 @@ const Home = () => {
 
   const chatSections = makeSection(messages ? [...messages].reverse() : []);
 
-  Object.entries(chatSections).map(([date, chats]) => {
-    chats.reverse().map((message) => {
-      console.log("message2= ", message);
-    });
-  });
-
   return (
     <>
       <Layout>
-        <Button
-          variant="outline-light"
-          onClick={() => setShow(true)}
-          style={{
-            border: "none",
-            backgroundColor: "transparent",
-            outline: "none",
-            cursor: "pointer",
-          }}
-        >
-          <AiTwotoneMessage />
-        </Button>
         {teamId ? (
           <>
+            <Button
+              variant="outline-light"
+              onClick={() => setShow(true)}
+              style={{
+                border: "none",
+                backgroundColor: "transparent",
+                outline: "none",
+                cursor: "pointer",
+              }}
+            >
+              <AiTwotoneMessage />
+            </Button>
             <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
               <Modal.Header closeButton>
                 <Modal.Title>{teamName}의 채팅방</Modal.Title>
