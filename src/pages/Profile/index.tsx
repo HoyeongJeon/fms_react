@@ -70,7 +70,9 @@ const MapContainer = styled.div`
 
 const Profile = () => {
   const { name } = useUserStore();
+
   const { id, gender, preferredPosition, height, weight, imageUUID, location } =
+
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
 
@@ -113,6 +115,7 @@ const Profile = () => {
                 {gender}
               </ListGroup.Item>
               <br />
+
               <ListGroup.Item>
                 <span>선호 포지션: </span>
                 {preferredPosition}

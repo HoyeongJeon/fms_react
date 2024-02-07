@@ -108,8 +108,8 @@ const InputMatchResultDetail = () => {
     const dataToSubmit = {
       results: playersData,
     };
-    console.log("dataToSubmit", dataToSubmit);
 
+    console.log("선수 상세 정보 등록", dataToSubmit);
     axios
       .post(
         `${process.env.REACT_APP_SERVER_HOST}:${

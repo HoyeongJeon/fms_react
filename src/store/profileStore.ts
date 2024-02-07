@@ -7,6 +7,7 @@ interface ProfileStore {
   preferredPosition: string;
   height: number;
   weight: number;
+  age: number;
   imageUUID: string;
   location: {
     latitude: number;
@@ -26,6 +27,7 @@ export const useProfileStore = create<ProfileStore>((set) => ({
   preferredPosition: "",
   height: 0,
   weight: 0,
+  age: 0,
   imageUUID: "",
   location: {
     latitude: 0,
