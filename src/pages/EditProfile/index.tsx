@@ -19,10 +19,9 @@ type Profile = {
   location: {
     latitude: string;
     longitude: string;
-    // state:string;
+     state:string;
     city: string;
     district: string;
-    dong: string;
     address: string;
   };
   [key: string]: string | { latitude: string; longitude: string } | undefined;
@@ -31,10 +30,9 @@ type Profile = {
 type ProfileLocation = {
   latitude: string;
   longitude: string;
-  //state:string;
+  state:string;
   city: string;
   district: string;
-  dong: string;
   address: string;
 };
 
@@ -124,10 +122,9 @@ const EditProfile = () => {
     location: {
       latitude: "",
       longitude: "",
-      //state: "",
+      state: "",
       city: "",
       district: "",
-      dong:"",
       address: "",
     },
   } as Profile);
@@ -233,7 +230,7 @@ const EditProfile = () => {
           longitude: profile.location.longitude,
           city: profile.location.city,
           district: profile.location.district,
-          dong: profile.location.dong,
+          state: profile.location.state,
           address: profile.location.address,
         },
         {
@@ -300,9 +297,9 @@ const EditProfile = () => {
           setLocation({
             latitude: result[0].road_address.y,
             longitude: result[0].road_address.x,
-            city: result[0].road_address.region_1depth_name,
-            district: result[0].road_address.region_2depth_name,
-            dong: result[0].road_address.region_3depth_name,
+            state: result[0].road_address.region_1depth_name,
+            city: result[0].road_address.region_2depth_name,
+            district: result[0].road_address.region_3depth_name,
             address: result[0].road_address.address_name,
           });
           setProfile((prevProfile) => ({
@@ -310,9 +307,9 @@ const EditProfile = () => {
             location: {
               latitude: result[0].road_address.y,
               longitude: result[0].road_address.x,
-              city: result[0].road_address.region_1depth_name,
-              district: result[0].road_address.region_2depth_name,
-              dong: result[0].road_address.region_3depth_name,
+              state: result[0].road_address.region_1depth_name,
+              city: result[0].road_address.region_2depth_name,
+              district: result[0].road_address.region_3depth_name,
               address: result[0].road_address.address_name,
             },
           }));
