@@ -95,10 +95,9 @@ const Home = () => {
           return {
             ...msg,
             createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
-            updatedAt: dayjs.utc(msg.updatedAt).add(6, "hour").format(),
+            updatedAt: dayjs.utc(msg.updatedAt).subtract(6, "hour").format(),
           };
         });
-
         // 중복되지 않는 메시지만 추가
         setMessages((currentMessages) => {
           const currentMessageIds = new Set(
@@ -141,12 +140,14 @@ const Home = () => {
     };
     if (socket && typeof socket !== "boolean" && typeof socket !== "function") {
       socket.emit("send_message", messageData);
+
       const tempMsg = {
         ...messageData,
         author: {
           id: userId,
         },
         createdAt: dayjs(time).add(3, "minutes").format("h:mm A"),
+        updatedAt: dayjs.utc(time).subtract(6, "hour").format(),
       };
       setMessages((messages) => [tempMsg, ...messages]);
     }
@@ -196,9 +197,11 @@ const Home = () => {
   // 메세지 받은 경우 화면 리렌더링
   useEffect(() => {
     socket?.on("receive_message", (data: any) => {
+      const time = new Date();
       const formattedData = {
         ...data,
         createdAt: dayjs(data.createdAt).add(9, "hour").format("h:mm A"),
+        updatedAt: dayjs.utc(time).subtract(6, "hour").format(),
       };
       setMessages((messages) => [formattedData, ...messages]);
     });
@@ -273,7 +276,7 @@ const Home = () => {
                       <StickyHeader>
                         <button>{date}</button>
                       </StickyHeader>
-                      {chats.reverse().map((chat) => (
+                      {chats.map((chat) => (
                         <>
                           {userId === chat?.author?.id ? (
                             <ChatWrapper>
