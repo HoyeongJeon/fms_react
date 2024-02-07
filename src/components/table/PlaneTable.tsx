@@ -4,6 +4,7 @@ import './table.css';
 import { PlayersType } from 'pages/Team';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface PlaneTableType {
     data: PlayersType;
@@ -56,6 +57,11 @@ const PlaneTable = (props: PlaneTableType) => {
         fetchAndSetPlayers();
     }, [props.data.players]);
 
+    const movePage = useNavigate();
+    const handleMemberDetail = (memberId: number) => {
+        movePage(`/member/${memberId}`);
+    };
+
     return (
         <Table className="table">
             <thead>
@@ -73,7 +79,7 @@ const PlaneTable = (props: PlaneTableType) => {
             </thead>
             <tbody>
                 {players.map((player) => (
-                    <tr>
+                    <tr onClick={() => handleMemberDetail(player.memberId)}>
                         <td style={{ width: '100px' }}>
                             <Card.Img
                                 variant="top"
