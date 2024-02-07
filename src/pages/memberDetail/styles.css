@@ -1,6 +1,22 @@
+.profile-main-div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
 .profile-info {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px;
- 
-  }
+    margin-left: 20px; /* 이미지와 정보 사이 간격 조절 */
+}
+
+.profile-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* 요소들을 가로로 고르게 분배 */
+    width: 100%;
+}
+
+.profile-row-data {
+    padding-left: 20px;
+}
+
+/* 이미지 크기 등 추가 스타일링은 필요에 따라 조정하세요. */

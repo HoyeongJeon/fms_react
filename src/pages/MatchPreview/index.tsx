@@ -16,23 +16,41 @@ import useSWR from "swr";
 import fetcher from "utils/fetcher";
 const { Title, Text, Link } = Typography;
 
-const Data = {
+// const Data = {
+//   home: {
+//     name: "홈팀",
+//     result: { L: 4, W: 12, D: 4 },
+//     currentResult: "LWWWL",
+//     goal: 14,
+//   },
+//   away: {
+//     name: "어웨이팀",
+//     result: {
+//       L: 6,
+//       W: 1,
+//       D: 2,
+//     },
+//     currentResult: "LWWWW",
+//     goal: 12,
+//   },
+// };
+type MatchInfo = {
   home: {
-    name: "홈팀",
-    result: { L: 4, W: 12, D: 4 },
-    currentResult: "LWWWL",
-    goal: 14,
-  },
-  away: {
-    name: "어웨이팀",
     result: {
-      L: 6,
-      W: 1,
-      D: 2,
-    },
-    currentResult: "LWWWW",
-    goal: 12,
-  },
+      L: number;
+      W: number;
+      D: number;
+    };
+    goal: number;
+  };
+  away: {
+    result: {
+      L: number;
+      W: number;
+      D: number;
+    };
+    goal: number;
+  };
 };
 
 const MatchPreview = () => {
@@ -61,6 +79,74 @@ const MatchPreview = () => {
     `/image/${awayTeam.imageUUID}`,
     fetcher
   );
+  const { data: homeTeamData } = useSWR(`/statistics/${homeTeamId}`, fetcher);
+  const { data: awayTeamData } = useSWR(`/statistics/${awayTeamId}`, fetcher);
+  const [matchInfo, setMatchInfo] = useState<MatchInfo>({
+    home: {
+      result: {
+        L: 0,
+        W: 0,
+        D: 0,
+      },
+      goal: 0,
+    },
+    away: {
+      result: {
+        L: 0,
+        W: 0,
+        D: 0,
+      },
+      goal: 0,
+    },
+  });
+
+  // 경기 종료 여부 확인
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    axios
+      .get(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/match/${matchId}/result/exist`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+          },
+        }
+      )
+      .then((res) => {
+        if (res !== undefined) {
+          setGameOver(true);
+        } else {
+          setGameOver(false);
+        }
+      });
+  }, [matchId]);
+
+  // 경기 종료 시 버튼 비활성화, 경기 리뷰 페이지로 이동 버튼 추기
+
+  useEffect(() => {
+    if (!homeTeamData || !awayTeamData) return;
+    setMatchInfo({
+      home: {
+        result: {
+          L: homeTeamData.loses,
+          W: homeTeamData.wins,
+          D: homeTeamData.draws,
+        },
+        goal: homeTeamData.goals,
+      },
+      away: {
+        result: {
+          L: awayTeamData.loses,
+          W: awayTeamData.wins,
+          D: awayTeamData.draws,
+        },
+        goal: awayTeamData.goals,
+      },
+    });
+  }, [homeTeamData, awayTeamData]);
+
   const handleNext = () => {
     // 매치 날짜보다 이르면 경기 종료 불가능
     // if (now < matchDate) {
@@ -69,7 +155,6 @@ const MatchPreview = () => {
     // }
     navigate(`/match/${matchId}/input`, { state: { matchDate } });
   };
-  console.log("matchDate", matchDate);
 
   useEffect(() => {
     if (!matchId) {
@@ -90,11 +175,13 @@ const MatchPreview = () => {
           const matchDate = new Date(
             res.data.data.date + " " + res.data.data.time
           );
-          console.log("now= ", now);
-          console.log("matchDate= ", matchDate);
-          if (now > matchDate) {
-            setGameOver(true);
-          }
+
+          // if (now > matchDate) {
+          //   setGameOver(false);
+          // }
+          // console.log("now= ", now);
+          // console.log("matchDate= ", matchDate);
+          // console.log("gameOver= ", gameOver);
 
           setMatchDate(res.data.data.date);
           setSoccerFieldId(res.data.data.soccer_field_id);
@@ -148,6 +235,10 @@ const MatchPreview = () => {
       });
   }, [homeTeamId, awayTeamId]);
 
+  const handleReview = () => {
+    navigate("/match/result", { state: { matchId } });
+  };
+
   return (
     <Layout>
       <ScoreboardContainer>
@@ -157,11 +248,11 @@ const MatchPreview = () => {
             <TeamLogo src={homePresignedURL} alt="홈 팀 로고 넣어야함" />
             <div>{homeTeam.name}</div>
             <Text type="secondary">
-              {Data.home.result.W}승 {Data.home.result.D}무 {Data.home.result.L}
-              패
+              {matchInfo.home.result.W}승 {matchInfo.home.result.D}무{" "}
+              {matchInfo.home.result.L}패
             </Text>
             <br />
-            {Data.home.currentResult.split("").map((result) => {
+            {/* {Data.home.currentResult.split("").map((result) => {
               let style = {};
               if (result === "W") {
                 style = { color: "#91D0F1" };
@@ -176,7 +267,7 @@ const MatchPreview = () => {
                   {result}
                 </Text>
               );
-            })}
+            })} */}
             <div>
               <Text style={{ color: "black", fontWeight: "lighter" }}>
                 평균득점
@@ -187,10 +278,10 @@ const MatchPreview = () => {
                   }}
                 >
                   {(
-                    Data.home.goal /
-                    (Data.home.result.W +
-                      Data.home.result.D +
-                      Data.home.result.L)
+                    matchInfo.home.goal /
+                    (matchInfo.home.result.W +
+                      matchInfo.home.result.D +
+                      matchInfo.home.result.L)
                   ).toFixed(2)}
                 </span>
               </Text>
@@ -202,11 +293,11 @@ const MatchPreview = () => {
             <TeamLogo src={awayPresignedURL} alt="어웨이 팀 로고 넣어야함" />
             <div>{awayTeam.name}</div>
             <Text type="secondary">
-              {Data.away.result.W}승 {Data.away.result.D}무 {Data.away.result.L}
-              패
+              {matchInfo.away.result.W}승 {matchInfo.away.result.D}무{" "}
+              {matchInfo.away.result.L}패
             </Text>
             <br />
-            {Data.away.currentResult.split("").map((result) => {
+            {/* {Data.away.currentResult.split("").map((result) => {
               let style = {};
               if (result === "W") {
                 style = { color: "#91D0F1" };
@@ -221,7 +312,7 @@ const MatchPreview = () => {
                   {result}
                 </Text>
               );
-            })}
+            })} */}
             <div>
               <Text style={{ color: "black", fontWeight: "lighter" }}>
                 평균득점
@@ -232,10 +323,10 @@ const MatchPreview = () => {
                   }}
                 >
                   {(
-                    Data.away.goal /
-                    (Data.away.result.W +
-                      Data.away.result.D +
-                      Data.away.result.L)
+                    matchInfo.away.goal /
+                    (matchInfo.away.result.W +
+                      matchInfo.away.result.D +
+                      matchInfo.away.result.L)
                   ).toFixed(2)}
                 </span>
               </Text>
@@ -245,9 +336,9 @@ const MatchPreview = () => {
         {
           // 경기 종료 후에는 버튼을 비활성화
           gameOver ? (
-            <Button onClick={handleNext}>경기 종료</Button>
+            <Button onClick={handleReview}>경기 리뷰 확인</Button>
           ) : (
-            <Button disabled>경기 종료</Button>
+            <Button onClick={handleNext}>경기 종료</Button>
           )
         }
       </ScoreboardContainer>

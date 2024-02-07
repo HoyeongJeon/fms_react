@@ -1,8 +1,8 @@
 import axios from "axios";
 import Layout from "layouts/App";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTokenStore } from "store/tokenStore";
 import { useProfileStore } from "store/profileStore";
 import { useUserStore } from "store/userStore";
@@ -10,17 +10,22 @@ import ListGroup from "react-bootstrap/ListGroup";
 import { LinkContainer } from "pages/SignUp/styles";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
+import { Map, MapMarker } from "react-kakao-maps-sdk";
 
 type Profile = {
-  // name: string;
-  age: string;
   height: string;
   weight: string;
   preferredPosition: string;
-  gender: string;
-  // password: string;
-  // confirmPassword: string;
-  [key: string]: string; // 인덱스 서명 추가
+  //birthdate: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    // state:string;
+    city: string;
+    district: string;
+    address: string;
+  };
+  [key: string]: string | { latitude: number; longitude: number } | undefined | number;
 };
 
 const Wrapper = styled.div`
@@ -32,18 +37,13 @@ const Wrapper = styled.div`
 
 const ProfileContainer = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start; /* 이미지가 위쪽에 정렬되도록 함 */
+  align-items: center;
   background-color: white;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
-
-const styledDiv = styled.div`
-  align-items: center;
-  margin-top: -4px;
-  display: flex;
 `;
 
 const ProfileImageWrapper = styled.div`
@@ -62,11 +62,40 @@ const ProfileImageWrapper = styled.div`
   }
 `;
 
+const MapContainer = styled.div`
+  width: 100%;
+  height: 300px;
+  margin-top: 20px;
+`;
+
 const Profile = () => {
   const { name } = useUserStore();
-  const { id, gender, preferredPosition, height, weight, imageUUID, age } =
+
+  const { id, gender, preferredPosition, height, weight, imageUUID, location } =
+
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
+
+  useEffect(() => {
+    const USER_LATITUDE = location.latitude;
+    const USER_LONGITUDE = location.longitude;
+
+    const container = document.getElementById("kakao-map")!;
+    const options = {
+      center: new window.kakao.maps.LatLng( USER_LATITUDE,
+        USER_LONGITUDE), 
+      level: 3,
+    };
+    const map = new window.kakao.maps.Map(container, options);
+
+    const markerPosition = new window.kakao.maps.LatLng(
+      USER_LATITUDE,
+      USER_LONGITUDE
+    );
+    const marker = new window.kakao.maps.Marker({ position: markerPosition });
+    marker.setMap(map);
+  }, [location]);
+
   return (
     <Layout>
       <Wrapper>
@@ -86,24 +115,17 @@ const Profile = () => {
                 {gender}
               </ListGroup.Item>
               <br />
-              <ListGroup.Item>
-                <span>나이: </span>
-                {age}
-              </ListGroup.Item>
-              <br />
 
               <ListGroup.Item>
                 <span>선호 포지션: </span>
                 {preferredPosition}
               </ListGroup.Item>
               <br />
-
               <ListGroup.Item>
                 <span>키: </span>
                 {height}cm
               </ListGroup.Item>
               <br />
-
               <ListGroup.Item>
                 <span>몸무게: </span>
                 {weight}kg
@@ -116,6 +138,7 @@ const Profile = () => {
           ) : (
             <div>loading...</div>
           )}
+          <MapContainer id="kakao-map" />
         </ProfileContainer>
       </Wrapper>
     </Layout>

@@ -14,10 +14,19 @@ import { useNavigate } from "react-router-dom";
 import { Alert, message } from "antd";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
 import { useTeamStore } from "store/teamStore";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const CreateTeam = () => {
   const { kakao } = window;
+  const [profile, setProfile] = useState({
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+  });
+
   const [addressValues, setAddressValues] = useState({
     roadAddress: "",
     postalCode: "",
@@ -101,7 +110,16 @@ const CreateTeam = () => {
     onChange,
   };
 
+  const handleMapClick = (latitude: number, longitude: number) => {
 
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      location: {
+        latitude,
+        longitude,
+      },
+    }));
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -120,6 +138,7 @@ const CreateTeam = () => {
       setSelectedFile(null);
     }
   };
+  
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -216,7 +235,19 @@ const CreateTeam = () => {
             <div className="right-section">
               <div className="location-container">
                 <label style={{ fontSize: "25px"}} htmlFor="">연고지</label>
-                <KakaoLocation center={addressValues.center}/>
+                <KakaoLocation
+  apiKey="YOUR_KAKAO_MAP_API_KEY"
+  center={{
+    lat: parseFloat(addressValues.center.lat),
+    lng: parseFloat(addressValues.center.lng),
+    level: 3,
+  }}
+  style={{ width: "100%", height: "300px", marginBottom: "1rem" }}
+  initialLevel={3}
+  initialLat={profile.location?.latitude.toString() || "0"}
+  initialLng={profile.location?.longitude.toString() || "0"}
+  onClick={(e: any) => handleMapClick(e.latLng.getLat(), e.latLng.getLng())}
+/>
                 <Button variant="dark" onClick={handleClick}>
                   주소 검색
                 </Button>

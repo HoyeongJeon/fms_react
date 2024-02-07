@@ -14,6 +14,7 @@ import { useTeamStore } from 'store/teamStore';
 import styled from 'styled-components';
 import './team.css';
 import MyResponsivePie from 'components/graph/MyResponsePie';
+import BasicBars from 'components/graph/BasicBars';
 
 const Button = styled.button`
     padding: 10px 20px;
@@ -131,6 +132,14 @@ export interface PlayersType {
     }>;
 }
 
+export interface YellowAndRedCardsType {
+    yellowAndRedCards: Array<{
+        yellow: number;
+        red: number;
+        created: Date;
+    }>;
+}
+
 export const getImageUrl = async (url: string) => {
     const getUrl = await axios.get<string>(
         `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/image/${url}`,
@@ -159,6 +168,7 @@ const Team = () => {
     const [topAssistsPlayer, setTopAssistsPlayer] = useState<string>('/img/empty_profile_iamge.png');
     const [topAttactPointPlayer, setAttactPointPlayer] = useState<string>('/img/empty_profile_iamge.png');
     const [topSavePlayer, setTopSavePlayer] = useState<string>('/img/empty_profile_iamge.png');
+    const [yellowAndRedCards, setYellowAndRedCards] = useState<YellowAndRedCardsType>();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -255,6 +265,21 @@ const Team = () => {
             setTopPlayer(getTopMembers.data);
         };
 
+        const getYellowAndRedCards = async () => {
+            const getYellowAndRedCardsAxiosData = await axios.get<YellowAndRedCardsType>(
+                `${process.env.REACT_APP_SERVER_HOST}:${
+                    process.env.REACT_APP_SERVER_PORT || 3000
+                }/api/team/${teamId}/cards`,
+                {
+                    params: {
+                        teamId,
+                    },
+                }
+            );
+
+            setYellowAndRedCards(getYellowAndRedCardsAxiosData.data);
+        };
+
         const loadPage = async () => {
             if (teamId) {
                 await getTeam();
@@ -262,6 +287,7 @@ const Team = () => {
                 await getMemberList();
                 await getTeamStats();
                 await getTopPlayer();
+                await getYellowAndRedCards();
             }
         };
 
@@ -414,11 +440,16 @@ const Team = () => {
                         </div>
                     </div>
                 </Card>
-                {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                 <Card className="card-div">
                     <TitleText title="시즌통계" />
+                    {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                     <div className="team-info-graph">
                         <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar>
+                        {yellowAndRedCards?.yellowAndRedCards && yellowAndRedCards?.yellowAndRedCards.length > 0 ? (
+                            <BasicBars yellowAndRedCards={yellowAndRedCards?.yellowAndRedCards ?? []} />
+                        ) : (
+                            <p>카드수집통계 집계에 필요한 데이터가 존재하지 않습니다.</p>
+                        )}
                     </div>
                 </Card>
                 <Card className="card-div">
