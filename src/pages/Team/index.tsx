@@ -445,10 +445,10 @@ const Team = () => {
                     {validationMsg ?? <p>{teamStats?.totalGames}게임 통계입니다.</p>}
                     <div className="team-info-graph">
                         <MyResponsiveRadar data={teamGraphData}></MyResponsiveRadar>
-                        {yellowAndRedCards?.yellowAndRedCards ? (
+                        {yellowAndRedCards?.yellowAndRedCards && yellowAndRedCards?.yellowAndRedCards.length > 0 ? (
                             <BasicBars yellowAndRedCards={yellowAndRedCards?.yellowAndRedCards ?? []} />
                         ) : (
-                            <p>카드 수집정보를 가져오고 있습니다.</p>
+                            <p>카드수집통계 집계에 필요한 데이터가 존재하지 않습니다.</p>
                         )}
                     </div>
                 </Card>
