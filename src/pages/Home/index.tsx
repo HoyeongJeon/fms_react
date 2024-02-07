@@ -20,19 +20,28 @@ import styled from "styled-components";
 import useSWRInfinite from "swr/infinite";
 import fetcher from "utils/fetcher";
 import useSocket from "utils/useSocket";
-import { ErrorContainer, ErrorMessage, MyTime, OthersTime } from "./styles";
+import {
+  ErrorContainer,
+  ErrorMessage,
+  MyTime,
+  OthersTime,
+  StickyHeader,
+} from "./styles";
 import BasicPie from "components/graph/BasicPie";
-import constructWithOptions from "styled-components/dist/constructors/constructWithOptions";
+import makeSection from "utils/makeSection";
+import utc from "dayjs/plugin/utc"; // import UTC plugin
+dayjs.extend(utc);
 
 export const Section = styled.section`
   margin-top: 20px;
   border-top: 1px solid #eee;
 `;
 
-interface Message {
+export interface Message {
   id: number;
   message: string;
   createdAt: string;
+  updatedAt: string;
   author: {
     id: number;
     name: string;
@@ -86,6 +95,7 @@ const Home = () => {
           return {
             ...msg,
             createdAt: dayjs(msg.createdAt).add(9, "hour").format("h:mm A"),
+            updatedAt: dayjs.utc(msg.updatedAt).add(6, "hour").format(),
           };
         });
 
@@ -201,8 +211,6 @@ const Home = () => {
     }
   }, [show]);
 
-  console.log("profileId= ", profileId);
-
   useEffect(() => {
     const getWinningRate = async () => {
       const resultRate = await axios.get<TeamStatsType>(
@@ -229,6 +237,14 @@ const Home = () => {
       );
     }
   }, [teamWinningRate]);
+
+  const chatSections = makeSection(messages ? [...messages].reverse() : []);
+
+  Object.entries(chatSections).map(([date, chats]) => {
+    chats.reverse().map((message) => {
+      console.log("message2= ", message);
+    });
+  });
 
   return (
     <>
@@ -257,36 +273,44 @@ const Home = () => {
                 }}
                 onScroll={onScroll}
               >
-                {messages &&
-                  [...messages].reverse().map((message) => (
-                    <>
-                      {userId === message?.author?.id ? (
-                        <ChatWrapper>
-                          <MyChatMessage>
-                            {message.message}
-                            <MyTime>{message.createdAt}</MyTime>
-                          </MyChatMessage>
-                        </ChatWrapper>
-                      ) : (
-                        <ChatWrapper>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                            }}
-                          >
-                            <ChatMessage>
-                              <span style={{ fontWeight: "bold" }}>
-                                {message?.author?.name}
-                              </span>
-                              : {message.message}
-                              <OthersTime>{message.createdAt}</OthersTime>
-                            </ChatMessage>
-                          </div>
-                        </ChatWrapper>
-                      )}
-                    </>
-                  ))}
+                {Object.entries(chatSections).map(([date, chats]) => {
+                  return (
+                    <Section className={`section-${date}`} key={date}>
+                      <StickyHeader>
+                        <button>{date}</button>
+                      </StickyHeader>
+                      {chats.reverse().map((chat) => (
+                        <>
+                          {userId === chat?.author?.id ? (
+                            <ChatWrapper>
+                              <MyChatMessage>
+                                {chat.message}
+                                <MyTime>{chat.createdAt}</MyTime>
+                              </MyChatMessage>
+                            </ChatWrapper>
+                          ) : (
+                            <ChatWrapper>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "flex-start",
+                                }}
+                              >
+                                <ChatMessage>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {chat?.author?.name}
+                                  </span>
+                                  : {chat.message}
+                                  <OthersTime>{chat.createdAt}</OthersTime>
+                                </ChatMessage>
+                              </div>
+                            </ChatWrapper>
+                          )}
+                        </>
+                      ))}
+                    </Section>
+                  );
+                })}
 
                 <div ref={messagesEndRef} />
               </Modal.Body>
@@ -325,18 +349,16 @@ const Home = () => {
               </ErrorMessage>
 
               {profileId ? (
-                // profileId가 있는 경우 정상적으로 링크 작동
                 <>
                   <CustomButton to="/team/create">팀 생성</CustomButton>
                   <CustomButton to="/teamTable">팀 참가하기</CustomButton>
                 </>
               ) : (
-                // profileId가 없는 경우
                 <>
                   <CustomButton
                     to="#"
                     onClick={(e) => {
-                      e.preventDefault(); // 링크 기본 동작 방지
+                      e.preventDefault();
                       alert("프로필을 생성해주세요.");
                     }}
                   >
@@ -345,7 +367,7 @@ const Home = () => {
                   <CustomButton
                     to="#"
                     onClick={(e) => {
-                      e.preventDefault(); // 링크 기본 동작 방지
+                      e.preventDefault();
                       alert("프로필을 생성해주세요.");
                     }}
                   >
