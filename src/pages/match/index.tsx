@@ -1,6 +1,7 @@
 import Layout from "layouts/App";
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
+import { Pagination } from "antd";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -95,6 +96,11 @@ const Button = styled.button`
 const Match = () => {
   const [getField, setField] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [total, setTotal] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
   const navigate = useNavigate();
 
   type Field = {
@@ -122,30 +128,70 @@ const Match = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
 
-    const findAllSoccerField = async () => {
+    const findAllSoccerField = async (page: number = 1) => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_HOST}:${
-            process.env.REACT_APP_SERVER_PORT || 3000
-          }/api/match/field`,
+
+        let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/soccerfield/page/?page=${page}`;
+  
+        // 검색어가 있는 경우 검색 쿼리 추가
+        if (searchQuery.trim() !== "") {
+          apiUrl += `&name=${searchQuery}`;
+        }
+
+        const response = await axios.get(apiUrl,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
             },
+            withCredentials: true,
           }
         );
+
         const fieldData = response.data.data;
 
+        console.log('fieldData:',fieldData);
+
         setField(fieldData); // creatorId가 존재하면 구단주로 간주
+        setTotal(response.data.total);
+
         setLoading(false); // 데이터 로딩 완료
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
         setLoading(false); // 데이터 로딩 실패
+        setTotal(0);
       }
     };
 
     findAllSoccerField(); // 데이터를 불러오는 함수 호출
   }, []);
+
+  const changePage = async (page: number) => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/soccerfield/page/?page=${page || 1}&name=${searchQuery}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+      
+      const fieldData = response.data.data;
+
+      setField(fieldData); // creatorId가 존재하면 구단주로 간주
+      setTotal(response.data.total);
+
+    } catch (error) {
+      console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
+    }
+  };
 
   return (
     <Layout>
@@ -174,6 +220,14 @@ const Match = () => {
           </CustomCard>
         ))}
       </StadiumsContainer>
+      <Pagination
+        defaultCurrent={currentPage}
+        total={total}
+        defaultPageSize={8}
+        onChange={(value) => {
+          changePage(value);
+        }}
+      />
     </Layout>
   );
 };

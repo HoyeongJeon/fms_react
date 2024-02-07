@@ -21,7 +21,6 @@ import MatchResult from "./pages/MatchResult";
 import InputMatchResult from "./pages/InputMatchResult";
 import InputMatchResultDetail from "./pages/InputMatchResultDetail";
 import MatchPreview from "./pages/MatchPreview";
-import MatchReview from "./pages/MatchReview";
 import MatchBook from "./pages/match/book";
 import MatchCalendar from "./pages/match/calendar";
 import Formation from "./pages/match/formation";
@@ -221,14 +220,13 @@ const App: React.FC = () => {
           />
           <Route path="/member/:memberId" element={<MemberDetail />} />
           <Route path="/match" element={<Match />} />
-          <Route path="/match/:matchId/result" element={<MatchResult />} />
+          <Route path="/match/result" element={<MatchResult />} />
           <Route path="/match/:matchId/input" element={<InputMatchResult />} />
           <Route
             path="/match/:matchId/input/detail"
             element={<InputMatchResultDetail />}
           />
           <Route path="/match/preview" element={<MatchPreview />} />
-          <Route path="/match/:matchId/review" element={<MatchReview />} />
           <Route path="/match/book" element={<MatchBook />} />
           <Route path="/match/calendar" element={<MatchCalendar />} />
           <Route path="/match/formation" element={<Formation />} />

@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Layout from "layouts/App";
 
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import {
   NextButton,
   Score,
@@ -57,8 +63,10 @@ const MatchResult = () => {
 
   // home away 정보를 통해 , img, teamName을 가져온다.
 
-  const { matchId } = useParams();
+  // const { matchId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { matchId } = location.state || {};
   const { teamId } = useTeamStore();
   const [homeTeamId, setHomeTeamId] = useState();
   const [awayTeamId, setAwayTeamId] = useState();
@@ -160,8 +168,6 @@ const MatchResult = () => {
     },
   ];
 
-  console.log("data", data);
-
   return (
     <Layout>
       <ScoreboardContainer>
@@ -173,7 +179,8 @@ const MatchResult = () => {
           </TeamBadge>
 
           <div>
-            <Score>1</Score>:<Score>2</Score>
+            <Score>{home?.counted_goals ?? 0}</Score>:
+            <Score>{away?.counted_goals ?? 0}</Score>
           </div>
 
           <TeamBadge>
