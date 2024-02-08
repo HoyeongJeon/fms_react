@@ -58,7 +58,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     if (data?.data.profile) {
+      console.log("data.data.profile1=",data.data.profile);
       setProfile(data.data.profile);
+      console.log("data.data.profile2=",data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {

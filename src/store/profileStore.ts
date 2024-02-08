@@ -9,6 +9,14 @@ interface ProfileStore {
   weight: number;
   age: number;
   imageUUID: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    city: string;
+    dong: string;
+    district: string;
+    address: string;
+  };
   setProfile: (profile: Omit<ProfileStore, "setProfile">) => void;
   resetProfile: () => void;
 }
@@ -21,6 +29,15 @@ export const useProfileStore = create<ProfileStore>((set) => ({
   weight: 0,
   age: 0,
   imageUUID: "",
+  location: {
+    latitude: 0,
+    longitude: 0,
+    //state: "",
+    city: "",
+    dong: "",
+    district: "",
+    address: "",
+  },
   setProfile: (profile) => set(profile),
   resetProfile: () =>
     set({ id: null, gender: "", preferredPosition: "", height: 0, weight: 0 }),

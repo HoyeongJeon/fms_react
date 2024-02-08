@@ -61,7 +61,7 @@ const ProfileTable = () => {
         },
         withCredentials: true,
       });
-
+      console.table("response=",response)
       setProfiles(response.data.data.data);
       setTotal(response.data.data.total);
     } catch (error) {
