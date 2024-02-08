@@ -181,7 +181,7 @@ const ProfileTable = () => {
             </Modal.Footer>
           </Modal>
         )}
-        ;<h2>멤버 정보</h2>
+        <h2>멤버 정보</h2>
         <div>
           <div className="search-container">
             <input
@@ -201,7 +201,7 @@ const ProfileTable = () => {
         <table>
           <thead>
             <tr>
-              <th>
+              {/* <th>
                 <input
                   type="checkbox"
                   checked={selectedProfiles.length === profiles.length}
@@ -214,7 +214,7 @@ const ProfileTable = () => {
                     );
                   }}
                 />
-              </th>
+              </th> */}
               <th>ID</th>
               <th>이름</th>
               {/* <th>실력</th> */}
@@ -233,13 +233,13 @@ const ProfileTable = () => {
           <tbody>
             {profiles.map((profile) => (
               <tr key={profile.id}>
-                <td>
+                {/* <td>
                   <input
                     type="checkbox"
                     checked={selectedProfiles.includes(profile.id)}
                     onChange={() => handleCheckboxChange(profile.id)}
                   />
-                </td>
+                </td> */}
                 <td>{profile.id}</td>
                 <td>{profile.name}</td>
                 {/* <td>{profile.skillLevel}</td> */}
@@ -265,7 +265,7 @@ const ProfileTable = () => {
           </tbody>
         </table>
         <div>
-          <button onClick={handleInviteSelected}>선택된 멤버 초대</button>
+          {/* <button onClick={handleInviteSelected}>선택된 멤버 초대</button> */}
         </div>
         <Pagination
           defaultCurrent={currentPage} // 현재 클릭한 페이지

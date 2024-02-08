@@ -18,6 +18,17 @@ const RegionFilter = styled.select`
   font-size: 16px;
 `;
 
+const SearchContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+
+const SearchInput = styled.input`
+  padding: 8px;
+  font-size: 16px;
+`;
+
 const StadiumsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -96,7 +107,6 @@ const Button = styled.button`
   }
 `;
 
-
 const Match = () => {
   const [getField, setField] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,51 +123,55 @@ const Match = () => {
     field_name: string;
     image_url: string;
     phone_number: string;
-    locationfield: object;
+    locationfield: {
+      address: string;
+    };
   };
 
-  const navigateToBooking = (Field: any) => {
+  const navigateToBooking = (field: Field) => {
     navigate("/match/book", {
       state: {
-        fieldId: Field.id,
-        fieldName: Field.field_name,
-        locationId: Field.location_id,
-        imageUrl: Field.image_url,
-        phone: Field.phone_number,
-        address: Field.locationfield.address,
+        fieldId: field.id,
+        fieldName: field.field_name,
+        locationId: field.location_id,
+        imageUrl: field.image_url,
+        phone: field.phone_number,
+        address: field.locationfield.address,
       },
     });
   };
 
+  console.log("selectedRegion=",selectedRegion)
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
 
     const findAllSoccerField = async (page: number = 1) => {
       try {
-
+        console.log("api 1 selectedRegion=",selectedRegion)
         let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/soccerfield/page/?page=${page}`;
-  
+
         // 검색어가 있는 경우 검색 쿼리 추가
         if (searchQuery.trim() !== "") {
           apiUrl += `&name=${searchQuery}`;
         }
 
-        const response = await axios.get(apiUrl,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
-            },
-            withCredentials: true,
-          }
-        );
+        // 위치 필터링이 있는 경우 검색 쿼리 추가
+        if (selectedRegion.trim() !== "") {
+          apiUrl += `&region=${selectedRegion}`;
+        }
+
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+          },
+          withCredentials: true,
+        });
 
         const fieldData = response.data.data;
 
-        console.log('fieldData:',fieldData);
-
-        setField(fieldData); // creatorId가 존재하면 구단주로 간주
+        setField(fieldData);
         setTotal(response.data.total);
 
         setLoading(false); // 데이터 로딩 완료
@@ -169,16 +183,16 @@ const Match = () => {
     };
 
     findAllSoccerField(); // 데이터를 불러오는 함수 호출
-  }, []);
+  }, [searchQuery,selectedRegion]);
 
   const changePage = async (page: number) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-
+      console.log("api2 selectedRegion=",selectedRegion)
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/soccerfield/page/?page=${page || 1}&name=${searchQuery}`,
+        }/api/soccerfield/page/?page=${page || 1}&region=${selectedRegion}&name=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -186,12 +200,11 @@ const Match = () => {
           withCredentials: true,
         }
       );
-      
+
       const fieldData = response.data.data;
 
-      setField(fieldData); // creatorId가 존재하면 구단주로 간주
+      setField(fieldData);
       setTotal(response.data.total);
-
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
@@ -199,11 +212,10 @@ const Match = () => {
 
   return (
     <Layout>
-            <RegionFilterContainer>
+      <RegionFilterContainer>
         <RegionFilter
           value={selectedRegion}
-          onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSelectedRegion(e.target.value)}
-        >
+          onChange={(e) => setSelectedRegion(e.target.value)}>
           <option value="">전체 지역</option>
           <option value="서울특별시">서울특별시</option>
           <option value="부산광역시">부산광역시</option>
@@ -224,6 +236,14 @@ const Match = () => {
           <option value="제주특별자치도">제주특별자치도</option>
         </RegionFilter>
       </RegionFilterContainer>
+      <SearchContainer>
+        <SearchInput
+          type="text"
+          placeholder="경기장 검색"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </SearchContainer>
       <h2>경기장 목록</h2>
       <StadiumsContainer>
         {getField.map((field) => (
