@@ -232,6 +232,7 @@ const Team = () => {
                 }/api/team/${teamId}/players`
             );
 
+            console.table(players.data);
             setPlayers(players.data);
         };
 
