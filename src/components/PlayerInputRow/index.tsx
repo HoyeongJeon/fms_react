@@ -42,6 +42,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
           type="text"
           value={player.name}
           placeholder="선수 이름을 입력하세요."
+          disabled
           onChange={(e) => onPlayerChange(player.id, "name", e.target.value)}
         />
       </td>
@@ -50,12 +51,14 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
           type="number"
           value={player.goal}
           placeholder="득점 수를 입력해주세요"
+          min={0}
           onChange={(e) => onPlayerChange(player.id, "goal", e.target.value)}
         />
       </td>
       <td>
         <Input
           type="number"
+          min={0}
           value={player.assist}
           onChange={(e) => onPlayerChange(player.id, "assist", e.target.value)}
         />
@@ -63,6 +66,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
       <td>
         <Input
           type="number"
+          min={0}
           value={player.yellowCards}
           onChange={(e) =>
             onPlayerChange(player.id, "yellowCards", e.target.value)
@@ -72,6 +76,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
       <td>
         <Input
           type="number"
+          min={0}
           value={player.redCards}
           onChange={(e) =>
             onPlayerChange(player.id, "redCards", e.target.value)
@@ -81,6 +86,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
       <td>
         <Input
           type="number"
+          min={0}
           value={player.save}
           onChange={(e) => onPlayerChange(player.id, "save", e.target.value)}
         />
