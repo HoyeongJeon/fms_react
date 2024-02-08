@@ -7,39 +7,42 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // 경기장 카드를 가로로 정렬하기 위한 컨테이너
+const RegionFilterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+
+const RegionFilter = styled.select`
+  padding: 8px;
+  font-size: 16px;
+`;
+
 const StadiumsContainer = styled.div`
   display: flex;
-  flex-wrap: wrap; // 카드들이 줄바꿈될 수 있도록 설정
-  justify-content: center; // 카드들을 중앙 정렬
-  gap: 20px; // 카드 간의 간격
-  overflow-y: auto; // 세로 스크롤을 위한 오버플로우
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  overflow-y: auto;
   max-height: 100vh;
-  margin: auto; // 중앙 정렬을 위한 마진 설정
+  margin: auto;
   padding-top: 10px;
   padding-left: 10px;
 
-  /* 스크롤바 전체에 대한 스타일 */
   &::-webkit-scrollbar {
     width: 10px;
     border-radius: 10px;
-    background-color: transparent; /* 트랙 부분의 배경색을 투명하게 설정 */
+    background-color: transparent;
   }
 
-  /* 스크롤바의 썸(움직이는 부분)에 대한 스타일 */
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2); /* 썸 부분의 색상과 투명도 설정 */
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     &:hover {
-      background-color: rgba(
-        0,
-        0,
-        0,
-        0.3
-      ); /* 마우스를 올렸을 때 썸의 색상 변경 */
+      background-color: rgba(0, 0, 0, 0.3);
     }
   }
 
-  /* 스크롤바 트랙에 대한 스타일 */
   &::-webkit-scrollbar-track {
     background-color: transparent;
     border-radius: 10px;
@@ -47,18 +50,18 @@ const StadiumsContainer = styled.div`
 `;
 
 const CustomCard = styled(Card)`
-  border: 2px solid #d6d6d6; /* 테두리를 진하게 */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
-  border-radius: 10px; /* 모서리 둥글게 */
+  border: 2px solid #d6d6d6;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
   transition:
     transform 0.2s ease-in-out,
-    box-shadow 0.3s ease-in-out; /* 확대와 그림자에 트랜지션 효과 추가 */
-  will-change: transform; /* 성능 최적화를 위해 변화가 있을 속성 명시 */
-  transform-origin: center center; // 확대의 기준점을 카드의 중앙으로 설정
+    box-shadow 0.3s ease-in-out;
+  will-change: transform;
+  transform-origin: center center;
 
   &:hover {
-    transform: scale(1.007) translateZ(0); /* 마우스 오버 시 약간 확대 */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* 마우스 오버 시 그림자 강조 */
+    transform: scale(1.007) translateZ(0);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
     margin: -0.1%;
   }
 `;
@@ -67,31 +70,32 @@ const Button = styled.button`
   padding: 8px 16px;
   min-width: 64px;
   border: none;
-  border-radius: 20px; /* 더 둥글게 조정 */
-  background-color: #f0f0f0; /* 밝은 회색으로 변경 */
+  border-radius: 20px;
+  background-color: #f0f0f0;
   color: #000;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 600; /* 폰트 두께 조정 */
+  font-weight: 600;
   margin: 0 5px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); /* 그림자 추가 */
-  transition: all 0.3s ease-in-out; /* 부드러운 전환 효과 추가 */
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 
   &:hover {
-    background-color: #e6e6e6; /* 호버 시 배경색 변경 */
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강조 */
+    background-color: #e6e6e6;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   }
 
   &:active {
-    background-color: #dcdcdc; /* 클릭 시 배경색 변경 */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15); /* 클릭 시 그림자 약화 */
+    background-color: #dcdcdc;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   }
 
   &:focus {
-    outline: none; /* 포커스 시 윤곽선 제거 */
-    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5); /* 포커스 시 그림자 추가 */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
   }
 `;
+
 
 const Match = () => {
   const [getField, setField] = useState<Field[]>([]);
@@ -100,7 +104,7 @@ const Match = () => {
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [selectedRegion, setSelectedRegion] = useState("");
   const navigate = useNavigate();
 
   type Field = {
@@ -195,6 +199,31 @@ const Match = () => {
 
   return (
     <Layout>
+            <RegionFilterContainer>
+        <RegionFilter
+          value={selectedRegion}
+          onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSelectedRegion(e.target.value)}
+        >
+          <option value="">전체 지역</option>
+          <option value="서울특별시">서울특별시</option>
+          <option value="부산광역시">부산광역시</option>
+          <option value="인천광역시">인천광역시</option>
+          <option value="대구광역시">대구광역시</option>
+          <option value="대전광역시">대전광역시</option>
+          <option value="광주광역시">광주광역시</option>
+          <option value="울산광역시">울산광역시</option>
+          <option value="세종특별자치시">세종특별자치시</option>
+          <option value="경기도">경기도</option>
+          <option value="충청북도">충청북도</option>
+          <option value="충청남도">충청남도</option>
+          <option value="전라남도">전라남도</option>
+          <option value="경상북도">경상북도</option>
+          <option value="경상남도">경상남도</option>
+          <option value="강원특별자치도">강원특별자치도</option>
+          <option value="전북특별자치도">전북특별자치도</option>
+          <option value="제주특별자치도">제주특별자치도</option>
+        </RegionFilter>
+      </RegionFilterContainer>
       <h2>경기장 목록</h2>
       <StadiumsContainer>
         {getField.map((field) => (

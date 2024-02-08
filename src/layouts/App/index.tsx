@@ -122,8 +122,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <StyledLink to="/home">
             <img
               src="img/title2.png"
-              alt="Football Management System (FMS) Logo"
-              style={{ cursor: "pointer", width: "50%" }}
+              alt="축구왕"
+              style={{ cursor: "pointer", width: "20%" }}
             />
           </StyledLink>
         </h2>

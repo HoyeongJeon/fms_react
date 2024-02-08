@@ -1,0 +1,11 @@
+@font-face {
+    font-family: "SongMyung-Regular";
+    font-weight: normal;
+    src: url("../components/fonts/SongMyung-Regular.woff") format("truetype");
+  }
+  
+/*   
+  body {
+    font-family: "SongMyung-Regular";
+  }
+   */

@@ -57,12 +57,6 @@ const Position = [
   "Left Winger",
 ];
 
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
-`;
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -324,7 +318,6 @@ const EditProfile = () => {
   return (
     <Layout>
       <ScoreboardContainer>
-        <Wrapper>
           <ProfileContainer>
             <h2>프로필 수정</h2>
             <Form>
@@ -401,7 +394,6 @@ const EditProfile = () => {
               <Button onClick={onClickAddButton}>저장</Button>
             </Form>
           </ProfileContainer>
-        </Wrapper>
       </ScoreboardContainer>
     </Layout>
   );
