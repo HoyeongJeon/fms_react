@@ -298,7 +298,7 @@ const TeamTable: React.FC = () => {
             />
             <button onClick={handleSearchButtonClick}>검색</button>
           </div>
-          <button onClick={handleLocationButtonClick}>내 위치 확인</button>
+          {/* <button onClick={handleLocationButtonClick}>내 위치 확인</button> */}
         </div>
         <table>
           <thead>
