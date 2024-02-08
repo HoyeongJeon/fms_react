@@ -1,36 +1,40 @@
 .create-team-form {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .singup-logoImg-label {
-    margin: 5px 0 20px 0;
-    font-weight: bold;
-    font-size: 13px;
-    color: #0095f6;
-    display: inline-block;
-    cursor: pointer;
+  margin: 5px 0 20px 0;
+  font-weight: bold;
+  font-size: 13px;
+  color: #0095f6;
+  display: inline-block;
+  cursor: pointer;
 }
 
 .singup-logoImg-input {
-    display: none;
+  display: none;
 }
 
 .location-container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
-  
+
 .left-section {
-    flex: 3;
-    margin-top: 50px;
-    /* 필요한 경우 추가 스타일링 */
+  flex: 3;
+  margin-top: 50px;
+  flex-direction: column;
+
+  /* 필요한 경우 추가 스타일링 */
 }
-  
+
 .right-section {
-    flex: 1;
-    margin: 50px 0 0 50px;
-    flex-direction: column;
-    /* 필요한 경우 추가 스타일링 */
+  flex: 1;
+  margin: 50px 0 0 50px;
+  flex-direction: column;
+  /* 필요한 경우 추가 스타일링 */
 }

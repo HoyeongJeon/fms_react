@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { Alert, Layout, message } from "antd";
+import { Alert, message } from "antd";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -17,11 +17,13 @@ import Toggle from "components/toggle/Toggle";
 
 import "./create-team.css";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import Layout from "layouts/App";
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f5f5;
+  width: 100%;
+  background-color: ##ffffff;
 `;
 const CreateTeam = () => {
   const { kakao } = window;
@@ -176,76 +178,80 @@ const CreateTeam = () => {
     <Layout>
       <ScoreboardContainer>
         <Wrapper>
-        <form className="create-team-form">
-          <div className="left-section">
-            {validationMessage && (
-              <Alert
-                message="에러"
-                description={validationMessage}
-                type="error"
-                showIcon
-                closable
-                onClose={() => setValidationMessage("")}
+          <form className="create-team-form">
+            <div className="left-section">
+              {validationMessage && (
+                <Alert
+                  message="에러"
+                  description={validationMessage}
+                  type="error"
+                  showIcon
+                  closable
+                  onClose={() => setValidationMessage("")}
+                />
+              )}
+              <FileUploader
+                descLabel="구단 로고를 등록해주세요"
+                changedFunc={handleFileChange}
               />
-            )}
-            <FileUploader
-              descLabel="구단 로고를 등록해주세요"
-              changedFunc={handleFileChange}
-            />
-            <InputBox
-              inputLabel="구단명"
-              name="name"
-              onChange={handleInputChange}
-            />
-            <InputBox
-              inputLabel="구단 설명"
-              name="description"
-              onChange={handleInputChange}
-            />
-            <RadioLayout
-              titleLabel="성별"
-              option={[
-                { label: "남성", nameAndId: "gender", value: "Male" },
-                { label: "여성", nameAndId: "gender", value: "Female" },
-              ]}
-              onChange={onChange}
-            />
-            <Toggle
-              label="혼성 여부"
-              onToggle={(value) => setSelectedToggle(value)}
-            />
-          </div>
-          <div className="right-section">
-            <div className="location-container">
-              <label style={{ fontSize: "25px" }}>연고지</label>
-              <KakaoLocation
-                apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
-                center={{
-                  lat: parseFloat(addressValues.center.lat),
-                  lng: parseFloat(addressValues.center.lng),
-                  level: 3,
-                }}
-                style={{ width: "100%", height: "300px", marginBottom: "1rem" }}
-                initialLevel={3}
-                initialLat={teamInfo.location?.latitude.toString() || "0"}
-                initialLng={teamInfo.location?.longitude.toString() || "0"}
-                onClick={(e: any) =>
-                  handleMapClick(e.latLng.getLat(), e.latLng.getLng())
-                }
+              <InputBox
+                inputLabel="구단명"
+                name="name"
+                onChange={handleInputChange}
               />
-        <Button variant="dark" onClick={handleClick}>
+              <InputBox
+                inputLabel="구단 설명"
+                name="description"
+                onChange={handleInputChange}
+              />
+              <RadioLayout
+                titleLabel="성별"
+                option={[
+                  { label: "남성", nameAndId: "gender", value: "Male" },
+                  { label: "여성", nameAndId: "gender", value: "Female" },
+                ]}
+                onChange={onChange}
+              />
+              <Toggle
+                label="혼성 여부"
+                onToggle={(value) => setSelectedToggle(value)}
+              />
+            </div>
+            <div className="right-section">
+              <div className="location-container">
+                <label style={{ fontSize: "25px" }}>연고지</label>
+                <KakaoLocation
+                  apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
+                  center={{
+                    lat: parseFloat(addressValues.center.lat),
+                    lng: parseFloat(addressValues.center.lng),
+                    level: 3,
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "300px",
+                    marginBottom: "1rem",
+                  }}
+                  initialLevel={3}
+                  initialLat={teamInfo.location?.latitude.toString() || "0"}
+                  initialLng={teamInfo.location?.longitude.toString() || "0"}
+                  onClick={(e: any) =>
+                    handleMapClick(e.latLng.getLat(), e.latLng.getLng())
+                  }
+                />
+                <Button variant="dark" onClick={handleClick}>
                   주소 검색
                 </Button>
+              </div>
+              <div style={{ fontSize: "12px", color: "gray" }}>
+                {validationMessage}
+              </div>
+              <br />
+              <Button variant="dark" onClick={onClickAddButton}>
+                저장
+              </Button>
             </div>
-            <div style={{ fontSize: "12px", color: "gray" }}>
-              {validationMessage}
-            </div>
-            <br />
-            <Button variant="dark" onClick={onClickAddButton}>
-              저장
-            </Button>
-          </div>
-        </form>
+          </form>
         </Wrapper>
       </ScoreboardContainer>
     </Layout>
