@@ -11,6 +11,7 @@ import { LinkContainer } from "pages/SignUp/styles";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 type Profile = {
   height: string;
@@ -98,6 +99,7 @@ const Profile = () => {
 
   return (
     <Layout>
+       <ScoreboardContainer> 
       <Wrapper>
         <ProfileContainer>
           <ProfileImageWrapper>
@@ -141,6 +143,7 @@ const Profile = () => {
           <MapContainer id="kakao-map" />
         </ProfileContainer>
       </Wrapper>
+      </ScoreboardContainer>
     </Layout>
   );
 };
