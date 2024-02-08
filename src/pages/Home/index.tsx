@@ -323,7 +323,6 @@ const Home = () => {
                 </Button>
               </Modal.Footer>
             </Modal>
-            <div>Your content here</div>
             <div>
               <div>
                 <h3>팀 승률</h3>
