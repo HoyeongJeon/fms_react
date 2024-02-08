@@ -10,6 +10,7 @@ import { format, isMatch } from "date-fns";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 const responsiveWidth = "768px";
 
@@ -317,41 +318,38 @@ const MatchCalendar = () => {
     navigate("/match/preview", { state: { matchId: selectedMatchId } });
   };
 
-  const handleMatchReview = () => {
-    navigate("/match/result", { state: { matchId: selectedMatchId } });
-  };
-
   return (
     <Layout>
-      <h3>경기 일정</h3>
-      <DatePickerContainer>
-        <DatePicker
-          selected={startDate}
-          className="custom-datepicker"
-          locale={ko}
-          inline
-          onChange={(date: Date) => setStartDate(date)}
-          renderDayContents={renderDayContents}
-        />
-      </DatePickerContainer>
+      <ScoreboardContainer>
+        <DatePickerContainer>
+          <DatePicker
+            selected={startDate}
+            className="custom-datepicker"
+            locale={ko}
+            inline
+            onChange={(date: Date) => setStartDate(date)}
+            renderDayContents={renderDayContents}
+          />
+        </DatePickerContainer>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>일정 정보</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{modalContent}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleMatchPreview}>
-            매치 정보
-          </Button>
-          <Button variant="primary" onClick={handleTacticSetting}>
-            전술 설정
-          </Button>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            닫기
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>일정 정보</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{modalContent}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleMatchPreview}>
+              매치 정보
+            </Button>
+            <Button variant="primary" onClick={handleTacticSetting}>
+              전술 설정
+            </Button>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              닫기
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </ScoreboardContainer>
     </Layout>
   );
 };

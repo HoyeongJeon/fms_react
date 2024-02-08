@@ -17,7 +17,6 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 import { Space, Typography } from "antd";
-import constructWithOptions from "styled-components/dist/constructors/constructWithOptions";
 
 const { Text, Link } = Typography;
 
@@ -109,7 +108,6 @@ const InputMatchResultDetail = () => {
       results: playersData,
     };
 
-    console.log("선수 상세 정보 등록", dataToSubmit);
     axios
       .post(
         `${process.env.REACT_APP_SERVER_HOST}:${
@@ -118,18 +116,10 @@ const InputMatchResultDetail = () => {
         dataToSubmit
       )
       .then((res) => {
-        console.log(res);
         navigate(`/team`);
       })
       .catch((err) => {
         alert("오류가 발생했습니다.");
-        console.log(err);
-        console.log(dataToSubmit);
-        console.log(
-          `${process.env.REACT_APP_SERVER_HOST}:${
-            process.env.REACT_APP_SERVER_PORT || 3000
-          }/api/match/${matchId}/result/member`
-        );
         navigate(`/match/${matchId}`);
       });
   };
@@ -237,27 +227,6 @@ const InputMatchResultDetail = () => {
             </tr>
           </thead>
         </Table>
-        {/* <tbody
-          style={{
-            width: "100%",
-          }}
-        >
-          {players.map((player) => (
-            <>
-              <tr key={player.id}>
-                <PlayerInputRow
-                  player={player}
-                  onPlayerChange={handlePlayerChange}
-                />
-                <td>
-                  <CustomButton onClick={() => removePlayer(player.id)}>
-                    X
-                  </CustomButton>
-                </td>
-              </tr>
-            </>
-          ))}
-        </tbody> */}
 
         <tbody
           style={{

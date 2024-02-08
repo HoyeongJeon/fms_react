@@ -15,7 +15,6 @@ export default function Calendar() {
         <p>메뉴 항목 2</p>
       </div>
       <div className="card">
-        <h2>경기 일정</h2>
         <FullCalendar
           plugins={[dayGridPlugin, googleCalendarPlugin]}
           initialView="dayGridMonth"
