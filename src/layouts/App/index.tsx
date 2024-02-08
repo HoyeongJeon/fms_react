@@ -53,6 +53,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id
       );
+
+      console.log(
+        " data.data.member[0]?.team?.id=",
+        data.data.member[0]?.team?.id
+      );
       // setMember(data.data.member[0]?.id);
       setMemberId(data.data.member[0]?.id);
     }
@@ -88,7 +93,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
                 navigate("/home");
               }
-            }}>
+            }}
+          >
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -119,21 +125,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}>
+          }}
+        >
           LOGOUT
         </MenuItem>
       </Menu>
       <Card>
-        <h2>
-          <StyledLink to="/home">
-            <img
-              src="img/title2.png"
-              alt="축구왕"
-              style={{ cursor: "pointer", width: "20%" }}
-            />
-          </StyledLink>
-        </h2>
-
+        <StyledLink to="/home">
+          <h1
+            style={{
+              textAlign: "center",
+              fontSize: "30px",
+              fontWeight: "bold",
+              marginBottom: "20px",
+            }}
+          >
+            축구왕
+          </h1>
+        </StyledLink>
         {children}
       </Card>
     </PageContainer>
