@@ -58,9 +58,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     if (data?.data.profile) {
-      console.log("data.data.profile1=",data.data.profile);
+      console.log("data.data.profile1=", data.data.profile);
       setProfile(data.data.profile);
-      console.log("data.data.profile2=",data.data.profile);
+      console.log("data.data.profile2=", data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {
@@ -88,8 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
                 navigate("/home");
               }
-            }}
-          >
+            }}>
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -114,15 +113,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}
-        >
+          }}>
           LOGOUT
         </MenuItem>
       </Menu>
       <Card>
         <h2>
           <StyledLink to="/home">
-            Football Management System (FMS) ⚽🔥
+            <img
+              src="img/title2.png"
+              alt="Football Management System (FMS) Logo"
+              style={{ cursor: "pointer", width: "50%" }}
+            />
           </StyledLink>
         </h2>
 
