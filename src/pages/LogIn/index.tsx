@@ -39,9 +39,12 @@ const LogIn = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await basicAxios.post(`${process.env.REACT_APP_SERVER_HOST}:${
-        process.env.REACT_APP_SERVER_PORT || 3000
-      }/api/auth/sign-in`, { email, password });
+      const res = await basicAxios.post(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/auth/sign-in`,
+        { email, password }
+      );
       // const res = await axios.post("http://localhost:3000/api/auth/sign-in", { email, password });
       localStorage.setItem("accessToken", res.data.data.accessToken);
       localStorage.setItem("refreshToken", res.data.data.refreshToken);
@@ -62,7 +65,7 @@ const LogIn = () => {
   const REDIRECT_URI = `${process.env.REACT_APP_SERVER_HOST}:${
     process.env.REACT_APP_SERVER_PORT || 3000
   }/api/auth/kakao/callback`;
-  
+
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   const onKakaoLoginClick = async () => {
@@ -132,7 +135,8 @@ const LogIn = () => {
           </LinkContainer>
           <div
             className="ms-auto kakao-login-container"
-            style={{ cursor: "pointer", width: "100%" }}>
+            style={{ cursor: "pointer", width: "100%" }}
+          >
             <img
               src="img/kakao_login_image.png"
               alt="카카오 로그인"
