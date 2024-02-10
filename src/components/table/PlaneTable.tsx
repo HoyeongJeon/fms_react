@@ -61,7 +61,7 @@ const PlaneTable = (props: PlaneTableType) => {
 
     const movePage = useNavigate();
     const handleMemberDetail = (memberId: number) => {
-        movePage(`/team/${teamId}/member/${memberId}`);
+        movePage(`/team/member/${memberId}`);
     };
 
     return (
