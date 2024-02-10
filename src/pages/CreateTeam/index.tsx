@@ -1,31 +1,32 @@
-import FileUploader from "components/file/FileUploader";
-import InputBox from "components/input/InputBox";
-import KakaoLocation from "components/location/Location";
-import RadioLayout from "components/radio/RadioLayout";
-import Toggle from "components/toggle/Toggle";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import "./create-team.css";
-import { useDaumPostcodePopup } from "react-daum-postcode";
+import { Alert, message } from "antd";
 import styled from "styled-components";
 import axios from "axios";
-import Layout from "layouts/App";
 import { useNavigate } from "react-router-dom";
-import { Alert, message } from "antd";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
 import { useTeamStore } from "store/teamStore";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import FileUploader from "components/file/FileUploader";
+import InputBox from "components/input/InputBox";
+import KakaoLocation from "components/location/Location";
+import RadioLayout from "components/radio/RadioLayout";
+import Toggle from "components/toggle/Toggle";
 
+import "./create-team.css";
+import { useDaumPostcodePopup } from "react-daum-postcode";
+import Layout from "layouts/App";
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: ##ffffff;
+`;
 const CreateTeam = () => {
   const { kakao } = window;
-  const [profile, setProfile] = useState({
-    location: {
-      latitude: 0,
-      longitude: 0,
-    },
-  });
 
   const [addressValues, setAddressValues] = useState({
     roadAddress: "",
@@ -39,6 +40,14 @@ const CreateTeam = () => {
   const [teamInfo, setTeamInfo] = useState({
     name: "",
     description: "",
+    location: {
+      latitude: "",
+      longitude: "",
+      state: "",
+      city: "",
+      district: "",
+      address: "",
+    },
   });
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>();
@@ -46,9 +55,7 @@ const CreateTeam = () => {
   const [validationMessage, setValidationMessage] = useState<string>("");
   const { setTeamId } = useTeamStore();
   const navigate = useNavigate();
-
   const open = useDaumPostcodePopup();
-
   const completeFunc = (data: any) => {
     setAddressValues({
       ...addressValues,
@@ -57,13 +64,11 @@ const CreateTeam = () => {
     });
   };
 
-  // 주소 입력시 이벤트
   useEffect(() => {
     searchLocation(addressValues.roadAddress);
   }, [addressValues.roadAddress]);
 
   const searchLocation = (address: string) => {
-    // 주소가 있는 경우에만 API 호출
     if (address) {
       const geocoder = new kakao.maps.services.Geocoder();
       geocoder.addressSearch(address, (result, status) => {
@@ -82,52 +87,6 @@ const CreateTeam = () => {
       });
     }
   };
-  
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    open({ onComplete: completeFunc });
-    e.preventDefault();
-  };
-
-  // 라디오 이벤트
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedGender(e.target.value);
-  };
-
-  const radioOption: RadioLayout = {
-    titleLabel: "성별",
-    option: [
-      {
-        label: "남성",
-        nameAndId: "gender",
-        value: "Male",
-      },
-      {
-        label: "여성",
-        nameAndId: "gender",
-        value: "Female",
-      },
-    ],
-    onChange,
-  };
-
-  const handleMapClick = (latitude: number, longitude: number) => {
-
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      location: {
-        latitude,
-        longitude,
-      },
-    }));
-  };
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setTeamInfo((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -138,36 +97,58 @@ const CreateTeam = () => {
       setSelectedFile(null);
     }
   };
-  
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setTeamInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedGender(e.target.value);
+  };
+
+  const handleMapClick = (latitude: number, longitude: number) => {};
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    open({ onComplete: completeFunc });
+    e.preventDefault();
+  };
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-  
+
     if (
       !teamInfo.name ||
       !teamInfo.description ||
-      !selectedFile ||
-      !addressValues ||
-      !addressValues.postalCode ||
-      !addressValues.roadAddress
+      !teamInfo.location ||
+      !selectedFile
     ) {
       setValidationMessage("필수 입력값을 입력해주세요");
+      return;
     }
-  
+
     const formData = new FormData();
     formData.append("name", teamInfo.name);
     formData.append("description", teamInfo.description);
+    formData.append("address", teamInfo.location.address);
+    formData.append("city", teamInfo.location.city);
+    formData.append("district", teamInfo.location.district);
+    formData.append("latitude", teamInfo.location.latitude);
+    formData.append("longitude", teamInfo.location.longitude);
+    formData.append("state", teamInfo.location.state);
     formData.append("gender", selectedGender);
     formData.append("isMixedGender", selectedToggle.toString());
-    formData.append("postalCode", addressValues.postalCode);
-    formData.append("address", addressValues.roadAddress);
     if (selectedFile) {
       formData.append("file", selectedFile);
     }
-  
+
     try {
       const accessToken = localStorage.getItem("accessToken");
-  
+
       const response = await axios.post(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
@@ -179,7 +160,7 @@ const CreateTeam = () => {
           },
         }
       );
-  
+
       if (response.status === 201) {
         setTeamId(response.data.data.id);
         message.success("팀등록이 완료되었습니다.");
@@ -195,59 +176,69 @@ const CreateTeam = () => {
 
   return (
     <Layout>
-      {
-        <ScoreboardContainer>
+      <ScoreboardContainer>
+        <Wrapper>
           <form className="create-team-form">
-          <div className="left-section">
-            {validationMessage && (
-              <Alert
-                message="에러"
-                description={validationMessage}
-                type="error"
-                showIcon
-                closable
-                onClose={() => setValidationMessage("")}></Alert>
-            )}
-            <FileUploader
-              descLabel="구단 로고를 등록해주세요"
-              changedFunc={handleFileChange}
-            />
-            <InputBox
-              inputLabel="구단명"
-              name="name"
-              onChange={handleInputChange}
-            />
-            <InputBox
-              inputLabel="구단 설명"
-              name="description"
-              onChange={handleInputChange}
-            />
-            <RadioLayout
-              titleLabel={radioOption.titleLabel}
-              option={radioOption.option}
-              onChange={radioOption.onChange}
-            />
-            <Toggle
-              label="혼성 여부"
-              onToggle={(value) => setSelectedToggle(value)}
-            />
+            <div className="left-section">
+              {validationMessage && (
+                <Alert
+                  message="에러"
+                  description={validationMessage}
+                  type="error"
+                  showIcon
+                  closable
+                  onClose={() => setValidationMessage("")}
+                />
+              )}
+              <FileUploader
+                descLabel="구단 로고를 등록해주세요"
+                changedFunc={handleFileChange}
+              />
+              <InputBox
+                inputLabel="구단명"
+                name="name"
+                onChange={handleInputChange}
+              />
+              <InputBox
+                inputLabel="구단 설명"
+                name="description"
+                onChange={handleInputChange}
+              />
+              <RadioLayout
+                titleLabel="성별"
+                option={[
+                  { label: "남성", nameAndId: "gender", value: "Male" },
+                  { label: "여성", nameAndId: "gender", value: "Female" },
+                ]}
+                onChange={onChange}
+              />
+              <Toggle
+                label="혼성 여부"
+                onToggle={(value) => setSelectedToggle(value)}
+              />
             </div>
             <div className="right-section">
               <div className="location-container">
-                <label style={{ fontSize: "25px"}} htmlFor="">연고지</label>
+                <label style={{ fontSize: "25px" }}>연고지</label>
                 <KakaoLocation
-  apiKey="YOUR_KAKAO_MAP_API_KEY"
-  center={{
-    lat: parseFloat(addressValues.center.lat),
-    lng: parseFloat(addressValues.center.lng),
-    level: 3,
-  }}
-  style={{ width: "100%", height: "300px", marginBottom: "1rem" }}
-  initialLevel={3}
-  initialLat={profile.location?.latitude.toString() || "0"}
-  initialLng={profile.location?.longitude.toString() || "0"}
-  onClick={(e: any) => handleMapClick(e.latLng.getLat(), e.latLng.getLng())}
-/>
+                  apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
+                  center={{
+                    lat: parseFloat(addressValues.center.lat),
+                    lng: parseFloat(addressValues.center.lng),
+                    level: 3,
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "300px",
+                    marginBottom: "1rem",
+                  }}
+                  initialLevel={3}
+                  initialLat={teamInfo.location?.latitude.toString() || "0"}
+                  initialLng={teamInfo.location?.longitude.toString() || "0"}
+                  onClick={(e: any) =>
+                    handleMapClick(e.latLng.getLat(), e.latLng.getLng())
+                  }
+                />
                 <Button variant="dark" onClick={handleClick}>
                   주소 검색
                 </Button>
@@ -255,14 +246,14 @@ const CreateTeam = () => {
               <div style={{ fontSize: "12px", color: "gray" }}>
                 {validationMessage}
               </div>
-              <br/>
+              <br />
               <Button variant="dark" onClick={onClickAddButton}>
-                Add
+                저장
               </Button>
             </div>
           </form>
-        </ScoreboardContainer>
-      }
+        </Wrapper>
+      </ScoreboardContainer>
     </Layout>
   );
 };

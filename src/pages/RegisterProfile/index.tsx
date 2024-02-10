@@ -7,6 +7,7 @@ import { Alert } from "antd";
 import FileUploader from "components/file/FileUploader";
 import KakaoLocation from "components/location/Location";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 type Profile = {
   // name: string;
@@ -313,115 +314,121 @@ const RegisterProfile = () => {
 
   return (
     <Layout>
-      <Wrapper>
-        <ProfileContainer>
-          <h2>프로필(사용자)</h2>
-          <Form>
-            {validationMessage && (
-              <Alert
-                message="에러"
-                description={validationMessage}
-                type="error"
-                showIcon
-                closable
-                onClose={() => setValidationMessage("")}></Alert>
-            )}
-            <FileUploader
-              descLabel="프로필 사진을 등록해주세요"
-              changedFunc={handleFileChange}
-            />
-            <Button onClick={handleClick} disabled={!kakaoMapLoaded}>
-              Open Map
-            </Button>
-
-            {kakaoMapLoaded && (
-              <KakaoLocation
-                apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
-                center={{
-                  lat: parseFloat(location.latitude.toString() || "0"),
-                  lng: parseFloat(location.longitude.toString() || "0"),
-                  level: 3,
-                }}
-                style={{ width: "100%", height: "300px", marginBottom: "1rem" }}
-                initialLevel={3}
-                initialLat={location.latitude.toString() || "0"}
-                initialLng={location.longitude.toString() || "0"}
-                onClick={(lat, lng) => handleMapClick(lat, lng)}
+      <ScoreboardContainer>
+        <Wrapper>
+          <ProfileContainer>
+            <h2>프로필(사용자)</h2>
+            <Form>
+              {validationMessage && (
+                <Alert
+                  message="에러"
+                  description={validationMessage}
+                  type="error"
+                  showIcon
+                  closable
+                  onClose={() => setValidationMessage("")}></Alert>
+              )}
+              <FileUploader
+                descLabel="프로필 사진을 등록해주세요"
+                changedFunc={handleFileChange}
               />
-            )}
-            <Input
-              name="birthdate"
-              type="date"
-              placeholder="생년월일"
-              value={profile.birthdate}
-              onChange={handleChange}
-              required
-            />
+              <Button onClick={handleClick} disabled={!kakaoMapLoaded}>
+                Open Map
+              </Button>
 
-            {profile.birthdate && (
+              {kakaoMapLoaded && (
+                <KakaoLocation
+                  apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
+                  center={{
+                    lat: parseFloat(location.latitude.toString() || "0"),
+                    lng: parseFloat(location.longitude.toString() || "0"),
+                    level: 3,
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "300px",
+                    marginBottom: "1rem",
+                  }}
+                  initialLevel={3}
+                  initialLat={location.latitude.toString() || "0"}
+                  initialLng={location.longitude.toString() || "0"}
+                  onClick={(lat, lng) => handleMapClick(lat, lng)}
+                />
+              )}
               <Input
-                name="age"
-                type="text"
-                placeholder="나이"
-                value={calculateAge(profile.birthdate)}
-                readOnly
+                name="birthdate"
+                type="date"
+                placeholder="생년월일"
+                value={profile.birthdate}
+                onChange={handleChange}
+                required
               />
-            )}
-            {Object.keys(profile).map((key) => {
-              if (key === "preferredPosition") {
-                return (
-                  <Select
-                    key={key}
-                    name={key}
-                    value={profile[key]}
-                    onChange={handleChange}
-                    required>
-                    <option value="">포지션 선택</option>
-                    {Position.map((position) => (
-                      <option key={position} value={position}>
-                        {position}
-                      </option>
-                    ))}
-                  </Select>
-                );
-              } else if (key === "gender") {
-                return (
-                  <Select
-                    key={key}
-                    name={key}
-                    value={profile[key]}
-                    onChange={handleChange}
-                    required>
-                    <option value="">성별</option>
-                    {Genders.map((gender) => (
-                      <option key={gender} value={gender}>
-                        {gender}
-                      </option>
-                    ))}
-                  </Select>
-                );
-              } else if (
-                key !== "birthdate" &&
-                key !== "age" &&
-                key !== "location"
-              ) {
-                return (
-                  <Input
-                    key={key}
-                    name={key}
-                    type="text"
-                    placeholder={key}
-                    value={profile[key] as string}
-                    onChange={handleChange}
-                    required
-                  />
-                );
-              }
-            })}
-            <Button onClick={onClickAddButton}>저장</Button>
-          </Form>
-        </ProfileContainer>
-      </Wrapper>
+
+              {profile.birthdate && (
+                <Input
+                  name="age"
+                  type="text"
+                  placeholder="나이"
+                  value={calculateAge(profile.birthdate)}
+                  readOnly
+                />
+              )}
+              {Object.keys(profile).map((key) => {
+                if (key === "preferredPosition") {
+                  return (
+                    <Select
+                      key={key}
+                      name={key}
+                      value={profile[key]}
+                      onChange={handleChange}
+                      required>
+                      <option value="">포지션 선택</option>
+                      {Position.map((position) => (
+                        <option key={position} value={position}>
+                          {position}
+                        </option>
+                      ))}
+                    </Select>
+                  );
+                } else if (key === "gender") {
+                  return (
+                    <Select
+                      key={key}
+                      name={key}
+                      value={profile[key]}
+                      onChange={handleChange}
+                      required>
+                      <option value="">성별</option>
+                      {Genders.map((gender) => (
+                        <option key={gender} value={gender}>
+                          {gender}
+                        </option>
+                      ))}
+                    </Select>
+                  );
+                } else if (
+                  key !== "birthdate" &&
+                  key !== "age" &&
+                  key !== "location"
+                ) {
+                  return (
+                    <Input
+                      key={key}
+                      name={key}
+                      type="text"
+                      placeholder={key}
+                      value={profile[key] as string}
+                      onChange={handleChange}
+                      required
+                    />
+                  );
+                }
+              })}
+              <Button onClick={onClickAddButton}>저장</Button>
+            </Form>
+          </ProfileContainer>
+        </Wrapper>
+      </ScoreboardContainer>
     </Layout>
   );
 };

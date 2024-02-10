@@ -33,6 +33,7 @@ import SendCode from './pages/sendCode';
 import KakaoSuccess from './pages/KakaoSuccess';
 import './styles.module.css';
 import HomePreview from 'pages/HomePreview';
+import ProfilePreview from 'pages/ProfilePreview';
 
 const Trail: React.FC<{ open: boolean }> = ({ open }: React.PropsWithChildren<{ open: boolean }>) => {
     const navigate = useNavigate();
@@ -171,6 +172,8 @@ const App: React.FC = () => {
         <Routes>
             {/* 로그인 안해도 접근 가능한 url */}
             <Route path="/home/preview" element={<HomePreview />} />
+            <Route path="/profile/preview" element={<ProfilePreview />} />
+
             <Route path="/" element={<Trail open={open} />} />
             <Route path="/emailCode" element={<SendCode />} />
             <Route path="/password" element={<ResetPassword />} />

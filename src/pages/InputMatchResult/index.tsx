@@ -1,7 +1,3 @@
-// 의문?
-// 화면에서 여기 왜 등록하는지?
-// 경기 종료 버튼?
-
 import axios from "axios";
 import Layout from "layouts/App";
 import {
@@ -11,13 +7,12 @@ import {
   TeamBadge,
   TeamLogo,
   TeamsContainer,
-  Title,
 } from "pages/MatchResult/styles";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTeamStore } from "store/teamStore";
 import { useUserStore } from "store/userStore";
-import { Input, Typography } from "antd";
+import { Input, Typography, InputNumber } from "antd";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
 import { BASE_URL } from "utils/axios";
@@ -25,8 +20,9 @@ import { useMemberStore } from "store/memberStore";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { BiFootball } from "react-icons/bi";
+import dayjs from "dayjs";
+const { Title, Text } = Typography;
 
-const { Text, Link } = Typography;
 //
 
 interface MatchInfo {
@@ -51,7 +47,6 @@ const InputMatchResult = () => {
   const { matchId } = useParams();
   const location = useLocation();
   const { matchDate } = location.state || {};
-  console.log("matchDate", matchDate);
   const { teamId, name, imageUUID } = useTeamStore();
   const { id: memberId } = useMemberStore();
   const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌x
@@ -209,18 +204,14 @@ const InputMatchResult = () => {
         </Modal.Footer>
       </Modal>
       <ScoreboardContainer>
-        <Title>{matchDate}</Title>
+        <Title level={3}>
+          {matchDate ? dayjs(matchDate).format("YYYY-MM-DD") : "Loading..."}
+        </Title>
         <TeamsContainer>
           <TeamBadge>
             <TeamLogo src={presignedURL} alt="작성자가 속한 팀 로고 넣어야함" />
             <div>{name}</div>
           </TeamBadge>
-
-          {/* <ScoreInput
-            type="text"
-            value={homeScore}
-            onChange={(e) => setHomeScore(Number(e.target.value))}
-          /> */}
         </TeamsContainer>
 
         {Object.keys(matchInfo).map((record) => {
@@ -236,6 +227,7 @@ const InputMatchResult = () => {
                 <Input
                   key={record}
                   name={record}
+                  min={0}
                   placeholder="숫자를 입력해주세요(e.g 1, 2, 3)"
                   type="number"
                   onChange={handleChange}

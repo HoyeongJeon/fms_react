@@ -12,6 +12,7 @@ import useSWR from "swr";
 import fetcher from "utils/fetcher";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
+import LayoutPreview from "layouts/AppPreview";
 
 type Profile = {
   height: string;
@@ -26,7 +27,11 @@ type Profile = {
     district: string;
     address: string;
   };
-  [key: string]: string | { latitude: number; longitude: number } | undefined | number;
+  [key: string]:
+    | string
+    | { latitude: number; longitude: number }
+    | undefined
+    | number;
 };
 
 const Wrapper = styled.div`
@@ -69,83 +74,55 @@ const MapContainer = styled.div`
   margin-top: 20px;
 `;
 
-const Profile = () => {
-  const { name } = useUserStore();
-
-  const { id, gender, preferredPosition, height, weight, imageUUID, location } =
-
-    useProfileStore();
-  const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
-
-  useEffect(() => {
-    const USER_LATITUDE = location.latitude;
-    const USER_LONGITUDE = location.longitude;
-
-    const container = document.getElementById("kakao-map")!;
-    const options = {
-      center: new window.kakao.maps.LatLng( USER_LATITUDE,
-        USER_LONGITUDE), 
-      level: 3,
-    };
-    const map = new window.kakao.maps.Map(container, options);
-
-    const markerPosition = new window.kakao.maps.LatLng(
-      USER_LATITUDE,
-      USER_LONGITUDE
-    );
-    const marker = new window.kakao.maps.Marker({ position: markerPosition });
-    marker.setMap(map);
-  }, [location]);
-
+const ProfilePreview = () => {
   return (
-    <Layout>
-       <ScoreboardContainer> 
-      <Wrapper>
-        <ProfileContainer>
-          <ProfileImageWrapper>
-            <img src={presignedURL} alt="프로필 이미지" />
-          </ProfileImageWrapper>
-          {id ? (
+    <LayoutPreview>
+      <ScoreboardContainer>
+        <Wrapper>
+          <ProfileContainer>
+            <ProfileImageWrapper>
+              <img
+                src="https://t2.gstatic.com/licensed-image?q=tbn:ANd9GcTt1_3DYt00pg7o5usPu4qi-AnYj_zQ1CmDtoeDHrmNfUEPjuKQSWx01WxA9_tCdW3f"
+                alt="프로필 이미지"
+              />
+            </ProfileImageWrapper>
             <ListGroup>
               <ListGroup.Item>
                 <span>이름: </span>
-                {name}
+                손흥민
               </ListGroup.Item>
               <br />
               <ListGroup.Item>
                 <span>성별: </span>
-                {gender}
+                Male
               </ListGroup.Item>
               <br />
 
               <ListGroup.Item>
                 <span>선호 포지션: </span>
-                {preferredPosition}
+                Left Wing
               </ListGroup.Item>
               <br />
               <ListGroup.Item>
                 <span>키: </span>
-                {height}cm
+                184cm
               </ListGroup.Item>
               <br />
               <ListGroup.Item>
                 <span>몸무게: </span>
-                {weight}kg
+                75kg
               </ListGroup.Item>
               <br />
               <LinkContainer>
-                <Link to={`/profile/${id}/edit`}>프로필 변경하기</Link>
+                {/* <Link to={`/profile/${id}/edit`}>프로필 변경하기</Link> */}
               </LinkContainer>
             </ListGroup>
-          ) : (
-            <div>loading...</div>
-          )}
-          <MapContainer id="kakao-map" />
-        </ProfileContainer>
-      </Wrapper>
+            <MapContainer id="kakao-map" />
+          </ProfileContainer>
+        </Wrapper>
       </ScoreboardContainer>
-    </Layout>
+    </LayoutPreview>
   );
 };
 
-export default Profile;
+export default ProfilePreview;

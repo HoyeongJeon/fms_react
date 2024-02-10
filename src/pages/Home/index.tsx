@@ -285,6 +285,7 @@ const Home = () => {
                                     );
                                 })}
 
+<<<<<<< HEAD
                                 <div ref={messagesEndRef} />
                             </Modal.Body>
                             <ChatBox
@@ -320,6 +321,42 @@ const Home = () => {
                                 <br />
                                 팀을 생성하거나 팀에 참가하세요.
                             </ErrorMessage>
+=======
+                <div ref={messagesEndRef} />
+              </Modal.Body>
+              <ChatBox
+                chat={chat}
+                teamId={teamId}
+                onChangeChat={onChangeChat}
+                onSubmitForm={onSubmitForm}
+              />
+              <Modal.Footer>
+                <Button variant="outline-dark" onClick={handleClose}>
+                  닫기
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            <div>
+              <div>
+                <h3>팀 승률</h3>
+                <h5>
+                  {teamWinningRate?.wins ?? 0}승 {teamWinningRate?.draws ?? 0}무{" "}
+                  {teamWinningRate?.loses ?? 0}패 {rate}%
+                </h5>
+                <BasicPie data={teamWinningRate} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* profileId가 없는 경우,  */}
+            <ErrorContainer>
+              <ErrorMessage>
+                속한 팀이 없습니다.
+                <br />
+                팀을 생성하거나 팀에 참가하세요.
+              </ErrorMessage>
+>>>>>>> f3ff90d2388640164686462296b2dce2a39151b0
 
                             {profileId ? (
                                 <>
