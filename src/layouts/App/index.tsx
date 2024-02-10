@@ -107,9 +107,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuItem>
               <StyledLink to="/memberTable">INVITE</StyledLink>
             </MenuItem>
-            <MenuItem>
+            {/* <MenuItem>
               <StyledLink to="/teamTable">JOIN</StyledLink>
-            </MenuItem>
+            </MenuItem> */}
           </>
         ) : (
           <></>
