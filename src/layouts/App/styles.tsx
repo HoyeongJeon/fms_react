@@ -34,7 +34,6 @@ export const MenuItem = styled.p`
   }
 `;
 
-
 export const Card = styled.div`
   width: 80%;
   height: 90%;
@@ -51,6 +50,7 @@ export const Card = styled.div`
 export const StyledLink = styled(Link)`
   color: #445664;
   text-decoration: none;
+
   &:hover {
     text-decoration: none;
   }

@@ -230,7 +230,9 @@ const Home = () => {
       setTeamWinningRate(resultRate.data);
     };
 
-    getWinningRate();
+    if (teamId) {
+      getWinningRate();
+    }
   }, [teamId]);
 
   useEffect(() => {
