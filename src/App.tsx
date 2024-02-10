@@ -204,7 +204,7 @@ const App: React.FC = () => {
                     <Route path="/profile/:userId/edit" element={<EditProfile />} />
                     <Route path="/profile/:userId" element={<Profile />} />
                     <Route path="/profile/:userId/register" element={<RegisterProfile />} />
-                    <Route path="/team/:teamId/member/:memberId" element={<MemberDetail />} />
+                    <Route path="/team/member/:memberId" element={<MemberDetail />} />
                     <Route path="/match" element={<Match />} />
                     <Route path="/match/result" element={<MatchResult />} />
                     <Route path="/match/:matchId/input" element={<InputMatchResult />} />
