@@ -1,14 +1,22 @@
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
 .image-viewer {
-    width: 200px;
-    height: 200px;
-    border-radius: 100px;
-    overflow: hidden;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  width: 200px;
+  height: 200px;
+  border-radius: 100px;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .image-viewer img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-    object-position: center;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
 }

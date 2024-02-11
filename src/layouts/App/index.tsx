@@ -48,19 +48,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       resetProfile();
       setUser(data.data);
       setTeamInfo(
-        data.data.member[0]?.team?.id,
-        data.data.member[0]?.team?.name,
-        data.data.member[0]?.team?.imageUUID,
-        data.data.member[0]?.team?.chat?.id
+        data.data.member[0]?.team?.id || data.data.team?.id,
+        data.data.member[0]?.team?.name || data.data.team?.name,
+        data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
+        data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
+      );
+
+      console.log("data.data", data.data);
+
+      console.log(
+        " data.data.member[0]?.team?.id=",
+        data.data.member[0]?.team?.id
       );
       // setMember(data.data.member[0]?.id);
       setMemberId(data.data.member[0]?.id);
     }
 
     if (data?.data.profile) {
-      console.log("data.data.profile1=", data.data.profile);
       setProfile(data.data.profile);
-      console.log("data.data.profile2=", data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {
@@ -88,7 +93,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
                 navigate("/home");
               }
-            }}>
+            }}
+          >
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -104,6 +110,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
             </MenuItem>
+            <MenuItem>
+              <StyledLink to="/memberTable">INVITE</StyledLink>
+            </MenuItem>
+            {/* <MenuItem>
+              <StyledLink to="/teamTable">JOIN</StyledLink>
+            </MenuItem> */}
           </>
         ) : (
           <></>
@@ -113,20 +125,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}>
+          }}
+        >
           LOGOUT
         </MenuItem>
       </Menu>
       <Card>
-        <h2>
-          <StyledLink to="/home">
-            <img
-              src="img/title2.png"
-              alt="Football Management System (FMS) Logo"
-              style={{ cursor: "pointer", width: "50%" }}
-            />
-          </StyledLink>
-        </h2>
+        <StyledLink to="/home">
+          <h1
+            style={{
+              textAlign: "center",
+              fontSize: "30px",
+              fontWeight: "bold",
+              marginBottom: "20px",
+            }}
+          >
+            축구왕
+          </h1>
+        </StyledLink>
 
         {children}
       </Card>

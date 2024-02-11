@@ -108,12 +108,6 @@ const TeamDetail = () => {
     };
 
     useEffect(() => {
-        // if (teamIdParam !== teamId) {
-        //     alert('잘못된 접근입니다.');
-        //     navigate('/home');
-        //     return;
-        // }
-
         const getTema = async () => {
             try {
                 const response = await axios.get(
