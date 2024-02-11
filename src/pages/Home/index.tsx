@@ -275,7 +275,7 @@ const Home = () => {
                 cursor: "pointer",
               }}
             >
-              <AiTwotoneMessage />
+              <AiTwotoneMessage size={30} />
             </Button>
             <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
               <Modal.Header closeButton>
