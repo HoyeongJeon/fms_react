@@ -222,6 +222,8 @@ const MatchCalendar = () => {
   };
 
   const [isMatchEnd, setIsMatchEnd] = useState<boolean>(false);
+  const [showScheduleButton, setShowScheduleButton] = useState<boolean>(false); // 경기 예정 여부에 따라 버튼 표시를 결정하는 상태
+
   const handleDayClick = async (date: Date) => {
     const formattedDate = format(date, "yyyy-MM-dd");
 
@@ -231,9 +233,12 @@ const MatchCalendar = () => {
     // 선택된 날짜에 해당하는 스케줄 찾기
     const daySchedules = schedules.filter((sch) => sch.date === formattedDate);
 
-    // 선택된 날짜에 해당하는 첫 번째 스케줄의 matchId를 저장
+    // 경기가 있는 날짜
     if (daySchedules.length > 0) {
-      setSelectedMatchId(daySchedules[0].matchId); // matchId를 상태에 저장
+      setSelectedMatchId(daySchedules[0].matchId);
+      setShowScheduleButton(true); // 경기가 예정되어 있으므로 false로 설정
+    } else {
+      setShowScheduleButton(false); // 경기가 예정되어 있지 않으므로 true로 설정
     }
 
     // 모달 내용 구성
@@ -318,6 +323,11 @@ const MatchCalendar = () => {
     navigate("/match/preview", { state: { matchId: selectedMatchId } });
   };
 
+  // 여기서 url 변경하면 됨.
+  const handleBookMatch = () => {
+    navigate("/match/book", { state: { matchId: selectedMatchId } });
+  };
+
   return (
     <Layout>
       <ScoreboardContainer>
@@ -338,9 +348,15 @@ const MatchCalendar = () => {
           </Modal.Header>
           <Modal.Body>{modalContent}</Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={handleMatchPreview}>
-              매치 정보
-            </Button>
+            {showScheduleButton ? (
+              <Button variant="primary" onClick={handleMatchPreview}>
+                매치 정보
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={handleBookMatch}>
+                경기 예약
+              </Button>
+            )}
             <Button variant="primary" onClick={handleTacticSetting}>
               전술 설정
             </Button>
