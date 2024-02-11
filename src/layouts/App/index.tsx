@@ -48,11 +48,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       resetProfile();
       setUser(data.data);
       setTeamInfo(
-        data.data.member[0]?.team?.id,
-        data.data.member[0]?.team?.name,
-        data.data.member[0]?.team?.imageUUID,
-        data.data.member[0]?.team?.chat?.id
+        data.data.member[0]?.team?.id || data.data.team?.id,
+        data.data.member[0]?.team?.name || data.data.team?.name,
+        data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
+        data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
       );
+
+      console.log("data.data", data.data);
 
       console.log(
         " data.data.member[0]?.team?.id=",
@@ -63,9 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     if (data?.data.profile) {
-      console.log("data.data.profile1=", data.data.profile);
       setProfile(data.data.profile);
-      console.log("data.data.profile2=", data.data.profile);
     }
   }, [data]);
   const handleLogout = () => {
@@ -143,6 +143,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             축구왕
           </h1>
         </StyledLink>
+
         {children}
       </Card>
     </PageContainer>
