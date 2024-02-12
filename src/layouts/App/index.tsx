@@ -132,12 +132,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </Menu>
       <Card>
         <StyledLink to="/home">
-          <h1
+        <h1
             style={{
               textAlign: "center",
-              fontSize: "30px",
+              // fontFamily: "HakgyoansimJiugaeR",
+              fontSize: "40px",
               fontWeight: "bold",
-              marginBottom: "20px",
+              marginBottom: "10px",
+              color: "black",
             }}
           >
             축구왕

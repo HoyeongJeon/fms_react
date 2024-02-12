@@ -35,7 +35,7 @@ import "./styles.module.css";
 import HomePreview from "pages/HomePreview";
 import ProfilePreview from "pages/ProfilePreview";
 
-import GlobalStyle from "./GlobalStyle";
+//import GlobalStyle from "./GlobalStyle";
 
 const Trail: React.FC<{ open: boolean }> = ({
   open,
@@ -183,7 +183,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <GlobalStyle />
+      {/* <GlobalStyle /> */}
       <Routes>
         {/* 로그인 안해도 접근 가능한 url */}
         <Route path="/home/preview" element={<HomePreview />} />
