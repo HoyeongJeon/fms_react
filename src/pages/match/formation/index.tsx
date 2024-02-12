@@ -196,7 +196,7 @@ const Formation = () => {
   >([]);
 
   const location = useLocation();
-  const { matchId } = location.state || {};
+  const { matchId, opponentTeamhId } = location.state || {};
 
   const accessToken = localStorage.getItem("accessToken");
 
@@ -294,6 +294,10 @@ const Formation = () => {
   const [modalData, setModalData] = useState<SimplifiedMemberInfo[]>([]);
   const [formationData, setFormationData] = useState<PopulerFormationInfo[]>([]);
   const [warningMember, setWarningMemberData] = useState<WarningMemberInfo[]>([]);
+  const [bestFormation, setBestFormationData] = useState<BestFormationInfo | null>(null);
+
+  console.log('bestFormation aaa:',bestFormation);
+  console.log('bestFormation formation1:',bestFormation?.formation1);
 
   interface User {
     name: string; // 사용자의 이름
@@ -328,6 +332,11 @@ const Formation = () => {
     member_id: number; 
     yellowCards: number;
     memberData: MemberData; 
+  }
+
+  interface BestFormationInfo {
+    formation1: string; 
+    formation2: string;
   }
 
   useEffect(() => {
@@ -466,6 +475,37 @@ const Formation = () => {
 
 
 
+    /************** 추천 포메이션 조회 ***************/
+
+    useEffect(() => {
+      // 추천 포메이션 조회
+      const getBestFormation = async () => {
+        if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
+  
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_SERVER_HOST}:${
+              process.env.REACT_APP_SERVER_PORT || 3000
+            }/api/formation/best/${homeTeamId}/${opponentTeamhId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+              },
+            }
+          );
+          const resultData = response.data;
+  
+          console.log('resultData bestForamtion:',resultData);
+
+          setBestFormationData(resultData);
+  
+        } catch (error) {
+          console.error("데이터 불러오기 실패:", error);
+        }
+      };
+  
+      getBestFormation();
+    }, [homeTeamId,opponentTeamhId, accessToken]);
 
 
   const setPosition = (position: string, playerName: string) => {
@@ -1119,10 +1159,13 @@ const Formation = () => {
               <FormationTable>
                 <tbody>
                   <TableRow>
-                    <TableCell>4-3-3</TableCell>
-                    <TableCell>5-2-3</TableCell>
-                    <TableCell>4-1-4-1</TableCell>
+                    {/* Optional Chaining을 사용하여 객체가 null이 아닐 때만 프로퍼티에 접근 */}
+                    <TableCell>{bestFormation?.formation1}</TableCell>
+                    <TableCell>{bestFormation?.formation2}</TableCell>
                   </TableRow>
+                  <TableCell colSpan={2}> 
+                    <p style={{fontSize:"15px"}}>*이전 경기 기록 중 승률 높은 포메이션 추천</p>
+                  </TableCell>
                 </tbody>
               </FormationTable>
               <br/>
