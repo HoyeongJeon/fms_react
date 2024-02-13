@@ -260,7 +260,7 @@ const MemberDetail = () => {
                             <th>도움</th>
                             <th>공격P</th>
                             <th>세이브</th>
-                            <th>무실점</th>
+                            <th>클린시트</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -277,7 +277,7 @@ const MemberDetail = () => {
                                     <th>{history.totalAssists ?? 0}</th>
                                     <th>{history.totalPoint ?? 0}</th>
                                     <th>{history.totalSave ?? 0}</th>
-                                    <th>{history.totalCleanSheet ?? 0}</th>
+                                    <th>{history.totalCleanSheet ? 'O' : 'X'}</th>
                                 </tr>
                             ))
                         ) : (

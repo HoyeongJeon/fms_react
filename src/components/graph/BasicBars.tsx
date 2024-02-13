@@ -32,13 +32,6 @@ export default function BasicBars(props: YellowAndRedCardsType) {
                 height={300}
                 colors={colors}
             />
-            <div className="bar-container">
-                <div className="bar-yellow">옐로우 카드</div>
-                <div>색깔</div>
-
-                <div className="bar-red">레드 카드</div>
-                <div>색깔</div>
-            </div>
         </div>
     );
 }
