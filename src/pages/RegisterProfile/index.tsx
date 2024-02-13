@@ -12,8 +12,8 @@ import { ScoreboardContainer } from "pages/MatchResult/styles";
 type Profile = {
   // name: string;
   age: string;
-  height: string;
-  weight: string;
+  height: number;
+  weight: number;
   preferredPosition: string;
   gender: string;
   // password: string;
@@ -28,7 +28,11 @@ type Profile = {
     district: string;
     address: string;
   };
-  [key: string]: string | { latitude: string; longitude: string } | undefined;
+  [key: string]:
+    | string
+    | { latitude: string; longitude: string }
+    | undefined
+    | number;
 };
 
 type ProfileLocation = {
@@ -120,8 +124,8 @@ const RegisterProfile = () => {
   const [imageUrl, setImageUrl] = useState<string | null | File>(null);
   const [profile, setProfile] = useState<Profile>({
     age: "", // Initialize age as an empty string
-    height: "",
-    weight: "",
+    height: 0,
+    weight: 0,
     gender: "",
     preferredPosition: "",
     birthdate: "",
@@ -269,8 +273,8 @@ const RegisterProfile = () => {
     }
 
     const formData = new FormData();
-    formData.append("height", profile.height);
-    formData.append("weight", profile.weight);
+    formData.append("height", `${profile.height}`);
+    formData.append("weight", `${profile.weight}`);
     formData.append("preferredPosition", profile.preferredPosition);
     formData.append("age", calculateAge(profile.birthdate)); // Calculate age here
     formData.append("gender", profile.gender);
@@ -326,7 +330,8 @@ const RegisterProfile = () => {
                   type="error"
                   showIcon
                   closable
-                  onClose={() => setValidationMessage("")}></Alert>
+                  onClose={() => setValidationMessage("")}
+                ></Alert>
               )}
               <FileUploader
                 descLabel="프로필 사진을 등록해주세요"
@@ -381,7 +386,8 @@ const RegisterProfile = () => {
                       name={key}
                       value={profile[key]}
                       onChange={handleChange}
-                      required>
+                      required
+                    >
                       <option value="">포지션 선택</option>
                       {Position.map((position) => (
                         <option key={position} value={position}>
@@ -397,7 +403,8 @@ const RegisterProfile = () => {
                       name={key}
                       value={profile[key]}
                       onChange={handleChange}
-                      required>
+                      required
+                    >
                       <option value="">성별</option>
                       {Genders.map((gender) => (
                         <option key={gender} value={gender}>
@@ -406,17 +413,32 @@ const RegisterProfile = () => {
                       ))}
                     </Select>
                   );
+                } else if (key === "height" || key === "weight") {
+                  // For 'height' and 'weight', use specific placeholders
+                  return (
+                    <Input
+                      key={key}
+                      name={key}
+                      type="number"
+                      min="0"
+                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize first letter
+                      value={profile[key] === 0 ? "" : profile[key].toString()} // If the value is 0, show an empty string
+                      onChange={handleChange}
+                      required
+                    />
+                  );
                 } else if (
                   key !== "birthdate" &&
                   key !== "age" &&
                   key !== "location"
                 ) {
+                  // For other fields, use 'key' as placeholder
                   return (
                     <Input
                       key={key}
                       name={key}
                       type="text"
-                      placeholder={key}
+                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize first letter
                       value={profile[key] as string}
                       onChange={handleChange}
                       required
