@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 interface Member {
   id: number;
   user: User;
+  isStaff: boolean;
 }
 
 interface User {
@@ -58,7 +59,6 @@ const Player: React.FC = () => {
 
       setMembers(response.data);
       setTotal(response.data.total);
-
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
       // Clear the members array in case of an error
@@ -90,11 +90,8 @@ const Player: React.FC = () => {
             withCredentials: true,
           }
         );
-
         setMembers(response.data.data);
         setTotal(response.data.total);
-
-
       } catch (error) {
         console.error("팀 정보를 불러오는 데 실패했습니다.", error);
         // Clear the members array in case of an error
@@ -131,7 +128,6 @@ const Player: React.FC = () => {
       );
       setMembers(response.data);
       setTotal(response.data.total);
-
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
@@ -140,14 +136,13 @@ const Player: React.FC = () => {
   const [show, setShow] = useState(false);
 
   const handleApplyButton = (team: Member) => {
-
     setSelectedMember(team);
     setShowModal(true);
     setShow(true);
 
     // Navigate to the MemberDetail page with the selected member's ID
     if (team.id) {
-      navigate(`/member/${team.id}`);
+      navigate(`/team/member/${team.id}`);
     }
   };
 
@@ -179,6 +174,7 @@ const Player: React.FC = () => {
           <tr>
             <th>ID</th>
             <th>이름</th>
+            <th>구단주 여부</th>
             <th>이메일</th>
             <th>선호 포지션</th>
             <th>나이</th>
@@ -193,9 +189,11 @@ const Player: React.FC = () => {
               <tr key={`memberData-${index}`}>
                 <td>{member.id}</td>
                 <td>{member.user.name}</td>
+                {/* 구단 주인 여부에 따라 텍스트를 다르게 표시 */}
+                <td>{member.isStaff ? "구단주" : "일반선수"}</td>
                 <td>{member.user.email}</td>
-                <td>{member.user.profile.preferredPosition}</td>
-                <td>{member.user.profile.age}</td>
+                <td>{member.user.profile?.preferredPosition}</td>
+                <td>{member.user.profile?.age}</td>
                 {/* <td>{member.user.profile.imageUrl}</td> */}
                 <td>
                   <button onClick={() => handleApplyButton(member)}>

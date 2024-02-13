@@ -40,33 +40,29 @@ const LayoutPreview: React.FC<LayoutProps> = ({ children }) => {
     <PageContainer>
       <Menu>
         <MenuItem>
-          <StyledLink to="/home">HOME</StyledLink>
+          <StyledLink to="/home/preview">HOME</StyledLink>
         </MenuItem>
-        {/* <MenuItem>
-          <StyledLink
-            to={
-              profileId
-                ? `/profile/${profileId}`
-                : `/profile/${userId}/register`
-            }
-          >
-            MY PROFILE
-          </StyledLink>
-        </MenuItem> */}
+        <MenuItem>
+          <StyledLink to="/profile/preview">MY PROFILE</StyledLink>
+        </MenuItem>
         <MenuItem>
           <StyledLink to="/team">TEAM</StyledLink>
         </MenuItem>
         <MenuItem>
-          <StyledLink to="/player">PLAYER</StyledLink>
+          <StyledLink to="/strategy">SCHEDULE</StyledLink>
         </MenuItem>
         <MenuItem>
-          <StyledLink to="/strategy">STRATEGY</StyledLink>
+          <StyledLink to="/player">PLAYER</StyledLink>
         </MenuItem>
       </Menu>
       <Card>
         <h2>
-          <StyledLink to="/home">
-            Football Management System (FMS) ⚽🔥
+        <StyledLink to="/home">
+            <img
+              src="img/title2.png"
+              alt="축구왕"
+              style={{ cursor: "pointer", width: "20%" }}
+            />
           </StyledLink>
         </h2>
         {children}

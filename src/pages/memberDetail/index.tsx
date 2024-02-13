@@ -1,11 +1,16 @@
+import axios, { AxiosError } from "axios";
 import Layout from "layouts/App";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
-import { set } from "date-fns";
-import styled from "styled-components";
+import "./styles.css";
+import PlaneTable from "components/table/PlaneTable";
+import { Table } from "react-bootstrap";
+import { useUserStore } from "store/userStore";
+import { useTeamStore } from "store/teamStore";
 
 interface PlayerData {
   match_id: number;
@@ -30,24 +35,45 @@ interface Match {
   time: string;
 }
 
-interface User {
-  id: number;
-  profile: Profile;
+interface MemberHistoryType {
+  teamId: number;
+  teamName: string;
+  joinDate: Date;
+  deletedAt: Date | null;
+  totalGames: number;
+  totalGoals: number;
+  totalAssists: number;
+  totalPoint: number;
+  totalSave: number;
+  totalCleanSheet: number;
 }
 
 interface Profile {
-  age: number;
-  birthdate: string;
-  gender: string;
-  height: number;
   id: number;
-  presignedURL: string;
-  name: string;
-  phone: string;
-  preferredPosition: string;
-  skillLevel: number;
+  joinDate: Date;
+  teamName: string;
+  userName: string;
   weight: number;
+  height: number;
+  preferredPosition: string;
+  imageUUID: string;
+  gender: string;
+  age: number;
 }
+
+interface MemberRecordType {
+  matchId: number;
+  memberId: number;
+  goals: number;
+  assists: number;
+  point: number;
+  save: number;
+  cleanSheet: number;
+  matchDate: Date;
+  matchTime: string;
+  opposingTeamName: string;
+}
+
 const ProfileImageWrapper = styled.div`
   background-color: white;
   box-shadow: 10px 10px 10px black;
@@ -64,69 +90,29 @@ const ProfileImageWrapper = styled.div`
   }
 `;
 
-const ProfileTable: React.FC<{ profileData: Profile | null }> = ({
-  profileData,
-}) => {
-  return (
-    <div>
-      {profileData && (
-        <div className="profile-info">
-          <table>
-            <thead>
-              <tr>
-                <th>이름</th>
-                <th>나이</th>
-                <th>성별</th>
-                <th>키</th>
-                <th>몸무게</th>
-                <th>선호 포지션</th>
-                <th>사진</th>
-                {/* <th>실력</th> */}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td> {profileData.name}</td>
-                <td>{profileData.age}</td>
-                <td>{profileData.gender}</td>
-                <td>{profileData.height}cm</td>
-                <td>{profileData.weight}kg</td>
-                <td> {profileData.preferredPosition}</td>
-                <td>
-                  <ProfileImageWrapper>
-                    <img src={profileData.presignedURL} alt="프로필 이미지" />
-                  </ProfileImageWrapper>
-                </td>
-                {/* <td> {profileData.skillLevel}/10</td> */}
-              </tr>
-            </tbody>
-          </table>
-          {/* Add more profile information as needed */}
-        </div>
-      )}
-    </div>
-  );
-};
-
 const MemberDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [playerData, setPlayerData] = useState<PlayerData[] | null>(null);
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { data: presignedURL } = useSWR(`/image/${imageUrl}`, fetcher);
+  const [imageUUID, setImageUUID] = useState<string>();
+  const [memberHistory, setMemberHistory] = useState<MemberHistoryType[]>();
+  const [memberRecord, setMemberRecord] = useState<MemberRecordType[]>();
+  const { teamId } = useTeamStore();
+  const navigate = useNavigate();
 
   const { memberId } = useParams();
-  console.log("presignedURL", presignedURL);
+
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
 
-        const response = await axios.get(
+        const response = await axios.get<Profile>(
           `${process.env.REACT_APP_SERVER_HOST}:${
             process.env.REACT_APP_SERVER_PORT || 3000
-          }/api/match/member/${memberId}`,
+          }/api/team/${teamId}/member/${memberId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -134,85 +120,179 @@ const MemberDetail = () => {
             withCredentials: true,
           }
         );
-        console.log("response=",response);
-        // console.log("response", response.data.data.user.profile);
-        setImageUrl(response.data.data.user.profile.imageUUID);
-        const { playerstats, user } = response.data.data;
 
-        // Check if user property exists in the response
-        if (user) {
-          const { profile } = user;
-          console.log("profile=",profile);
-          setProfileData(profile);
-          setProfileData(() => {
-            return { ...profile, presignedURL };
-          });
-          console.log("profileData", profileData);
-        } else {
-          console.warn("User property not found in the API response.");
-          // Handle this case based on your requirements
-          // For now, setting profileData to null
-          setProfileData(null);
-        }
-
-        setPlayerData(playerstats);
+        setProfileData(response.data);
+        setImageUUID(response.data.imageUUID);
       } catch (error) {
         console.error("데이터를 불러오는 중 오류 발생:", error);
-      } finally {
-        setLoading(false);
+        alert("데이터를 불러오는 중 오류 발생:" + error);
       }
     };
 
-    fetchMemberData();
-  }, [memberId, presignedURL]);
+    const fetchMemberHistory = async () => {
+      try {
+        const response = await axios.get<MemberHistoryType[]>(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/team/${teamId}/member/${memberId}/history`
+        );
+
+        setMemberHistory(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchMemberRecord = async () => {
+      try {
+        const response = await axios.get<MemberRecordType[]>(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/team/${teamId}/member/${memberId}/record`
+        );
+
+        setMemberRecord(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (teamId && memberId) {
+      fetchMemberData();
+      fetchMemberHistory();
+      fetchMemberRecord();
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+      if (!imageUUID) {
+        return;
+      }
+
+      try {
+        const response = await axios.get<string>(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/image/${profileData?.imageUUID}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        setImageUrl(response.data);
+      } catch (error: any) {
+        if (error.response.data) {
+          alert(error.response.data.message);
+          navigate("/team");
+        }
+      }
+    };
+
+    fetchImageUrl();
+  }, [imageUUID]);
 
   return (
     <Layout>
-      <div className="App">
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
-
-        {/* Use the ProfileTable component to render profile information */}
-        <ProfileTable profileData={profileData} />
-
-        {playerData && playerData.length > 0 && (
-          <div>
-            {/* Render player statistics */}
-            <div className="season-total">
-              <table>
-                <thead>
-                  <tr>
-                    <th>경기 아이디</th>
-                    <th>경기 날짜</th>
-                    <th>경기 시간</th>
-                    <th>골</th>
-                    <th>어시스트</th>
-                    <th>무실점</th>
-                    <th>교체</th>
-                    <th>세이브</th>
-                    <th>경고</th>
-                    <th>퇴장</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{playerData[0].match_id}</td>
-                    <td>{playerData[0].match.date}</td>
-                    <td>{playerData[0].match.time}</td>
-                    <td>{playerData[0].goals}</td>
-                    <td>{playerData[0].assists}</td>
-                    <td>{playerData[0].clean_sheet}</td>
-                    <td>{playerData[0].substitutions}</td>
-                    <td>{playerData[0].save}</td>
-                    <td>{playerData[0].yellow_cards}</td>
-                    <td>{playerData[0].red_cards}</td>
-                  </tr>
-                </tbody>
-              </table>
+      <ScoreboardContainer>
+        <div className="profile-main-div">
+          <ProfileImageWrapper>
+            {imageUrl ? <img src={imageUrl} alt="프로필 이미지" /> : ""}
+          </ProfileImageWrapper>
+          <div className="profile-info">
+            <h3>{profileData?.userName}</h3>
+            <p>{profileData?.teamName}</p>
+            <div className="profile-row">
+              <p className="profile-row-data">나이 {profileData?.age}</p>
+              <p className="profile-row-data">
+                포지션 {profileData?.preferredPosition}
+              </p>
+            </div>
+            <div className="profile-row">
+              <p className="profile-row-data">키 {profileData?.height}cm</p>
+              <p className="profile-row-data">몸무게 {profileData?.weight}kg</p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </ScoreboardContainer>
+      <ScoreboardContainer>
+        <h3>경기별 통계</h3>
+        <Table className="table">
+          <thead>
+            <tr>
+              <th>상대팀</th>
+              <th>경기일</th>
+              <th>득점</th>
+              <th>도움</th>
+              <th>공격P</th>
+              <th>세이브</th>
+              <th>클린시트</th>
+            </tr>
+          </thead>
+          <tbody>
+            {memberRecord ? (
+              memberRecord.map((record) => (
+                <tr>
+                  <th>{record.opposingTeamName}</th>
+                  <th>
+                    {new Date(record.matchDate).toLocaleDateString()} -{" "}
+                    {record.matchTime}
+                  </th>
+                  <th>{record.goals ?? 0}</th>
+                  <th>{record.assists ?? 0}</th>
+                  <th>{record.point ?? 0}</th>
+                  <th>{record.save ?? 0}</th>
+                  <th>{record.cleanSheet === 1 ? "O" : "X"}</th>
+                </tr>
+              ))
+            ) : (
+              <p>존재 하지 않습니다.</p>
+            )}
+          </tbody>
+        </Table>
+      </ScoreboardContainer>
+      <ScoreboardContainer>
+        <h3>팀별 기록</h3>
+        <Table className="table">
+          <thead>
+            <tr>
+              <th>팀</th>
+              <th>기간</th>
+              <th>경기</th>
+              <th>득점</th>
+              <th>도움</th>
+              <th>공격P</th>
+              <th>세이브</th>
+              <th>클린시트</th>
+            </tr>
+          </thead>
+          <tbody>
+            {memberHistory ? (
+              memberHistory.map((history) => (
+                <tr>
+                  <th>{history.teamName}</th>
+                  <th>
+                    {new Date(history.joinDate).toLocaleDateString()} ~{" "}
+                    {history.deletedAt
+                      ? new Date(history?.deletedAt).toLocaleDateString()
+                      : "현재"}
+                  </th>
+                  <th>{history.totalGames ?? 0}</th>
+                  <th>{history.totalGoals ?? 0}</th>
+                  <th>{history.totalAssists ?? 0}</th>
+                  <th>{history.totalPoint ?? 0}</th>
+                  <th>{history.totalSave ?? 0}</th>
+                  <th>
+                    {history.totalCleanSheet ? history.totalCleanSheet : 0}
+                  </th>
+                </tr>
+              ))
+            ) : (
+              <p>존재 하지 않습니다.</p>
+            )}
+          </tbody>
+        </Table>
+      </ScoreboardContainer>
     </Layout>
   );
 };

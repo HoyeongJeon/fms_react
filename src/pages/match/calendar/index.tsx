@@ -6,10 +6,12 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // 날짜 선택기 스타일
 import { ko } from "date-fns/locale";
-import { format } from "date-fns";
+import { format, isMatch } from "date-fns";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
+import { useMemberStore } from "store/memberStore";
 
 const responsiveWidth = "768px";
 
@@ -111,7 +113,7 @@ const DatePickerContainer = styled.div`
 const MatchCalendar = () => {
   const navigate = useNavigate();
 
-  const [teamId, setTeamId] = useState<string>("");
+  const [teamId, setTeamId] = useState<number | undefined>();
   const [startDate, setStartDate] = useState(new Date());
   const [eventDates, setEventDates] = useState<EventDates>({});
   const [schedules, setScheldules] = useState<schelduleInfo[]>([]);
@@ -159,9 +161,11 @@ const MatchCalendar = () => {
     date: string;
     time: string;
     matchId: number;
+    opponentTeamId: number;
   }
 
   const [selectedMatchId, setSelectedMatchId] = useState<number>(0);
+  const [opponentTeamhId, setOpponentTeamId] = useState<number>(0);
 
   const getScheldule = async () => {
     try {
@@ -189,8 +193,10 @@ const MatchCalendar = () => {
           date: team.date,
           time: team.time,
           matchId: team.match_id,
+          opponentTeamId: team.opponent_team_id,
         }));
 
+        setOpponentTeamId(newSchelduleInfo[0].opponentTeamId);
         setEventDates(newEventDates); // 상태 업데이트
         setScheldules(newSchelduleInfo);
       }
@@ -201,15 +207,43 @@ const MatchCalendar = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>("");
 
-  const handleDayClick = (date: Date) => {
+  const fetchMatchResult = async (matchId: number) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/match/${matchId}/result/exist`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+          },
+        }
+      );
+      const result = response.data.data;
+      return result;
+    } catch (error) {
+      console.error("데이터 불러오기 실패:", error);
+    }
+  };
+
+  const [isMatchEnd, setIsMatchEnd] = useState<boolean>(false);
+  const [showScheduleButton, setShowScheduleButton] = useState<boolean>(false); // 경기 예정 여부에 따라 버튼 표시를 결정하는 상태
+
+  const handleDayClick = async (date: Date) => {
     const formattedDate = format(date, "yyyy-MM-dd");
+
+    const isMatchEnd = await fetchMatchResult(selectedMatchId);
+    isMatchEnd ? setIsMatchEnd(true) : setIsMatchEnd(false);
 
     // 선택된 날짜에 해당하는 스케줄 찾기
     const daySchedules = schedules.filter((sch) => sch.date === formattedDate);
 
-    // 선택된 날짜에 해당하는 첫 번째 스케줄의 matchId를 저장
+    // 경기가 있는 날짜
     if (daySchedules.length > 0) {
-      setSelectedMatchId(daySchedules[0].matchId); // matchId를 상태에 저장
+      setSelectedMatchId(daySchedules[0].matchId);
+      setShowScheduleButton(true); // 경기가 예정되어 있으므로 false로 설정
+    } else {
+      setShowScheduleButton(false); // 경기가 예정되어 있지 않으므로 true로 설정
     }
 
     // 모달 내용 구성
@@ -234,10 +268,19 @@ const MatchCalendar = () => {
 
     setShowModal(true);
   };
+  const { isStaff } = useMemberStore();
+
+  const [isMemberStaff, setIsMemberStaff] = useState(false);
+
+  useEffect(() => {
+    setIsMemberStaff(isStaff);
+  }, [isStaff]);
 
   // 전술 설정 페이지로 이동하는 함수
   const handleTacticSetting = () => {
-    navigate("/match/formation/", { state: { matchId: selectedMatchId } }); // matchId를 URL에 포함하여 페이지 이동
+    navigate("/match/formation/", {
+      state: { matchId: selectedMatchId, opponentTeamhId },
+    }); // matchId를 URL에 포함하여 페이지 이동
   };
 
   const handleCloseModal = () => setShowModal(false);
@@ -294,37 +337,55 @@ const MatchCalendar = () => {
     navigate("/match/preview", { state: { matchId: selectedMatchId } });
   };
 
+  // 여기서 url 변경하면 됨.
+  const handleBookMatch = () => {
+    navigate("/match", { state: { matchId: selectedMatchId } });
+  };
+
   return (
     <Layout>
-      <h3>경기 일정</h3>
-      <DatePickerContainer>
-        <DatePicker
-          selected={startDate}
-          className="custom-datepicker"
-          locale={ko}
-          inline
-          onChange={(date: Date) => setStartDate(date)}
-          renderDayContents={renderDayContents}
-        />
-      </DatePickerContainer>
+      <ScoreboardContainer>
+        <DatePickerContainer>
+          <DatePicker
+            selected={startDate}
+            className="custom-datepicker"
+            locale={ko}
+            inline
+            onChange={(date: Date) => setStartDate(date)}
+            renderDayContents={renderDayContents}
+          />
+        </DatePickerContainer>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>일정 정보</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{modalContent}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleMatchPreview}>
-            매치 프리뷰
-          </Button>
-          <Button variant="primary" onClick={handleTacticSetting}>
-            전술 설정
-          </Button>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            닫기
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>일정 정보</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{modalContent}</Modal.Body>
+          <Modal.Footer>
+            {showScheduleButton ? (
+              <Button variant="primary" onClick={handleMatchPreview}>
+                매치 정보
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={handleBookMatch}>
+                경기 예약
+              </Button>
+            )}
+            {isStaff ? (
+              <>
+                <Button variant="primary" onClick={handleTacticSetting}>
+                  전술 설정
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
+            <Button variant="secondary" onClick={handleCloseModal}>
+              닫기
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </ScoreboardContainer>
     </Layout>
   );
 };

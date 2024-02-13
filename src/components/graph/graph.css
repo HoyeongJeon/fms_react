@@ -1,4 +1,22 @@
 .radar-container {
-    width: 1200px;
+    width: 50%;
     height: 500px;
+}
+
+.bar-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bar-yellow {
+    flex: 0 0 auto;
+}
+
+.bar-red {
+    flex: 0 0 50%;
+}
+
+.bar-main-container {
+    margin-top: 10%;
+    width: 50%;
 }

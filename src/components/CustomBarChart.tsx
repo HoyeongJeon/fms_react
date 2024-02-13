@@ -49,18 +49,18 @@ const ComparisonBarChart = ({ data }: { data: StatData[] }) => {
           <StatRow key={index}>
             {item.home === item.away ? (
               <>
-                <StatValue>{item.away}</StatValue>
                 <StatValue>{item.home}</StatValue>
+                <StatValue>{item.away}</StatValue>
               </>
             ) : item.home > item.away ? (
               <>
-                <StatValue>{item.away}</StatValue>
                 <HigherHomeStatValue>{item.home}</HigherHomeStatValue>
+                <StatValue>{item.away}</StatValue>
               </>
             ) : (
               <>
-                <HigherAwayStatValue>{item.away}</HigherAwayStatValue>
                 <StatValue>{item.home}</StatValue>
+                <HigherAwayStatValue>{item.away}</HigherAwayStatValue>
               </>
             )}
           </StatRow>

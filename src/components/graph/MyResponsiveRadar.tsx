@@ -13,10 +13,17 @@ const MyResponsiveRadar = ({ data }: any) => {
     const normalizedData = data.data.map((item: any) => {
         const maxValue = Math.max(item.myTeam, item.avgTeam);
 
+        let myTeam = (item.myTeam / maxValue) * 100 || 0;
+        let avgTeam = (item.avgTeam / maxValue) * 100 || 0;
+
+        if (!myTeam) {
+            avgTeam = 0;
+        }
+
         return {
             stats: item.stats,
-            myTeam: (item.myTeam / maxValue) * 100 || 0,
-            avgTeam: (item.avgTeam / maxValue) * 100 || 0,
+            내구단: myTeam,
+            다른팀평균: avgTeam,
         };
     });
 
@@ -24,7 +31,7 @@ const MyResponsiveRadar = ({ data }: any) => {
         <div className="radar-container">
             <ResponsiveRadar
                 data={normalizedData}
-                keys={['myTeam', 'avgTeam']}
+                keys={['내구단', '다른팀평균']}
                 indexBy="stats"
                 maxValue={100}
                 // valueFormat=">-.2f"

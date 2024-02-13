@@ -4,6 +4,8 @@ import './table.css';
 import { PlayersType } from 'pages/Team';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTeamStore } from 'store/teamStore';
 
 interface PlaneTableType {
     data: PlayersType;
@@ -25,6 +27,7 @@ interface NewPlayerType {
 
 const PlaneTable = (props: PlaneTableType) => {
     const [players, setPlayers] = useState<NewPlayerType[]>(props.data.players);
+    const { teamId } = useTeamStore();
 
     const getImageUrl = async (url: string) => {
         const getUrl = await axios.get<string>(
@@ -56,6 +59,11 @@ const PlaneTable = (props: PlaneTableType) => {
         fetchAndSetPlayers();
     }, [props.data.players]);
 
+    const movePage = useNavigate();
+    const handleMemberDetail = (memberId: number) => {
+        movePage(`/team/member/${memberId}`);
+    };
+
     return (
         <Table className="table">
             <thead>
@@ -73,7 +81,7 @@ const PlaneTable = (props: PlaneTableType) => {
             </thead>
             <tbody>
                 {players.map((player) => (
-                    <tr>
+                    <tr onClick={() => handleMemberDetail(player.memberId)}>
                         <td style={{ width: '100px' }}>
                             <Card.Img
                                 variant="top"
@@ -82,14 +90,14 @@ const PlaneTable = (props: PlaneTableType) => {
                             />
                             {player.userName}
                         </td>
-                        <td>{player.totalGames}</td>
-                        <td>{player.totalGoals}</td>
-                        <td>{player.totalAssists}</td>
-                        <td>{player.attactPoint}</td>
-                        <td>{player.totalYellowCards}</td>
-                        <td>{player.totalRedCards}</td>
-                        <td>{player.totalÇleanSheet}</td>
-                        <td>{player.totalSave}</td>
+                        <td>{player.totalGames ?? 0}</td>
+                        <td>{player.totalGoals ?? 0}</td>
+                        <td>{player.totalAssists ?? 0}</td>
+                        <td>{player.attactPoint ?? 0}</td>
+                        <td>{player.totalYellowCards ?? 0}</td>
+                        <td>{player.totalRedCards ?? 0}</td>
+                        <td>{player.totalÇleanSheet ?? 0}</td>
+                        <td>{player.totalSave ?? 0}</td>
                     </tr>
                 ))}
             </tbody>

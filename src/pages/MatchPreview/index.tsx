@@ -1,7 +1,6 @@
 import Layout from "layouts/App";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  NextButton,
   ScoreboardContainer,
   TeamBadge,
   TeamLogo,
@@ -11,28 +10,30 @@ import { Typography, Button, Flex } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "utils/axios";
-import { set } from "date-fns";
 import useSWR from "swr";
 import fetcher from "utils/fetcher";
+import { match } from "assert";
+import dayjs from "dayjs";
+import { useMemberStore } from "store/memberStore";
 const { Title, Text, Link } = Typography;
 
-const Data = {
+type MatchInfo = {
   home: {
-    name: "홈팀",
-    result: { L: 4, W: 12, D: 4 },
-    currentResult: "LWWWL",
-    goal: 14,
-  },
-  away: {
-    name: "어웨이팀",
     result: {
-      L: 6,
-      W: 1,
-      D: 2,
-    },
-    currentResult: "LWWWW",
-    goal: 12,
-  },
+      L: number;
+      W: number;
+      D: number;
+    };
+    goal: number;
+  };
+  away: {
+    result: {
+      L: number;
+      W: number;
+      D: number;
+    };
+    goal: number;
+  };
 };
 
 const MatchPreview = () => {
@@ -40,7 +41,7 @@ const MatchPreview = () => {
   const location = useLocation();
   const { matchId } = location.state || {};
   const [gameOver, setGameOver] = useState(false);
-  const [matchDate, setMatchDate] = useState();
+  const [matchDate, setMatchDate] = useState<Date | null>(null);
   const [soccerFieldId, setSoccerFieldId] = useState();
   const [homeTeamId, setHomeTeamId] = useState();
   const [awayTeamId, setAwayTeamId] = useState();
@@ -61,15 +62,80 @@ const MatchPreview = () => {
     `/image/${awayTeam.imageUUID}`,
     fetcher
   );
+  const { data: homeTeamData } = useSWR(`/statistics/${homeTeamId}`, fetcher);
+  const { data: awayTeamData } = useSWR(`/statistics/${awayTeamId}`, fetcher);
+  const [matchInfo, setMatchInfo] = useState<MatchInfo>({
+    home: {
+      result: {
+        L: 0,
+        W: 0,
+        D: 0,
+      },
+      goal: 0,
+    },
+    away: {
+      result: {
+        L: 0,
+        W: 0,
+        D: 0,
+      },
+      goal: 0,
+    },
+  });
+
+  // 경기 종료 여부 확인
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    axios
+      .get(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/match/${matchId}/result/exist`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+          },
+        }
+      )
+      .then((res) => {
+        if (res !== undefined) {
+          setGameOver(true);
+        } else {
+          setGameOver(false);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [matchId]);
+
+  useEffect(() => {
+    if (!homeTeamData || !awayTeamData) return;
+    setMatchInfo({
+      home: {
+        result: {
+          L: homeTeamData.loses,
+          W: homeTeamData.wins,
+          D: homeTeamData.draws,
+        },
+        goal: homeTeamData.goals,
+      },
+      away: {
+        result: {
+          L: awayTeamData.loses,
+          W: awayTeamData.wins,
+          D: awayTeamData.draws,
+        },
+        goal: awayTeamData.goals,
+      },
+    });
+  }, [homeTeamData, awayTeamData]);
+
   const handleNext = () => {
-    // 매치 날짜보다 이르면 경기 종료 불가능
-    // if (now < matchDate) {
-    //   alert("경기가 시작되지 않았습니다.");
-    //   return;
-    // }
-    navigate(`/match/${matchId}/input`, { state: { matchDate } });
+    navigate(`/match/${matchId}/input`, {
+      state: { matchDate: matchDate?.toISOString() },
+    });
   };
-  console.log("matchDate", matchDate);
 
   useEffect(() => {
     if (!matchId) {
@@ -85,27 +151,32 @@ const MatchPreview = () => {
           withCredentials: true,
         })
         .then((res) => {
-          console.log("res.data.data= ", res.data.data);
-
-          const matchDate = new Date(
-            res.data.data.date + " " + res.data.data.time
+          const matchDateTime = new Date(
+            res.data.data.date + "T" + res.data.data.time
           );
-          console.log("now= ", now);
-          console.log("matchDate= ", matchDate);
-          if (now > matchDate) {
-            setGameOver(true);
-          }
+          setMatchDate(matchDateTime);
 
-          setMatchDate(res.data.data.date);
           setSoccerFieldId(res.data.data.soccer_field_id);
           setHomeTeamId(res.data.data.home_team_id);
           setAwayTeamId(res.data.data.away_team_id);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [matchId]);
+  const { isStaff } = useMemberStore();
+
+  const [isMemberStaff, setIsMemberStaff] = useState(false);
+
+  useEffect(() => {
+    setIsMemberStaff(isStaff);
+  }, [isStaff]);
+  const isFutureMatch = () => {
+    if (!matchDate || isStaff) return false; // matchDate가 설정되지 않았으면 false 반환
+
+    return matchDate > new Date(); // 현재 날짜와 비교
+  };
 
   useEffect(() => {
     if (!homeTeamId || !awayTeamId) return;
@@ -126,7 +197,7 @@ const MatchPreview = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
     axios
       .get(`${BASE_URL}/team/${awayTeamId}`, {
@@ -144,39 +215,31 @@ const MatchPreview = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }, [homeTeamId, awayTeamId]);
+
+  const handleReview = () => {
+    navigate("/match/result", { state: { matchId } });
+  };
 
   return (
     <Layout>
       <ScoreboardContainer>
-        <Title level={3}>{matchDate}</Title>
+        <Title level={3}>
+          {matchDate instanceof Date
+            ? dayjs(matchDate).format("YYYY-MM-DD")
+            : "Loading..."}
+        </Title>
         <TeamsContainer>
           <TeamBadge>
-            <TeamLogo src={homePresignedURL} alt="홈 팀 로고 넣어야함" />
+            <TeamLogo src={homePresignedURL} alt="홈 팀 로고" />
             <div>{homeTeam.name}</div>
             <Text type="secondary">
-              {Data.home.result.W}승 {Data.home.result.D}무 {Data.home.result.L}
-              패
+              {matchInfo.home.result.W}승 {matchInfo.home.result.D}무{" "}
+              {matchInfo.home.result.L}패
             </Text>
             <br />
-            {Data.home.currentResult.split("").map((result) => {
-              let style = {};
-              if (result === "W") {
-                style = { color: "#91D0F1" };
-              } else if (result === "L") {
-                style = { color: "#BF9394" };
-              } else if (result === "D") {
-                style = { color: "#C6C2C1" };
-              }
-
-              return (
-                <Text type="secondary" style={style}>
-                  {result}
-                </Text>
-              );
-            })}
             <div>
               <Text style={{ color: "black", fontWeight: "lighter" }}>
                 평균득점
@@ -186,11 +249,12 @@ const MatchPreview = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  {(
-                    Data.home.goal /
-                    (Data.home.result.W +
-                      Data.home.result.D +
-                      Data.home.result.L)
+                  {(matchInfo.home.goal === 0
+                    ? 0
+                    : matchInfo.home.goal /
+                      (matchInfo.home.result.W +
+                        matchInfo.home.result.D +
+                        matchInfo.home.result.L)
                   ).toFixed(2)}
                 </span>
               </Text>
@@ -198,30 +262,13 @@ const MatchPreview = () => {
           </TeamBadge>
           <Title level={4}>vs</Title>
           <TeamBadge>
-            {/* Replace with actual image paths */}
-            <TeamLogo src={awayPresignedURL} alt="어웨이 팀 로고 넣어야함" />
+            <TeamLogo src={awayPresignedURL} alt="어웨이 팀 로고" />
             <div>{awayTeam.name}</div>
             <Text type="secondary">
-              {Data.away.result.W}승 {Data.away.result.D}무 {Data.away.result.L}
-              패
+              {matchInfo.away.result.W}승 {matchInfo.away.result.D}무{" "}
+              {matchInfo.away.result.L}패
             </Text>
             <br />
-            {Data.away.currentResult.split("").map((result) => {
-              let style = {};
-              if (result === "W") {
-                style = { color: "#91D0F1" };
-              } else if (result === "L") {
-                style = { color: "#BF9394" };
-              } else if (result === "D") {
-                style = { color: "#C6C2C1" };
-              }
-
-              return (
-                <Text type="secondary" style={style}>
-                  {result}
-                </Text>
-              );
-            })}
             <div>
               <Text style={{ color: "black", fontWeight: "lighter" }}>
                 평균득점
@@ -231,11 +278,12 @@ const MatchPreview = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  {(
-                    Data.away.goal /
-                    (Data.away.result.W +
-                      Data.away.result.D +
-                      Data.away.result.L)
+                  {(matchInfo.away.goal === 0
+                    ? 0
+                    : matchInfo.away.goal /
+                      (matchInfo.away.result.W +
+                        matchInfo.away.result.D +
+                        matchInfo.away.result.L)
                   ).toFixed(2)}
                 </span>
               </Text>
@@ -245,9 +293,14 @@ const MatchPreview = () => {
         {
           // 경기 종료 후에는 버튼을 비활성화
           gameOver ? (
-            <Button onClick={handleNext}>경기 종료</Button>
+            <Button onClick={handleReview}>경기 리뷰 확인</Button>
           ) : (
-            <Button disabled>경기 종료</Button>
+            <Button
+              onClick={handleNext}
+              disabled={isFutureMatch() || !isMemberStaff}
+            >
+              경기 종료
+            </Button>
           )
         }
       </ScoreboardContainer>

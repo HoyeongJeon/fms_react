@@ -21,7 +21,6 @@ import MatchResult from "./pages/MatchResult";
 import InputMatchResult from "./pages/InputMatchResult";
 import InputMatchResultDetail from "./pages/InputMatchResultDetail";
 import MatchPreview from "./pages/MatchPreview";
-import MatchReview from "./pages/MatchReview";
 import MatchBook from "./pages/match/book";
 import MatchCalendar from "./pages/match/calendar";
 import Formation from "./pages/match/formation";
@@ -34,6 +33,11 @@ import SendCode from "./pages/sendCode";
 import KakaoSuccess from "./pages/KakaoSuccess";
 import "./styles.module.css";
 import HomePreview from "pages/HomePreview";
+import ProfilePreview from "pages/ProfilePreview";
+
+import GlobalStyle from "./GlobalStyle";
+import { useUserStore } from "store/userStore";
+//import GlobalStyle from "./GlobalStyle";
 
 const Trail: React.FC<{ open: boolean }> = ({
   open,
@@ -154,6 +158,7 @@ const App: React.FC = () => {
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const [open, set] = useState(true);
+  const { role } = useUserStore();
 
   const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     useEffect(() => {
@@ -180,70 +185,77 @@ const App: React.FC = () => {
   };
 
   return (
-    <Routes>
-      {/* 로그인 안해도 접근 가능한 url */}
-      <Route path="/home/preview" element={<HomePreview />} />
-      <Route path="/" element={<Trail open={open} />} />
-      <Route path="/emailCode" element={<SendCode />} />
-      <Route path="/password" element={<ResetPassword />} />
-      <Route
-        path="/login"
-        element={
-          <ProtectedRoute>
-            <LogIn />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <ProtectedRoute>
-            <SignUp />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/kakaoSuccess" element={<KakaoSuccess />} />
-      {/* ... (로그인 이후에 접근 가능한 라우트들) ... */}
-      {isLoggedIn ? (
-        <>
-          <Route path="/home" element={<Home />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/team/create" element={<CreateTeam />} />
-          <Route path="/team/:teamId" element={<TeamDetail />} />
-          <Route path="/player" element={<Player />} />
-          <Route path="/strategy" element={<Strategy />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/profile/:userId/edit" element={<EditProfile />} />
-          <Route path="/profile/:userId" element={<Profile />} />
-          <Route
-            path="/profile/:userId/register"
-            element={<RegisterProfile />}
-          />
-          <Route path="/member/:memberId" element={<MemberDetail />} />
-          <Route path="/match" element={<Match />} />
-          <Route path="/match/:matchId/result" element={<MatchResult />} />
-          <Route path="/match/:matchId/input" element={<InputMatchResult />} />
-          <Route
-            path="/match/:matchId/input/detail"
-            element={<InputMatchResultDetail />}
-          />
-          <Route path="/match/preview" element={<MatchPreview />} />
-          <Route path="/match/:matchId/review" element={<MatchReview />} />
-          <Route path="/match/book" element={<MatchBook />} />
-          <Route path="/match/calendar" element={<MatchCalendar />} />
-          <Route path="/match/formation" element={<Formation />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/teams" element={<AdminTeams />} />
-          <Route path="/playerStat" element={<PlayerStatistics />} />
-          <Route path="/teamTable" element={<TeamTable />} />
-          <Route path="/memberTable" element={<MemberTable />} />
-        </>
-      ) : (
-        <>
-          <Route path="/*" element={<Navigate replace to="/login" />} />
-        </>
-      )}
-    </Routes>
+    <>
+      {/* <GlobalStyle /> */}
+      <Routes>
+        {/* 로그인 안해도 접근 가능한 url */}
+        <Route path="/home/preview" element={<HomePreview />} />
+        <Route path="/profile/preview" element={<ProfilePreview />} />
+
+        <Route path="/" element={<Trail open={open} />} />
+        <Route path="/emailCode" element={<SendCode />} />
+        <Route path="/password" element={<ResetPassword />} />
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute>
+              <LogIn />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <ProtectedRoute>
+              <SignUp />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/kakaoSuccess" element={<KakaoSuccess />} />
+        {/* ... (로그인 이후에 접근 가능한 라우트들) ... */}
+        {isLoggedIn ? (
+          <>
+            <Route path="/home" element={<Home />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/team/create" element={<CreateTeam />} />
+            <Route path="/team/:teamId" element={<TeamDetail />} />
+            <Route path="/player" element={<Player />} />
+            <Route path="/strategy" element={<Strategy />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/profile/:userId/edit" element={<EditProfile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route
+              path="/profile/:userId/register"
+              element={<RegisterProfile />}
+            />
+            <Route path="/team/member/:memberId" element={<MemberDetail />} />
+            <Route path="/match" element={<Match />} />
+            <Route path="/match/result" element={<MatchResult />} />
+            <Route
+              path="/match/:matchId/input"
+              element={<InputMatchResult />}
+            />
+            <Route
+              path="/match/:matchId/input/detail"
+              element={<InputMatchResultDetail />}
+            />
+            <Route path="/match/preview" element={<MatchPreview />} />
+            <Route path="/match/book" element={<MatchBook />} />
+            <Route path="/match/calendar" element={<MatchCalendar />} />
+            <Route path="/match/formation" element={<Formation />} />
+            <Route path="/admin/members" element={<AdminUsers />} />
+            <Route path="/admin/teams" element={<AdminTeams />} />
+            <Route path="/playerStat" element={<PlayerStatistics />} />
+            <Route path="/teamTable" element={<TeamTable />} />
+            <Route path="/memberTable" element={<MemberTable />} />
+          </>
+        ) : (
+          <>
+            <Route path="/*" element={<Navigate replace to="/login" />} />
+          </>
+        )}
+      </Routes>
+    </>
   );
 };
 

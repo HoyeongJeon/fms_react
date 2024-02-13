@@ -36,9 +36,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetcher
     // { dedupingInterval: 1000 * 60 * 60 * 24 }
   );
-  const { id: memberId, setMemberId } = useMemberStore();
+  const { id: memberId, setMemberId, setMember, isStaff } = useMemberStore();
   const { teamId, setTeamInfo, chatId } = useTeamStore();
-  const { id: userId, setUser } = useUserStore();
+  const { id: userId, setUser, role } = useUserStore();
   const { logout } = useAuthStore();
   const { setProfile, id: profileId, resetProfile } = useProfileStore();
   const navigate = useNavigate();
@@ -48,13 +48,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       resetProfile();
       setUser(data.data);
       setTeamInfo(
-        data.data.member[0]?.team?.id,
-        data.data.member[0]?.team?.name,
-        data.data.member[0]?.team?.imageUUID,
-        data.data.member[0]?.team?.chat?.id
+        data.data.member[0]?.team?.id || data.data.team?.id,
+        data.data.member[0]?.team?.name || data.data.team?.name,
+        data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
+        data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
       );
-      // setMember(data.data.member[0]?.id);
+
       setMemberId(data.data.member[0]?.id);
+      setMember(data.data.member[0]);
     }
 
     if (data?.data.profile) {
@@ -103,6 +104,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
             </MenuItem>
+            {isStaff ? (
+              <>
+                <MenuItem>
+                  <StyledLink to="/memberTable">INVITE</StyledLink>
+                </MenuItem>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {/* <MenuItem>
+              <StyledLink to="/teamTable">JOIN</StyledLink>
+            </MenuItem> */}
           </>
         ) : (
           <></>
@@ -118,11 +132,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </MenuItem>
       </Menu>
       <Card>
-        <h2>
-          <StyledLink to="/home">
-            Football Management System (FMS) ⚽🔥
-          </StyledLink>
-        </h2>
+        <StyledLink to="/home">
+          <h1
+            style={{
+              textAlign: "center",
+              // fontFamily: "HakgyoansimJiugaeR",
+              fontSize: "40px",
+              fontWeight: "bold",
+              marginBottom: "10px",
+              color: "black",
+            }}
+          >
+            축구왕
+          </h1>
+        </StyledLink>
 
         {children}
       </Card>
