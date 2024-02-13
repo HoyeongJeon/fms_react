@@ -36,9 +36,29 @@ type User = {
   id: number;
   email: string;
   name: string;
-  team?: string; // team은 선택적 프로퍼티로, 값이 없을 수도 있습니다.
+  role: string;
+  status: string;
+  team?: Team; // team은 선택적 프로퍼티로, 값이 없을 수도 있습니다.
   phone?: string; // phone도 선택적 프로퍼티입니다.
   birthdate?: string; // birthdate도 선택적 프로퍼티입니다.
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  appleId?: string;
+  googleId?: string;
+  kakaoId?: string;
+};
+
+type Team = {
+  id: number;
+  name: string;
+  description: string;
+  imageUUID: string;
+  is_mixedGender: boolean;
+  totalMember: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 };
 
 type SelectedUsers = {
@@ -89,22 +109,28 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]); // 사용자 목록을 저장할 상태
   const [total, setTotal] = useState(0); // 총 데이터 개수
   const [searchParams] = useSearchParams(); // URLSearchParams 객체
+
+  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
-    const page = searchParams.get("page");
+    const page = searchParams.get("page") || "1";
+    setCurrentPage(parseInt(page));
     const getUsers = async () => {
       try {
-        const { data } = await authAxios.get(`/admin/users?page=${page || 1}`);
-        setUsers(data.data); // 받아온 데이터 저징
-        setTotal(data.total); // 전체 개수 저장
-        setError(""); // 에러 상태를 초기화
+        const { data } = await authAxios.get(`/admin/users?page=${page}`);
+        setUsers(data.data);
+        setTotal(data.total);
+        setError("");
+        setUser(data.data[0]);
+        console.log("user= ", user);
+        console.log("data=", data.data[0]);
+        console.log("users=", users);
       } catch (err) {
-        // 에러 처리 로직
         setError("사용자 정보를 불러오는데 실패했습니다.");
         console.error(err);
       }
     };
     getUsers();
-  }, []);
+  }, [searchParams]);
 
   const changePage = async (page: number) => {
     try {
@@ -124,7 +150,6 @@ const AdminUsers = () => {
 
   return (
     <AdminLayout>
-      <span>admin 만 들어올 수 있도록 프론트 로직 추가해야함</span>
       {error && <div className="error-message">{error}</div>}{" "}
       <Table>
         <TableHead>
@@ -161,7 +186,7 @@ const AdminUsers = () => {
               </td>
               <td>{aUser.email}</td>
               <td>{aUser.name}</td>
-              <td>{aUser.team || "N/A"}</td>
+              <td>{aUser.team?.name || "N/A"}</td>
               <td>{aUser.phone || "N/A"}</td>
               <td>{aUser.birthdate || "N/A"}</td>
             </tr>
@@ -171,7 +196,7 @@ const AdminUsers = () => {
       <Pagination
         defaultCurrent={currentPage} // 현재 클릭한 페이지
         total={total} // 데이터 총 개수
-        defaultPageSize={5} // 페이지 당 데이터 개수
+        defaultPageSize={10} // 페이지 당 데이터 개수
         onChange={(value) => {
           changePage(value);
         }}
