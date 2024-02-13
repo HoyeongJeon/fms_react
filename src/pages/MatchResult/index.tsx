@@ -119,7 +119,7 @@ const MatchResult = () => {
         setAway(res.data.away);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }, [matchId, setHome, setAway]);
 

@@ -192,7 +192,7 @@ const MatchCalendar = () => {
           date: team.date,
           time: team.time,
           matchId: team.match_id,
-          opponentTeamId:team.opponent_team_id,
+          opponentTeamId: team.opponent_team_id,
         }));
 
         setOpponentTeamId(newSchelduleInfo[0].opponentTeamId);
@@ -270,7 +270,9 @@ const MatchCalendar = () => {
 
   // 전술 설정 페이지로 이동하는 함수
   const handleTacticSetting = () => {
-    navigate("/match/formation/", { state: { matchId: selectedMatchId, opponentTeamhId } }); // matchId를 URL에 포함하여 페이지 이동
+    navigate("/match/formation/", {
+      state: { matchId: selectedMatchId, opponentTeamhId },
+    }); // matchId를 URL에 포함하여 페이지 이동
   };
 
   const handleCloseModal = () => setShowModal(false);
@@ -329,7 +331,7 @@ const MatchCalendar = () => {
 
   // 여기서 url 변경하면 됨.
   const handleBookMatch = () => {
-    navigate("/match/book", { state: { matchId: selectedMatchId } });
+    navigate("/match", { state: { matchId: selectedMatchId } });
   };
 
   return (
