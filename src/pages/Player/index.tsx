@@ -121,7 +121,7 @@ const Player: React.FC = () => {
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamId}/members/?page=${page || 1}&name=${searchQuery}`,
+        }/api/team/${teamId}/members/?page=${currentPage}&name=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
