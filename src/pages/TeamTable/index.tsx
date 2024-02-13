@@ -3,9 +3,6 @@ import axios from "axios";
 import { Pagination } from "antd";
 import Layout from "layouts/App";
 import "./table.css";
-import Modal from "react-bootstrap/Modal";
-import { useTeamStore } from "store/teamStore";
-import { useUserStore } from "store/userStore";
 import Geolocation from "@react-native-community/geolocation";
 
 interface Team {
@@ -37,23 +34,33 @@ interface Team {
   };
 }
 
-
 const TeamTable: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [isMixed, setIsMixed] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [region, setRegion] = useState<string>("");
 
-  const fetchTeams = async (page: number = 1, query: string = "") => {
+  const fetchTeams = async (page: number = 1) => {
     try {
-      const userLocation = await getUserLocation();
-      const apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}&name=${query}`;
-      const accessToken = localStorage.getItem("accessToken");
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}`;
   
+      if (searchQuery.trim() !== "") {
+        apiUrl += `&name=${searchQuery}`;
+      }
+  
+      if (gender) {
+        apiUrl += `&gender=${gender}`;
+      }
+  
+      if (region.trim() !== "") {
+        apiUrl += `&region=${encodeURIComponent(region)}`;
+      }
+      console.log("apiurl=", apiUrl);
+  
+      const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -61,27 +68,23 @@ const TeamTable: React.FC = () => {
         withCredentials: true,
       });
   
-      console.log("response.data.data=", response.data.data);
-  
       const teamsData = response.data.data;
   
-      // teamsData 배열을 순회하면서 올바른 팀 데이터를 추출하여 teams 배열에 추가
-      const teams = teamsData.map((data: { team: any; totalMember: any; }) => {
+      const teams = teamsData.map((data: { team: any; totalMember: any }) => {
         if (data.team) {
           return {
             team: data.team,
             totalMember: data.totalMember,
           };
         } else {
-          return null; // team이 없는 경우, 적절한 처리를 수행할 수 있습니다.
+          return null;
         }
       });
   
-      // teams 배열에 존재하는 유효한 팀 데이터만 필터링
       const filteredTeams = teams.filter((team: null) => team !== null);
   
       setTeams(filteredTeams);
-      setTotal(filteredTeams.length);
+      setTotal(response.data.total); // 서버에서 받은 전체 페이지 수로 설정
     } catch (error) {
       console.error("팀 정보를 불러오는 데 실패했습니다.", error);
       setTeams([]);
@@ -89,37 +92,50 @@ const TeamTable: React.FC = () => {
     }
   };
   
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      console.log("Fetching teams...");
-      fetchTeams();
-    }, 500);
-  
-    return () => clearTimeout(delay);
-  }, [currentPage, searchQuery]);
-  console.log("Current Page:", currentPage);
-  console.log("Total Teams:", total);
-
-
   const changePage = async (page: number) => {
     try {
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}`;
+  
+      if (searchQuery.trim() !== "") {
+        apiUrl += `&name=${searchQuery}`;
+      }
+  
+      if (gender) {
+        apiUrl += `&gender=${gender}`;
+      }
+  
+      if (region.trim() !== "") {
+        apiUrl += `&region=${encodeURIComponent(region)}`;
+      }
+      console.log("apiurl=", apiUrl);
+  
       const accessToken = localStorage.getItem("accessToken");
-
-      const response = await axios.get(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page || 1}&name=${searchQuery}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      });
+  
+      console.log("response.data=", response.data);
+  
       setTeams(response.data.data);
       setTotal(response.data.total);
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
   };
+  
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      console.log("Fetching teams...");
+      fetchTeams();
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [currentPage, searchQuery, isMixed, gender, region]);
+
 
 
   const getUserLocation = () => {
@@ -128,185 +144,127 @@ const TeamTable: React.FC = () => {
     });
   };
 
-  const calculateDistance = (
-    lat1: number, lon1: number,
-    lat2: number, lon2: number
-  ): number => {
-    const R = 6371; // 지구 반지름 (단위: km)
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // 거리 (단위: km)
-    
-    return distance;
-  };
-  
-  const [show, setShow] = useState(false);
-  const { teamId, setTeamId } = useTeamStore();
-  const { id, setUser } = useUserStore();
-
-  const handleApplyButton = async (teamData: Team) => {
-    try {
-      // 팀 데이터를 불러올 비동기 작업 수행
-      const teamDetails = await axios.get(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamData.team.id}`,
-        {
-          withCredentials: true,
-        }
-      );
-      console.log("Server Response:", teamDetails);
-      // 불러온 팀 데이터로 setSelectedTeam 호출
-      setSelectedTeam(teamDetails.data.team);
-      setShowModal(true);
-      setShow(true);
-    } catch (error) {
-      console.error("팀 정보를 불러오는 데 실패했습니다.", error);
-    }
+  const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setGender(e.target.value);
   };
 
-  const handleConfirmApply = async () => {
-    try {
-      if (selectedTeam) {
-        const accessToken = localStorage.getItem("accessToken");
-
-        const response = await axios.post(
-          `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${selectedTeam.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            withCredentials: true,
-          }
-        );
-
-        setShowModal(false);
-        setSelectedTeam(null);
-        setShowSuccessAlert(true);
-
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          setShowSuccessAlert(false);
-        }, 5000);
-
-        // Refresh the page after confirmation
-        window.location.reload();
-      } else {
-        console.error("Selected Team is undefined");
-        setShowErrorAlert(true);
-
-        // Hide error message after 5 seconds
-        setTimeout(() => {
-          setShowErrorAlert(false);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error("Error inviting member:", error);
-      setShowErrorAlert(true);
-
-      // Hide error message after 3 seconds
-      setTimeout(() => {
-        setShowErrorAlert(false);
-      }, 3000);
-    }
+  const handleMixedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setIsMixed(e.target.value);
   };
 
-  const handleCancelApply = () => {
-    setShowModal(false);
-    setSelectedTeam(null);
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRegion(e.target.value);
   };
 
-  const handleClose = () => {
-    setShow(false);
-    setSelectedTeam(null); // 모달을 닫을 때 선택된 사용자 ID 초기화
-  };
   const handleSearchButtonClick = () => {
     fetchTeams();
   };
 
-  const handleLocationButtonClick = async () => {
+  const handleApplyButton = async (teamData: Team) => {
     try {
-      const userLocation = await getUserLocation();
-      console.log("User location:", userLocation);
-  
-      // 위도와 경도를 이용하여 주소로 변환하는 Kakao Maps API 요청
-      const apiUrl = `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${userLocation.coords.longitude}&y=${userLocation.coords.latitude}`;
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `KakaoAK ${process.env.REACT_APP_MAP_KEY}`,
-        },
-      });
-      const data = await response.json();
-  
-      if (data.documents && data.documents.length > 0) {
-        const address = data.documents[0].address_name;
-        alert('현재 위치: ' + address);
-      } else {
-        alert('주소를 찾을 수 없습니다.');
+      if (!teamData) {
+        console.error("No team data provided.");
+        return;
       }
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) {
+        console.error("Access token not found.");
+        return;
+      }
+
+      // 가입 신청을 서버로 요청하는 비동기 작업 수행
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/team/${teamData.team.id}/apply`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      // setShowModal(false); // 모달 닫기
+      // setShowSuccessAlert(true); // 성공 알림 표시
+
+      // // 성공 알림을 5초 후에 숨김
+      // setTimeout(() => {
+      //   setShowSuccessAlert(false);
+      // }, 5000);
+
+      // // 가입 신청 후 페이지 새로고침
+      // window.location.reload();
     } catch (error) {
-      console.error("Error getting user location:", error);
-      alert('위치 정보를 가져오는 데 실패했습니다.');
+      console.error("Error applying to join the team:", error);
+      // setShowErrorAlert(true); // 오류 알림 표시
+
+      // // 오류 알림을 5초 후에 숨김
+      // setTimeout(() => {
+      //   setShowErrorAlert(false);
+      // }, 5000);
     }
   };
-  
-  
-  
 
   return (
     <Layout>
       <div>
-        {showModal && selectedTeam && (
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>초대 확인 메세지</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>{`${selectedTeam?.name} 팀에 가입신청 하시겠습니까?`}</Modal.Body>
-            <Modal.Footer>
-              <button onClick={handleConfirmApply}>확인</button>
-              <button onClick={handleCancelApply}>취소</button>
-            </Modal.Footer>
-          </Modal>
-        )}
-        <div className="alert-container">
-          {showSuccessAlert && (
-            <div className="alert alert-success" role="alert">
-              팀 신청이 성공했습니다!
-            </div>
-          )}
-          {showErrorAlert && (
-            <div className="alert alert-danger" role="alert">
-              팀 신청에 실패했습니다.
-            </div>
-          )}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="이름 검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                fetchTeams();
+              }
+            }}
+          />
+          {/* <select value={isMixed} onChange={handleMixedChange}>
+            <option value="">혼성여부 선택</option>
+            <option value="true">혼성</option>
+            <option value="false">단일성별</option>
+          </select>
+          <select value={gender} onChange={handleGenderChange}>
+            <option value="">성별 선택</option>
+            <option value="Male">남성</option>
+            <option value="Female">여성</option>
+          </select>
+            <select value={region} onChange={(e) => setRegion(e.target.value)}>
+              <option value="">전체 지역</option>
+              <option value="서울">서울특별시</option>
+              <option value="부산">부산광역시</option>
+              <option value="인천">인천광역시</option>
+              <option value="대구">대구광역시</option>
+              <option value="대전">대전광역시</option>
+              <option value="광주">광주광역시</option>
+              <option value="울산">울산광역시</option>
+              <option value="세종">세종특별자치시</option>
+              <option value="경기">경기도</option>
+              <option value="충북">충청북도</option>
+              <option value="충남">충청남도</option>
+              <option value="전남">전라남도</option>
+              <option value="경북">경상북도</option>
+              <option value="경남">경상남도</option>
+              {/* <option value="강원">강원특별자치도</option> */}
+          {/* <option value="강원특별자치도">강원특별자치도</option>
+              <option value="전북">전북특별자치도</option>
+              <option value="제주">제주특별자치도</option>
+            </select> */}
+
+          <button onClick={handleSearchButtonClick}>검색</button>
         </div>
-        <h2>팀 정보</h2>
-        <div>
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="이름 검색"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  fetchTeams();
-                }
-              }}
-            />
-            <button onClick={handleSearchButtonClick}>검색</button>
-          </div>
-          {/* <button onClick={handleLocationButtonClick}>내 위치 확인</button> */}
-        </div>
+
         <table>
           <thead>
             <tr>
               <th>ID</th>
               <th>팀 이름</th>
               <th>팀 설명</th>
-              {/* <th>로고 이미지</th> */}
               <th>혼성 여부</th>
               <th>성별</th>
               <th>인원수</th>
@@ -339,21 +297,13 @@ const TeamTable: React.FC = () => {
         </table>
 
         <Pagination
-        
-          defaultCurrent={currentPage} // 현재 클릭한 페이지
-          total={total} // 데이터 총 개수
-          defaultPageSize={5} // 페이지 당 데이터 개수
+          defaultCurrent={currentPage}
+          total={total}
+          defaultPageSize={5}
           onChange={(value) => {
             changePage(value);
           }}
         />
-        {showModal && selectedTeam && (
-          <div className="modal">
-            <p>{`${selectedTeam.name} 팀에 초대하시겠습니까?`}</p>
-            <button onClick={handleConfirmApply}>확인</button>
-            <button onClick={handleCancelApply}>취소</button>
-          </div>
-        )}
       </div>
     </Layout>
   );

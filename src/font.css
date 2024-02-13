@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
   font-family: "SongMyung-Regular";
   src: url("/src/components/fonts/SongMyung-Regular.ttf") format("truetype");
   font-weight: normal;
@@ -6,4 +6,22 @@
 
 body {
   font-family: SongMyung-Regular;
+} */
+@font-face {
+  font-family: "HakgyoansimJiugaeR";
+  src: url("/src/components/fonts/HakgyoansimJiugaeR.ttf") format("truetype");
+  font-weight: normal;
 }
+
+body {
+  font-family: HakgyoansimJiugaeR;
+}
+/* @font-face {
+  font-family: "Noto";
+  src: url("/src/components/fonts/NotoSerifKR-ExtraLight.ttf") format("truetype");
+  font-weight: normal;
+}
+
+body {
+  font-family: Noto;
+} */

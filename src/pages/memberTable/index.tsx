@@ -55,13 +55,10 @@ const MemberTable = () => {
   const [selectedProfiles, setSelectedProfiles] = useState<number[]>([]);
   const [gender, setGender] = useState<string>("");
   const [region, setRegion] = useState("");
-  const [regionCategory, setRegionCategory] = useState("");
 
   const fetchProfiles = async () => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
-        process.env.REACT_APP_SERVER_PORT || 3000
-      }/api/profile/available?page=${currentPage}`;
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/available?page=${currentPage}`;
 
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
@@ -72,7 +69,7 @@ const MemberTable = () => {
       }
 
       if (region.trim() !== "") {
-        apiUrl += `&region=${encodeURIComponent(region)}`; 
+        apiUrl += `&region=${encodeURIComponent(region)}`;
       }
       console.log("apiurl=", apiUrl);
 
@@ -97,7 +94,7 @@ const MemberTable = () => {
         setTotal(response.data.data.total);
       } else {
         console.log("초대할수있는 사용자가 없습니다.");
-        // 사용자에게 적절한 메시지를 표시할 수 있도록 처리
+        setProfiles([]); // 데이터가 없을 때 빈 배열로 설정하여 화면을 갱신합니다.
       }
     } catch (error) {
       console.error("프로필을 불러오는 중 오류 발생:", error);
@@ -113,46 +110,20 @@ const MemberTable = () => {
   };
 
   const changePage = async (page: number) => {
-    setCurrentPage(page); // 페이지 변경 시 현재 페이지 업데이트
-    // 페이지 변경 시 새로운 프로필을 불러오도록 함
+    setCurrentPage(page);
     fetchProfiles();
   };
-  
-
-  // const changePage = async (page: number) => {
-  //   try {
-  //     const accessToken = localStorage.getItem("accessToken");
-  
-  //     const apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
-  //       process.env.REACT_APP_SERVER_PORT || 3000
-  //     }/api/profile/available/?page=${page || 1}&name=${searchQuery}&gender=${gender}&region=${region}`;
-  
-  //     const response = await axios.get(apiUrl, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //       withCredentials: true,
-  //     });
-  
-  //     const { total, data: profileDatas } = response.data.data;
-  
-  //     setProfiles(profileDatas);
-  //     setTotal(total);
-  //     setCurrentPage(page); // 페이지 변경 시 현재 페이지 업데이트
-  //   } catch (error) {
-  //     console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
-  //   }
-  // };
-  
 
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
+    console.log("profile=",profile);
+    console.log("setSelectedprofile=",selectedProfile);
     setShowModal(true);
   };
 
   const handleClose = () => {
     setShowModal(false);
-    setSelectedProfile(null); // 모달을 닫을 때 선택된 사용자 ID 초기화
+    setSelectedProfile(null);
   };
 
   const { teamId, setTeamId } = useTeamStore();
@@ -160,11 +131,8 @@ const MemberTable = () => {
   const handleConfirmInvite = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      // Make the API call to invite the selected profile to a team //멤버 스토어에서 가져올수있나?
       const response = await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamId}/user/${selectedProfile?.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/user/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -177,7 +145,6 @@ const MemberTable = () => {
       setShowModal(false);
       setSelectedProfile(null);
 
-      // Refresh the page after confirmation
       window.location.reload();
     } catch (error) {
       console.error("Error inviting member:", error);
@@ -213,7 +180,7 @@ const MemberTable = () => {
             <Modal.Header closeButton>
               <Modal.Title>초대 확인 메세지</Modal.Title>
             </Modal.Header>
-            <Modal.Body>{`${selectedProfile?.name} 팀에 초대하시겠습니까?`}</Modal.Body>
+            <Modal.Body>{`${selectedProfile?.user.name}님을 팀에 초대하시겠습니까?`}</Modal.Body>
             <Modal.Footer>
               <button onClick={handleConfirmInvite}>확인</button>
               <button onClick={handleCancelInvite}>취소</button>
@@ -235,13 +202,11 @@ const MemberTable = () => {
               }}
             />
             <button onClick={handleSearchButtonClick}>검색</button>
-            {/* 수정 시작 */}
             <select value={gender || ''} onChange={handleGenderChange}>
               <option value="">성별 선택</option>
               <option value="Male">남성</option>
               <option value="Female">여성</option>
             </select>
-            {/* 수정 끝 */}
             <select value={region} onChange={(e) => setRegion(e.target.value)}>
               <option value="">전체 지역</option>
               <option value="서울">서울특별시</option>
@@ -258,7 +223,8 @@ const MemberTable = () => {
               <option value="전남">전라남도</option>
               <option value="경북">경상북도</option>
               <option value="경남">경상남도</option>
-              <option value="강원">강원특별자치도</option>
+              {/* <option value="강원">강원특별자치도</option> */}
+              <option value="강원특별자치도">강원특별자치도</option>
               <option value="전북">전북특별자치도</option>
               <option value="제주">제주특별자치도</option>
             </select>
@@ -289,7 +255,7 @@ const MemberTable = () => {
                   <td>{profile.preferredPosition}</td>
                   <td>{profile.age}</td>
                   <td>{profile.gender}</td>
-                  <td>{profile.location.state}</td>
+                  <td>{profile.location.state || profile.location.city}</td>
                   <td>
                     <button onClick={() => handleInviteButton(profile)}>
                       초대
@@ -300,9 +266,10 @@ const MemberTable = () => {
             </tbody>
           </table>
         ) : (
-          <p> </p>
+          <p>데이터가 없습니다.</p>
         )}
-  <Pagination
+
+        <Pagination
           defaultCurrent={currentPage}
           total={total}
           defaultPageSize={5}
