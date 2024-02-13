@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetcher
     // { dedupingInterval: 1000 * 60 * 60 * 24 }
   );
-  const { id: memberId, setMemberId, setMember, isStaff } = useMemberStore();
+  const { setMemberId, setMember, isStaff } = useMemberStore();
   const { teamId, setTeamInfo, chatId } = useTeamStore();
   const { id: userId, setUser, role } = useUserStore();
   const { logout } = useAuthStore();
@@ -54,13 +54,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       setUser(data.data);
       setTeamInfo(
-        data.data.member[0]?.team?.id || data.data.team?.id,
-        data.data.member[0]?.team?.name || data.data.team?.name,
-        data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
-        data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
+        data.data?.member[0]?.team?.id || data.data?.team?.id,
+        data.data?.member[0]?.team?.name || data.data?.team?.name,
+        data.data?.member[0]?.team?.imageUUID || data.data?.team?.imageUUID,
+        data.data?.member[0]?.team?.chat?.id || data.data?.team?.chat?.id
       );
       setMemberId(data.data?.member[0]?.id);
       setMember(data.data?.member[0]);
+      console.log("memberCheck= ", data.data);
     }
 
     if (data?.data.profile) {
