@@ -90,7 +90,6 @@ const Player: React.FC = () => {
             withCredentials: true,
           }
         );
-        console.log("response=", response.data.data);
         setMembers(response.data.data);
         setTotal(response.data.total);
       } catch (error) {
@@ -144,7 +143,7 @@ const Player: React.FC = () => {
 
     // Navigate to the MemberDetail page with the selected member's ID
     if (team.id) {
-      navigate(`/member/${team.id}`);
+      navigate(`/team/member/${team.id}`);
     }
   };
 
@@ -194,8 +193,8 @@ const Player: React.FC = () => {
                 {/* 구단 주인 여부에 따라 텍스트를 다르게 표시 */}
                 <td>{member.isStaff ? "구단주" : "일반선수"}</td>
                 <td>{member.user.email}</td>
-                <td>{member.user.profile.preferredPosition}</td>
-                <td>{member.user.profile.age}</td>
+                <td>{member.user.profile?.preferredPosition}</td>
+                <td>{member.user.profile?.age}</td>
                 {/* <td>{member.user.profile.imageUrl}</td> */}
                 <td>
                   <button onClick={() => handleApplyButton(member)}>

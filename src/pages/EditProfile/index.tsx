@@ -57,7 +57,6 @@ const Position = [
   "Left Winger",
 ];
 
-
 const ProfileContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -165,7 +164,6 @@ const EditProfile = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
 
-    console.log("파일이 입력되었습니다 : ", file);
     if (file) {
       setSelectedFile(file);
     } else {
@@ -183,11 +181,7 @@ const EditProfile = () => {
     searchLocation(data.roadAddress);
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
-    console.log("Map clicked");
-    console.log("Latitude:", lat);
-    console.log("Longitude:", lng);
-  };
+  const handleMapClick = (lat: number, lng: number) => {};
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!kakaoMapLoaded) {
@@ -200,7 +194,6 @@ const EditProfile = () => {
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("profile=", profile);
     if (
       //!profile.birthdate ||
       !profile.height ||
@@ -235,8 +228,6 @@ const EditProfile = () => {
           },
         }
       );
-
-      console.log("response=", response);
 
       if (response.status === 200) {
         setProfile(response.data.data);
@@ -273,14 +264,10 @@ const EditProfile = () => {
 
   const searchLocation = (address: string) => {
     // 주소가 있는 경우에만 API 호출
-    console.log("address1=", address);
     if (address) {
       const geocoder = new kakao.maps.services.Geocoder();
       geocoder.addressSearch(address, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
-          console.log("address2=", address);
-          console.log("address2=", result);
-          console.log("address2 x=", result[0].road_address.x);
           setAddressValues({
             ...addressValues,
             center: {
@@ -318,82 +305,84 @@ const EditProfile = () => {
   return (
     <Layout>
       <ScoreboardContainer>
-          <ProfileContainer>
-            <h2>프로필 수정</h2>
-            <Form>
-              {validationMessage && (
-                <Alert
-                  message="에러"
-                  description={validationMessage}
-                  type="error"
-                  showIcon
-                  closable
-                  onClose={() => setValidationMessage("")}></Alert>
-              )}
-              <FileUploader
-                descLabel="프로필 사진을 등록해주세요"
-                changedFunc={handleFileChange}
+        <ProfileContainer>
+          <h2>프로필 수정</h2>
+          <Form>
+            {validationMessage && (
+              <Alert
+                message="에러"
+                description={validationMessage}
+                type="error"
+                showIcon
+                closable
+                onClose={() => setValidationMessage("")}
+              ></Alert>
+            )}
+            <FileUploader
+              descLabel="프로필 사진을 등록해주세요"
+              changedFunc={handleFileChange}
+            />
+            <Button onClick={handleClick} disabled={!kakaoMapLoaded}>
+              Open Map
+            </Button>
+
+            {kakaoMapLoaded && (
+              <KakaoLocation
+                apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
+                center={{
+                  lat: parseFloat(location.latitude.toString() || "0"),
+                  lng: parseFloat(location.longitude.toString() || "0"),
+                  level: 3,
+                }}
+                style={{
+                  width: "100%",
+                  height: "300px",
+                  marginBottom: "1rem",
+                }}
+                initialLevel={3}
+                initialLat={location.latitude.toString() || "0"}
+                initialLng={location.longitude.toString() || "0"}
+                onClick={(lat, lng) => handleMapClick(lat, lng)}
               />
-              <Button onClick={handleClick} disabled={!kakaoMapLoaded}>
-                Open Map
-              </Button>
+            )}
 
-              {kakaoMapLoaded && (
-                <KakaoLocation
-                  apiKey={process.env.REACT_APP_KAKAO_MAP_KEY || ""}
-                  center={{
-                    lat: parseFloat(location.latitude.toString() || "0"),
-                    lng: parseFloat(location.longitude.toString() || "0"),
-                    level: 3,
-                  }}
-                  style={{
-                    width: "100%",
-                    height: "300px",
-                    marginBottom: "1rem",
-                  }}
-                  initialLevel={3}
-                  initialLat={location.latitude.toString() || "0"}
-                  initialLng={location.longitude.toString() || "0"}
-                  onClick={(lat, lng) => handleMapClick(lat, lng)}
-                />
-              )}
+            {Object.keys(profile).map((key) => {
+              if (key === "preferredPosition") {
+                return (
+                  <Select
+                    key={key}
+                    name={key}
+                    value={profile[key]}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">포지션 선택</option>
+                    {Position.map((position) => (
+                      <option key={position} value={position}>
+                        {position}
+                      </option>
+                    ))}
+                  </Select>
+                );
+              } else if (key !== "location") {
+                // location 필드는 제외
+                return (
+                  <Input
+                    key={key}
+                    name={key}
+                    type="text"
+                    placeholder={`${key}를 입력해주세요`}
+                    value={profile[key] as string | undefined}
+                    onChange={handleChange}
+                    required
+                  />
+                );
+              }
+            })}
 
-              {Object.keys(profile).map((key) => {
-                if (key === "preferredPosition") {
-                  return (
-                    <Select
-                      key={key}
-                      name={key}
-                      value={profile[key]}
-                      onChange={handleChange}
-                      required>
-                      <option value="">포지션 선택</option>
-                      {Position.map((position) => (
-                        <option key={position} value={position}>
-                          {position}
-                        </option>
-                      ))}
-                    </Select>
-                  );
-                } else if (key !== "location") {
-                  // location 필드는 제외
-                  return (
-                    <Input
-                      key={key}
-                      name={key}
-                      type="text"
-                      placeholder={`${key}를 입력해주세요`}
-                      value={profile[key] as string | undefined}
-                      onChange={handleChange}
-                      required
-                    />
-                  );
-                }
-              })}
-
-              <Button onClick={onClickAddButton}>저장</Button>
-            </Form>
-          </ProfileContainer>
+            <Button onClick={onClickAddButton}>저장</Button>
+          </Form>
+        </ProfileContainer>
       </ScoreboardContainer>
     </Layout>
   );
