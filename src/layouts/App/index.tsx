@@ -59,8 +59,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
       );
-      setMemberId(data.data.member[0]?.id);
-      setMember(data.data.member[0]);
+      setMemberId(data.data?.member[0]?.id);
+      setMember(data.data?.member[0]);
     }
 
     if (data?.data.profile) {
