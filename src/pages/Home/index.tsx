@@ -20,6 +20,10 @@ import { ErrorContainer, ErrorMessage, MyTime, OthersTime, StickyHeader } from '
 import BasicPie from 'components/graph/BasicPie';
 import makeSection from 'utils/makeSection';
 import utc from 'dayjs/plugin/utc'; // import UTC plugin
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
 dayjs.extend(utc);
 
 export const Section = styled.section`
@@ -183,6 +187,13 @@ const Home = () => {
         });
     }, [socket]);
 
+    useEffect(() => {
+        socket?.on('enter_team', (data: any) => {
+            console.log('누군 가 팀에 들어왔어요!', data);
+            toast.info(`${data.message}`);
+        });
+    }, [socket]);
+
     // 모달이 열린 경우 스크롤 최하단으로 이동
     useEffect(() => {
         if (show) {
@@ -218,10 +229,12 @@ const Home = () => {
     }, [teamWinningRate]);
 
     const chatSections = makeSection(messages ? [...messages].reverse() : []);
-
     return (
         <>
             <Layout>
+                <div>
+                    <ToastContainer limit={1} autoClose={4000} hideProgressBar />
+                </div>
                 {teamId ? (
                     <>
                         <Button
@@ -234,7 +247,7 @@ const Home = () => {
                                 cursor: 'pointer',
                             }}
                         >
-                            <AiTwotoneMessage />
+                            <AiTwotoneMessage size={30} />
                         </Button>
                         <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
                             <Modal.Header closeButton>

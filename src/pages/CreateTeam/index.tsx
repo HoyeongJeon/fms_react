@@ -160,8 +160,8 @@ const CreateTeam = () => {
           },
         }
       );
-
-      if (response.status === 201) {
+      console.log("response", response);
+      if (response.data.status === 200) {
         setTeamId(response.data.data.id);
         message.success("팀등록이 완료되었습니다.");
         navigate("/home");
