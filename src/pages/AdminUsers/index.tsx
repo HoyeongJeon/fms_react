@@ -80,7 +80,7 @@ const AdminUsers = () => {
         window.location.reload();
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
 
     setShow(false);

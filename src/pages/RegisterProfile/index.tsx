@@ -137,7 +137,7 @@ const RegisterProfile = () => {
       address: "",
     },
   });
-
+  const today = new Date().toISOString().split("T")[0];
   const [location, setLocation] = useState<ProfileLocation>({
     latitude: "",
     longitude: "",
@@ -238,11 +238,7 @@ const RegisterProfile = () => {
     }
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
-    console.log("Map clicked");
-    console.log("Latitude:", lat);
-    console.log("Longitude:", lng);
-  };
+  const handleMapClick = (lat: number, lng: number) => {};
 
   const calculateAge = (birthdate: string) => {
     const today = new Date();
@@ -366,6 +362,7 @@ const RegisterProfile = () => {
                 placeholder="생년월일"
                 value={profile.birthdate}
                 onChange={handleChange}
+                max={today}
                 required
               />
 

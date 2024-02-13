@@ -58,7 +58,9 @@ const MemberTable = () => {
 
   const fetchProfiles = async () => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/available?page=${currentPage}`;
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/profile/available?page=${currentPage}`;
 
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
@@ -71,7 +73,6 @@ const MemberTable = () => {
       if (region.trim() !== "") {
         apiUrl += `&region=${encodeURIComponent(region)}`;
       }
-      console.log("apiurl=", apiUrl);
 
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
@@ -81,19 +82,15 @@ const MemberTable = () => {
         withCredentials: true,
       });
 
-      console.log("response.data=", response.data);
-
       if (
         response.data &&
         response.data.data &&
         response.data.data.data.length > 0
       ) {
         const fetchedProfiles = response.data.data.data;
-        console.log("Fetched profiles:", fetchedProfiles);
         setProfiles(fetchedProfiles);
         setTotal(response.data.data.total);
       } else {
-        console.log("초대할수있는 사용자가 없습니다.");
         setProfiles([]); // 데이터가 없을 때 빈 배열로 설정하여 화면을 갱신합니다.
       }
     } catch (error) {
@@ -116,8 +113,6 @@ const MemberTable = () => {
 
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
-    console.log("profile=",profile);
-    console.log("setSelectedprofile=",selectedProfile);
     setShowModal(true);
   };
 
@@ -132,7 +127,9 @@ const MemberTable = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/user/${selectedProfile?.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/team/${teamId}/user/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -202,7 +199,7 @@ const MemberTable = () => {
               }}
             />
             <button onClick={handleSearchButtonClick}>검색</button>
-            <select value={gender || ''} onChange={handleGenderChange}>
+            <select value={gender || ""} onChange={handleGenderChange}>
               <option value="">성별 선택</option>
               <option value="Male">남성</option>
               <option value="Female">여성</option>

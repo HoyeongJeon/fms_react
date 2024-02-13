@@ -90,7 +90,6 @@ const Player: React.FC = () => {
             withCredentials: true,
           }
         );
-        console.log("response=", response.data.data);
         setMembers(response.data.data);
         setTotal(response.data.total);
       } catch (error) {
