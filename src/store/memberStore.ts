@@ -6,7 +6,7 @@ interface MemberStore {
   id: number | null;
   // 사용자 정보를 설정하는 함수들입니다.
   setMember: (user: Omit<MemberStore, "setMember">) => void;
-  setMemberId: (id: number) => void;
+  setMemberId: (id: number | null) => void;
   clearMember: () => void; // 사용자 정보를 초기화합니다.
 }
 
