@@ -40,7 +40,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { teamId, setTeamInfo, chatId } = useTeamStore();
   const { id: userId, setUser, role } = useUserStore();
   const { logout } = useAuthStore();
-  const { setProfile, id: profileId, resetProfile } = useProfileStore();
+  const {
+    setProfile,
+    id: profileId,
+    resetProfile,
+    imageUUID,
+  } = useProfileStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,13 +59,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
       );
-
       setMemberId(data.data.member[0]?.id);
       setMember(data.data.member[0]);
     }
 
     if (data?.data.profile) {
       setProfile(data.data.profile);
+      console.log("imageUUID1", data.data.profile);
+      console.log("imageUUID2", data.data.profile.imageUUID);
     }
   }, [data]);
   const handleLogout = () => {
