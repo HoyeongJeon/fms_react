@@ -47,7 +47,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (data) {
       resetProfile();
       setUser(data.data);
-      console.log("userRole=", role);
       setTeamInfo(
         data.data.member[0]?.team?.id || data.data.team?.id,
         data.data.member[0]?.team?.name || data.data.team?.name,

@@ -62,7 +62,6 @@ const MatchPreview = () => {
     `/image/${awayTeam.imageUUID}`,
     fetcher
   );
-  console.log(awayPresignedURL);
   const { data: homeTeamData } = useSWR(`/statistics/${homeTeamId}`, fetcher);
   const { data: awayTeamData } = useSWR(`/statistics/${awayTeamId}`, fetcher);
   const [matchInfo, setMatchInfo] = useState<MatchInfo>({

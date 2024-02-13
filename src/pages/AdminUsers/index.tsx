@@ -121,9 +121,6 @@ const AdminUsers = () => {
         setTotal(data.total);
         setError("");
         setUser(data.data[0]);
-        console.log("user= ", user);
-        console.log("data=", data.data[0]);
-        console.log("users=", users);
       } catch (err) {
         setError("사용자 정보를 불러오는데 실패했습니다.");
         console.error(err);
