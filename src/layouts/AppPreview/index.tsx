@@ -57,8 +57,12 @@ const LayoutPreview: React.FC<LayoutProps> = ({ children }) => {
       </Menu>
       <Card>
         <h2>
-          <StyledLink to="/home">
-            Football Management System (FMS) ⚽🔥
+        <StyledLink to="/home">
+            <img
+              src="img/title2.png"
+              alt="축구왕"
+              style={{ cursor: "pointer", width: "20%" }}
+            />
           </StyledLink>
         </h2>
         {children}

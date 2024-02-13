@@ -8,7 +8,7 @@ const GlobalStyle = createGlobalStyle`
 
 
 body {
-    font-family : 'SongMyung-Regular';
+    font-family : 'HakgyoansimJiugaeR';
 }
 
 `;
