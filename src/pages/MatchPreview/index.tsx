@@ -85,7 +85,6 @@ const MatchPreview = () => {
   // 경기 종료 여부 확인
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("matchId= ", matchId);
     axios
       .get(
         `${process.env.REACT_APP_SERVER_HOST}:${
@@ -105,7 +104,7 @@ const MatchPreview = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }, [matchId]);
 
@@ -161,7 +160,7 @@ const MatchPreview = () => {
           setAwayTeamId(res.data.data.away_team_id);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [matchId]);
@@ -191,7 +190,7 @@ const MatchPreview = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
     axios
       .get(`${BASE_URL}/team/${awayTeamId}`, {
@@ -209,7 +208,7 @@ const MatchPreview = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }, [homeTeamId, awayTeamId]);
 

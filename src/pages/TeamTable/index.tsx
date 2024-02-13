@@ -45,21 +45,22 @@ const TeamTable: React.FC = () => {
 
   const fetchTeams = async (page: number = 1) => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}`;
-  
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/team/?page=${page}`;
+
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
       }
-  
+
       if (gender) {
         apiUrl += `&gender=${gender}`;
       }
-  
+
       if (region.trim() !== "") {
         apiUrl += `&region=${encodeURIComponent(region)}`;
       }
-      console.log("apiurl=", apiUrl);
-  
+
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
         headers: {
@@ -67,9 +68,9 @@ const TeamTable: React.FC = () => {
         },
         withCredentials: true,
       });
-  
+
       const teamsData = response.data.data;
-  
+
       const teams = teamsData.map((data: { team: any; totalMember: any }) => {
         if (data.team) {
           return {
@@ -80,9 +81,9 @@ const TeamTable: React.FC = () => {
           return null;
         }
       });
-  
+
       const filteredTeams = teams.filter((team: null) => team !== null);
-  
+
       setTeams(filteredTeams);
       setTotal(response.data.total); // 서버에서 받은 전체 페이지 수로 설정
     } catch (error) {
@@ -91,24 +92,25 @@ const TeamTable: React.FC = () => {
       setTotal(0);
     }
   };
-  
+
   const changePage = async (page: number) => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}`;
-  
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/team/?page=${page}`;
+
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
       }
-  
+
       if (gender) {
         apiUrl += `&gender=${gender}`;
       }
-  
+
       if (region.trim() !== "") {
         apiUrl += `&region=${encodeURIComponent(region)}`;
       }
-      console.log("apiurl=", apiUrl);
-  
+
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
         headers: {
@@ -116,27 +118,21 @@ const TeamTable: React.FC = () => {
         },
         withCredentials: true,
       });
-  
-      console.log("response.data=", response.data);
-  
+
       setTeams(response.data.data);
       setTotal(response.data.total);
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
     }
   };
-  
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      console.log("Fetching teams...");
       fetchTeams();
     }, 500);
 
     return () => clearTimeout(delay);
   }, [currentPage, searchQuery, isMixed, gender, region]);
-
-
 
   const getUserLocation = () => {
     return new Promise<GeolocationPosition>((resolve, reject) => {
@@ -287,7 +283,8 @@ const TeamTable: React.FC = () => {
                   <td>{teamData.team.location.address}</td>
                   <td>
                     <button
-                      onClick={async () => await handleApplyButton(teamData)}>
+                      onClick={async () => await handleApplyButton(teamData)}
+                    >
                       신청
                     </button>
                   </td>
