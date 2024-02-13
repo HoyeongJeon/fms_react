@@ -317,7 +317,7 @@ const RegisterProfile = () => {
       <ScoreboardContainer>
         <Wrapper>
           <ProfileContainer>
-            <h2>프로필(사용자)</h2>
+            <h2>프로필</h2>
             <Form>
               {validationMessage && (
                 <Alert
