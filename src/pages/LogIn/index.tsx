@@ -51,7 +51,7 @@ const LogIn = () => {
       login();
       navigate("/home", { replace: true });
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       // alert(err.response?.data?.message);
       setErrorMessage(err.response?.data?.message || "로그인에 실패했습니다.");
       setInputs({

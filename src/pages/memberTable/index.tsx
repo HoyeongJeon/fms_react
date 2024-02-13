@@ -8,6 +8,7 @@ import Modal from "react-bootstrap/Modal";
 import { useTeamStore } from "store/teamStore";
 
 interface Member {
+  id:number;
   isStaff: boolean;
   joinDate: string;
   team: Team;
@@ -43,6 +44,7 @@ interface Profile {
     address: string;
   };
   user: User;
+  invited: boolean; // 초대된 상태 저장
 }
 
 const MemberTable = () => {
@@ -88,7 +90,10 @@ const MemberTable = () => {
         response.data.data &&
         response.data.data.data.length > 0
       ) {
-        const fetchedProfiles = response.data.data.data;
+        const fetchedProfiles = response.data.data.data.map((profile: Profile) => ({
+          ...profile,
+          invited: false, // 초대 상태 초기화
+        }));
         console.log("Fetched profiles:", fetchedProfiles);
         setProfiles(fetchedProfiles);
         setTotal(response.data.data.total);
@@ -116,9 +121,10 @@ const MemberTable = () => {
 
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
-    console.log("profile=",profile);
-    console.log("setSelectedprofile=",selectedProfile);
     setShowModal(true);
+    
+    // 초대 상태를 true로 변경
+    setProfiles(prevProfiles => prevProfiles.map(prevProfile => prevProfile.id === profile.id ? { ...prevProfile, invited: true } : prevProfile));
   };
 
   const handleClose = () => {
@@ -131,8 +137,8 @@ const MemberTable = () => {
   const handleConfirmInvite = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/user/${selectedProfile?.id}`,
+      await axios.post(
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -145,12 +151,17 @@ const MemberTable = () => {
       setShowModal(false);
       setSelectedProfile(null);
 
-      window.location.reload();
+      // 초대 성공 메시지 표시
+      alert("초대 이메일을 보냈습니다");
+
+      // 초대한 멤버를 프로필 목록에서 제거
+      setProfiles(prevProfiles => prevProfiles.filter(profile => profile.id !== selectedProfile?.id));
+
     } catch (error) {
       console.error("Error inviting member:", error);
     }
   };
-
+  
   const handleCancelInvite = () => {
     setShowModal(false);
     setSelectedProfile(null);
@@ -257,7 +268,7 @@ const MemberTable = () => {
                   <td>{profile.gender}</td>
                   <td>{profile.location.state || profile.location.city}</td>
                   <td>
-                    <button onClick={() => handleInviteButton(profile)}>
+                    <button onClick={() => handleInviteButton(profile)} disabled={profile.invited}>
                       초대
                     </button>
                   </td>
