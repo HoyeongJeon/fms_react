@@ -52,7 +52,6 @@ const InputMatchResult = () => {
   const { data: memberData, error } = useSWR(`/team/${teamId}/member`, fetcher); // 이친구가 요청을 보내줌x
 
   const [show, setShow] = useState(false);
-  console.log("memberData", memberData);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
@@ -150,7 +149,6 @@ const InputMatchResult = () => {
       }),
     };
     try {
-      console.log("dataToSend", dataToSend);
       const response = await axios.post(
         `${BASE_URL}/match/${matchId}/result`,
         dataToSend,
@@ -161,11 +159,10 @@ const InputMatchResult = () => {
           withCredentials: true,
         }
       );
-      console.log("response", response);
 
       navigate(`/match/${matchId}/input/detail`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

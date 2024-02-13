@@ -12,7 +12,7 @@ const responsiveWidth = "768px";
 
 const Sidebar = styled.div`
   width: 95%;
-  height : 98%;
+  height : 95%;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
@@ -51,7 +51,7 @@ const Button = styled.button`
 
 const ImageContainer = styled.div`
   position: relative;
-  margin-top : 10px;
+  margin-top: 10px;
   height: 70vh;
   background-image: url("../../img/field.png"); // 배경 이미지로 경기장 이미지를 설정합니다.
   background-size: cover; // 배경 이미지가 컨테이너를 꽉 채우도록 합니다.
@@ -76,7 +76,9 @@ const Player = styled.div`
   position: absolute;
   width: 80px; // 선수 크기
   height: 80px;
-  background-color: red;
+  //background-color: red;
+  background-image: url('../../img/uniform.png'); // 여기에 이미지 경로를 입력하세요
+  background-size: cover; // 이미지가 div의 크기에 맞게 조정됩니다
   border-radius: 50%; // 원 모양
   display: flex;
   justify-content: center;
@@ -88,7 +90,7 @@ const Player = styled.div`
 const PlayerList = styled.ul`
     list-style: none;
     width: 80%;
-    height : 98%;
+    height : 95%;
     padding: 0;
     margin-left: 10px;
     justify-content: center;
@@ -96,34 +98,34 @@ const PlayerList = styled.ul`
     max-height: 90vh; /* 화면 크기에 따라 최대 높이 설정 */
     overflow: visible;
 
-    //background: #f8f9fa;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    border: 2px solid #d6d6d6; /* 선명한 회색 테두리를 추가 */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  //background: #f8f9fa;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #d6d6d6; /* 선명한 회색 테두리를 추가 */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 
-    > h3 {
-      margin-top:20px;
-      }
+  > h3 {
+    margin-top: 20px;
+  }
 `;
 
 const PlayerListItem = styled.li`
-    justify-content: space-between;
-    padding: 10px 20px; /* 좌우 여백 추가 */
-    border-bottom: 1px solid #ddd;
-    text-align: left; /* 텍스트를 왼쪽 정렬합니다 */
-    font-size: 1.1rem; /* 폰트 크기를 살짝 늘립니다 */
-    &:hover {
-        background-color: #f0f0f0; /* 마우스 오버 시 배경색 변경 */
-    }
+  justify-content: space-between;
+  padding: 10px 20px; /* 좌우 여백 추가 */
+  border-bottom: 1px solid #ddd;
+  text-align: left; /* 텍스트를 왼쪽 정렬합니다 */
+  font-size: 1.1rem; /* 폰트 크기를 살짝 늘립니다 */
+  &:hover {
+    background-color: #f0f0f0; /* 마우스 오버 시 배경색 변경 */
+  }
 `;
 
 const RightContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    //justify-content: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: flex-start;
 `;
 
 const TacticalAdvantages = styled.ul`
@@ -137,15 +139,15 @@ const TacticalDisadvantages = styled(TacticalAdvantages)``;
 
 const TacticalPoint = styled.li`
   &:before {
-    content: '• ';
+    content: "• ";
     color: green; // 장점은 녹색
   }
 `;
 
 const TacticalWeakness = styled(TacticalPoint)`
-  text-align:left;
+  text-align: left;
   &:before {
-    content: '• ';
+    content: "• ";
     color: red; // 단점은 적색
   }
 `;
@@ -272,7 +274,6 @@ const Formation = () => {
           position: item.position,
         }));
 
-
         formation.map((item: FormationItem) =>
           setPosition(item.position, item.member.user.name)
         );
@@ -282,7 +283,6 @@ const Formation = () => {
         }
 
         setFormationInfo(newFormationInfo);
-
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
@@ -292,12 +292,14 @@ const Formation = () => {
   }, [homeTeamId]);
 
   const [modalData, setModalData] = useState<SimplifiedMemberInfo[]>([]);
-  const [formationData, setFormationData] = useState<PopulerFormationInfo[]>([]);
-  const [warningMember, setWarningMemberData] = useState<WarningMemberInfo[]>([]);
-  const [bestFormation, setBestFormationData] = useState<BestFormationInfo | null>(null);
-
-  console.log('bestFormation aaa:',bestFormation);
-  console.log('bestFormation formation1:',bestFormation?.formation1);
+  const [formationData, setFormationData] = useState<PopulerFormationInfo[]>(
+    []
+  );
+  const [warningMember, setWarningMemberData] = useState<WarningMemberInfo[]>(
+    []
+  );
+  const [bestFormation, setBestFormationData] =
+    useState<BestFormationInfo | null>(null);
 
   interface User {
     name: string; // 사용자의 이름
@@ -320,22 +322,22 @@ const Formation = () => {
   }
 
   interface PopulerFormationInfo {
-    cnt: number; 
-    formation: string; 
+    cnt: number;
+    formation: string;
   }
 
   interface MemberData {
-    user: User; 
+    user: User;
   }
 
   interface WarningMemberInfo {
-    member_id: number; 
+    member_id: number;
     yellowCards: number;
-    memberData: MemberData; 
+    memberData: MemberData;
   }
 
   interface BestFormationInfo {
-    formation1: string; 
+    formation1: string;
     formation2: string;
   }
 
@@ -357,22 +359,18 @@ const Formation = () => {
         );
         const members: Member[] = response.data.data;
 
-        console.log('members:',members);
-
         const newModalData = members.map((member: Member) => {
           // const position =
           //   member.matchformation.length > 0
           //     ? member.matchformation[0].position
           //     : "";
-          const position = '';
+          const position = "";
           return {
             id: member.id,
             name: member.user.name,
             position: position,
           };
         });
-
-        console.log('newModalData:',newModalData);
 
         setModalData(newModalData);
       } catch (error) {
@@ -382,8 +380,6 @@ const Formation = () => {
 
     getTeamFormation();
   }, [homeTeamId]);
-
-
 
   /************** 인기 포메이션 기능 ***************/
 
@@ -405,9 +401,7 @@ const Formation = () => {
         );
         const resultData: PopulerFormationInfo[] = response.data;
 
-        console.log('resultData:',resultData);
-
-        setFormationData(resultData); 
+        setFormationData(resultData);
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
@@ -417,96 +411,104 @@ const Formation = () => {
   }, [homeTeamId]);
 
   // 3개씩 분할하는 함수
-  const chunkArray = (arr:PopulerFormationInfo [], size:number): PopulerFormationInfo[][]  =>
-  arr.reduce((acc: PopulerFormationInfo[][] , val: PopulerFormationInfo, i:number) => {
-    let idx = Math.floor(i / size);
-    let page = acc[idx] || (acc[idx] = []);
-    page.push(val);
-    return acc;
-  }, []);
+  const chunkArray = (
+    arr: PopulerFormationInfo[],
+    size: number
+  ): PopulerFormationInfo[][] =>
+    arr.reduce(
+      (acc: PopulerFormationInfo[][], val: PopulerFormationInfo, i: number) => {
+        let idx = Math.floor(i / size);
+        let page = acc[idx] || (acc[idx] = []);
+        page.push(val);
+        return acc;
+      },
+      []
+    );
 
   // 인기 포메이션 데이터를 3개씩 분할
-  const groupedFormationData: PopulerFormationInfo[][] = chunkArray(formationData, 3);
+  const groupedFormationData: PopulerFormationInfo[][] = chunkArray(
+    formationData,
+    3
+  );
 
+  /************** 최근 3경기간 최다 누적 경고 인원 ***************/
 
+  useEffect(() => {
+    // 최근 3경기간 최다 누적 경고 인원 조회
+    const getPopularFormation = async () => {
+      if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
 
-    /************** 최근 3경기간 최다 누적 경고 인원 ***************/
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/formation/warning/${homeTeamId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+            },
+          }
+        );
+        const resultData: WarningMemberInfo[] = response.data;
 
-    useEffect(() => {
-      // 최근 3경기간 최다 누적 경고 인원 조회
-      const getPopularFormation = async () => {
-        if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
-  
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_SERVER_HOST}:${
-              process.env.REACT_APP_SERVER_PORT || 3000
-            }/api/formation/warning/${homeTeamId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
-              },
-            }
-          );
-          const resultData: WarningMemberInfo[] = response.data;
-  
-          console.log('resultData warning:',resultData);
-  
-          setWarningMemberData(resultData); 
-        } catch (error) {
-          console.error("데이터 불러오기 실패:", error);
-        }
-      };
-  
-      getPopularFormation();
-    }, [homeTeamId]);
-  
-    // 3개씩 분할하는 함수
-    const warningChunkArray = (arr:WarningMemberInfo [], size:number): WarningMemberInfo[][]  =>
-    arr.reduce((acc: WarningMemberInfo[][] , val: WarningMemberInfo, i:number) => {
-      let idx = Math.floor(i / size);
-      let page = acc[idx] || (acc[idx] = []);
-      page.push(val);
-      return acc;
-    }, []);
-  
-    // 인기 포메이션 데이터를 3개씩 분할
-    const warningGroupedData: WarningMemberInfo[][] = warningChunkArray(warningMember, 3);
+        setWarningMemberData(resultData);
+      } catch (error) {
+        console.error("데이터 불러오기 실패:", error);
+      }
+    };
 
+    getPopularFormation();
+  }, [homeTeamId]);
 
+  // 3개씩 분할하는 함수
+  const warningChunkArray = (
+    arr: WarningMemberInfo[],
+    size: number
+  ): WarningMemberInfo[][] =>
+    arr.reduce(
+      (acc: WarningMemberInfo[][], val: WarningMemberInfo, i: number) => {
+        let idx = Math.floor(i / size);
+        let page = acc[idx] || (acc[idx] = []);
+        page.push(val);
+        return acc;
+      },
+      []
+    );
 
-    /************** 추천 포메이션 조회 ***************/
+  // 인기 포메이션 데이터를 3개씩 분할
+  const warningGroupedData: WarningMemberInfo[][] = warningChunkArray(
+    warningMember,
+    3
+  );
 
-    useEffect(() => {
-      // 추천 포메이션 조회
-      const getBestFormation = async () => {
-        if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
-  
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_SERVER_HOST}:${
-              process.env.REACT_APP_SERVER_PORT || 3000
-            }/api/formation/best/${homeTeamId}/${opponentTeamhId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
-              },
-            }
-          );
-          const resultData = response.data;
-  
-          console.log('resultData bestForamtion:',resultData);
+  /************** 추천 포메이션 조회 ***************/
 
-          setBestFormationData(resultData);
-  
-        } catch (error) {
-          console.error("데이터 불러오기 실패:", error);
-        }
-      };
-  
-      getBestFormation();
-    }, [homeTeamId,opponentTeamhId, accessToken]);
+  useEffect(() => {
+    // 추천 포메이션 조회
+    const getBestFormation = async () => {
+      if (!homeTeamId) return; // homeTeamId가 없으면 함수를 실행하지 않음
 
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_SERVER_HOST}:${
+            process.env.REACT_APP_SERVER_PORT || 3000
+          }/api/formation/best/${homeTeamId}/${opponentTeamhId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // Bearer 토큰 추가
+            },
+          }
+        );
+        const resultData = response.data;
+
+        setBestFormationData(resultData);
+      } catch (error) {
+        console.error("데이터 불러오기 실패:", error);
+      }
+    };
+
+    getBestFormation();
+  }, [homeTeamId, opponentTeamhId, accessToken]);
 
   const setPosition = (position: string, playerName: string) => {
     setSelectedPlayerNames((prevNames) => ({
@@ -572,8 +574,6 @@ const Formation = () => {
     [key: string]: string;
   }>({});
 
-
-
   const handleClickOnPlayer = (player: Player) => {
     setSelectedPlayer(player);
     //etSelectedPlayerName(player.name);
@@ -616,7 +616,8 @@ const Formation = () => {
                   position: formationData.positionNames.attackers[index],
                   id: index,
                 })
-              }>
+              }
+            >
               {selectedPlayerNames[
                 formationData.positionNames.attackers[index]
               ] ? (
@@ -645,7 +646,8 @@ const Formation = () => {
                   position: formationData.positionNames.midfielders[index],
                   id: index,
                 })
-              }>
+              }
+            >
               {selectedPlayerNames[
                 formationData.positionNames.midfielders[index]
               ] ? (
@@ -674,7 +676,8 @@ const Formation = () => {
                   position: formationData.positionNames.defenders[index],
                   id: index,
                 })
-              }>
+              }
+            >
               {selectedPlayerNames[
                 formationData.positionNames.defenders[index]
               ] ? (
@@ -705,7 +708,8 @@ const Formation = () => {
                 position: formationData.positionNames.goalkeeper,
                 id: 1,
               })
-            }>
+            }
+          >
             {selectedPlayerNames[formationData.positionNames.goalkeeper] ? (
               <>
                 {formationData.positionNames.goalkeeper}
@@ -826,7 +830,6 @@ const Formation = () => {
       }
     }
 
-
     setFormationInfo(newPlayerPositions);
     // playerPositions 업데이트
     //fillPlayerPositions();
@@ -836,15 +839,12 @@ const Formation = () => {
     // 상태 업데이트가 완료되기를 기다립니다.
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-
     // confirm 대화 상자를 사용하여 사용자 확인 요청
     if (window.confirm(`포메이션 및 포지션 정보 저장하시겠습니까?`)) {
       const data: SaveFormationDto = {
         playerPositions: newPlayerPositions,
         currentFormation: currentFormation,
       };
-
-
 
       try {
         if (playerPositions.length === 0) {
@@ -879,18 +879,15 @@ const Formation = () => {
         }
       );
 
+      // API 호출 성공 시
+      alert("포메이션 및 포지션 정보 저장되었습니다.");
+      // navigate("/home"); // 여기서 "/home"은 홈 페이지의 경로입니다.
 
-
-        // API 호출 성공 시
-        alert("포메이션 및 포지션 정보 저장되었습니다.");
-        // navigate("/home"); // 여기서 "/home"은 홈 페이지의 경로입니다.
-
-        window.location.reload();
-
-      } catch (error) {
-        console.error("데이터 불러오기 실패:", error);
-      }
-    };  
+      window.location.reload();
+    } catch (error) {
+      console.error("데이터 불러오기 실패:", error);
+    }
+  };
 
   const fillPlayerPositions = async () => {
     const newPlayerPositions = [];
@@ -915,56 +912,54 @@ const Formation = () => {
     }
 
     setFormationInfo(newPlayerPositions);
-
-
   };
 
-    // 초기화 함수
-    const handleResetSelection = () => {
-      setSelectedPlayerNames({});
-    };
+  // 초기화 함수
+  const handleResetSelection = () => {
+    setSelectedPlayerNames({});
+  };
 
-    function getPositionsByFormation(formationName: string): string[] {
-      // 주어진 포메이션명에 해당하는 포메이션 객체를 찾음
-      const formation = formations[formationName];
-    
-      if (!formation) {
-        throw new Error(`Formation "${formationName}" not found`);
-      }
-    
-      // 각 포지션의 이름들을 추출하여 하나의 배열로 결합
-      const positions = [
-        ...formation.positionNames.defenders,
-        ...formation.positionNames.midfielders,
-        ...formation.positionNames.attackers,
-        formation.positionNames.goalkeeper
-      ];
-    
-      return positions;
+  function getPositionsByFormation(formationName: string): string[] {
+    // 주어진 포메이션명에 해당하는 포메이션 객체를 찾음
+    const formation = formations[formationName];
+
+    if (!formation) {
+      throw new Error(`Formation "${formationName}" not found`);
     }
 
-    const positions = getPositionsByFormation(currentFormation);
+    // 각 포지션의 이름들을 추출하여 하나의 배열로 결합
+    const positions = [
+      ...formation.positionNames.defenders,
+      ...formation.positionNames.midfielders,
+      ...formation.positionNames.attackers,
+      formation.positionNames.goalkeeper,
+    ];
 
-    const PlayerListItem = styled.li`
-        // ... 기존 스타일링 유지
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px; // 좌우 여백 추가
-        border-bottom: 1px solid #ddd; // 하단에 경계선을 추가합니다.
-        &:hover {
-          background-color: #f0f0f0; // 마우스 호버 시 배경색을 변경합니다.
-        }
-      
-        > div:first-child {
-          margin-right: auto; // 첫 번째 자식 div(텍스트를 감싼 div)에 오른쪽 여백을 자동으로 설정하여 나머지 요소들을 오른쪽으로 밀어냅니다.
-        }
-    `;
+    return positions;
+  }
 
-    // Dropdown 컴포넌트를 스타일링합니다.
-    const StyledDropdown = styled(Dropdown)`
+  const positions = getPositionsByFormation(currentFormation);
+
+  const PlayerListItem = styled.li`
+    // ... 기존 스타일링 유지
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; // 좌우 여백 추가
+    border-bottom: 1px solid #ddd; // 하단에 경계선을 추가합니다.
+    &:hover {
+      background-color: #f0f0f0; // 마우스 호버 시 배경색을 변경합니다.
+    }
+
+    > div:first-child {
+      margin-right: auto; // 첫 번째 자식 div(텍스트를 감싼 div)에 오른쪽 여백을 자동으로 설정하여 나머지 요소들을 오른쪽으로 밀어냅니다.
+    }
+  `;
+
+  // Dropdown 컴포넌트를 스타일링합니다.
+  const StyledDropdown = styled(Dropdown)`
     margin-left: 16px; // 드롭다운과 텍스트 사이의 간격을 설정합니다.
-    `;
+  `;
 
   type onSelectPositionType = (playerId: number, newPosition: string) => void;
 
@@ -973,50 +968,48 @@ const Formation = () => {
     onSelectPosition: onSelectPositionType;
   }
 
-    // PlayerListItem 내부에 드롭다운을 추가하는 컴포넌트
-    const PlayerDropdown: React.FC<PlayerDropdownProps>  = ({ player, onSelectPosition }) => {
+  // PlayerListItem 내부에 드롭다운을 추가하는 컴포넌트
+  const PlayerDropdown: React.FC<PlayerDropdownProps> = ({
+    player,
+    onSelectPosition,
+  }) => {
+    const handlePositionSelect = (newPosition: string) => {
+      // 선택한 포지션을 onSelectPosition 함수를 통해 부모 컴포넌트로 전달합니다.
 
-      const handlePositionSelect = (newPosition: string) => {
-        // 선택한 포지션을 onSelectPosition 함수를 통해 부모 컴포넌트로 전달합니다.
+      const playerCount = Object.keys(selectedPlayerNames).length;
 
-        const playerCount = Object.keys(selectedPlayerNames).length;
+      if (playerCount >= 11) {
+        alert("최대 11명의 선수만 등록할 수 있습니다.");
+        return;
+      }
 
-        if (playerCount >= 11) {
-            alert('최대 11명의 선수만 등록할 수 있습니다.');
-            return;
-        }
+      if (Object.values(selectedPlayerNames).includes(player.name)) {
+        alert("이미 선택된 선수입니다.");
+      } else {
+        onSelectPosition(player.id, newPosition);
+      }
+    };
 
-        if (Object.values(selectedPlayerNames).includes(player.name)){
+    return (
+      <StyledDropdown>
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id={`dropdown-${player.id}`}>
+            {"포지션"}
+          </Dropdown.Toggle>
 
-          alert('이미 선택된 선수입니다.');
-
-        }else{
-          onSelectPosition(player.id, newPosition);
-        }
-        
-      };
-
-        return (
-          <StyledDropdown>
-            <Dropdown>
-              <Dropdown.Toggle variant="success" id={`dropdown-${player.id}`}>
-                  {"포지션"}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                  {positions.map((pos) => (
-                      <Dropdown.Item
-                          key={pos}
-                          onClick={() => handlePositionSelect(pos)}
-                      >
-                          {pos}
-                      </Dropdown.Item>
-                  ))}
-              </Dropdown.Menu>
-          </Dropdown>
-          </StyledDropdown>
-
-        );
+          <Dropdown.Menu>
+            {positions.map((pos) => (
+              <Dropdown.Item
+                key={pos}
+                onClick={() => handlePositionSelect(pos)}
+              >
+                {pos}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </StyledDropdown>
+    );
   };
 
   // 선수 포지션 변경 처리 함수
@@ -1031,39 +1024,41 @@ const Formation = () => {
     // selectedPlayerNames 상태를 업데이트하여 선택한 포지션 정보 추가
     setSelectedPlayerNames((prevNames) => ({
       ...prevNames,
-      [newPosition]: modalData.find((player) => player.id === playerId)?.name || ""
+      [newPosition]:
+        modalData.find((player) => player.id === playerId)?.name || "",
     }));
   };
 
-    // 전술의 장점과 단점 데이터를 상태로 관리하거나 고정 데이터로 설정할 수 있습니다.
-    const tacticalAdvantages = [
-      "공격적인 포메이션으로, 세 명의 전방 공격수가 강력한 공격력을 발휘할 수 있습니다.",
-      "네 명의 미드필더가 중앙과 측면을 넓게 커버하며, 상대 팀의 공격을 빠르게 차단할 수 있습니다.",
-      "수비 시에는 중앙 미드필더가 뒤로 내려와 수비수를 지원하여 5명의 수비 라인을 형성할 수 있습니다."
-    ];
-  
-    const tacticalDisadvantages = [
-      "수비수 세 명만이 후방을 담당하기 때문에, 상대의 측면 공격에 취약할 수 있습니다.",
-      "미드필더와 수비수 사이의 간격이 멀어, 상대에게 공간을 제공할 위험이 있습니다.",
-      "중앙 미드필더가 수비적인 역할을 소화해야 하며, 이를 소화하지 못할 경우 수비에 구멍이 생길 수 있습니다."
-    ];
+  // 전술의 장점과 단점 데이터를 상태로 관리하거나 고정 데이터로 설정할 수 있습니다.
+  const tacticalAdvantages = [
+    "공격적인 포메이션으로, 세 명의 전방 공격수가 강력한 공격력을 발휘할 수 있습니다.",
+    "네 명의 미드필더가 중앙과 측면을 넓게 커버하며, 상대 팀의 공격을 빠르게 차단할 수 있습니다.",
+    "수비 시에는 중앙 미드필더가 뒤로 내려와 수비수를 지원하여 5명의 수비 라인을 형성할 수 있습니다.",
+  ];
 
-    interface FormationAdvantagesDisadvantages {
-      advantages: string[];
-      disadvantages: string[];
-    }
+  const tacticalDisadvantages = [
+    "수비수 세 명만이 후방을 담당하기 때문에, 상대의 측면 공격에 취약할 수 있습니다.",
+    "미드필더와 수비수 사이의 간격이 멀어, 상대에게 공간을 제공할 위험이 있습니다.",
+    "중앙 미드필더가 수비적인 역할을 소화해야 하며, 이를 소화하지 못할 경우 수비에 구멍이 생길 수 있습니다.",
+  ];
 
-  const [formationDetails, setFormationDetails] = useState<FormationAdvantagesDisadvantages>({
-    advantages: [],
-    disadvantages: []
-  });
+  interface FormationAdvantagesDisadvantages {
+    advantages: string[];
+    disadvantages: string[];
+  }
+
+  const [formationDetails, setFormationDetails] =
+    useState<FormationAdvantagesDisadvantages>({
+      advantages: [],
+      disadvantages: [],
+    });
 
   // 현재 선택된 포메이션의 장점과 단점을 설정하는 함수
   const setFormationDetailsFromName = (formationName: string) => {
     const formation = formations[formationName];
     setFormationDetails({
       advantages: formation.advantages,
-      disadvantages: formation.disadvantages
+      disadvantages: formation.disadvantages,
     });
   };
 
@@ -1071,8 +1066,6 @@ const Formation = () => {
   useEffect(() => {
     setFormationDetailsFromName(currentFormation);
   }, [currentFormation]);
-
-  console.log('warningGroupedData:',warningGroupedData);
 
   return (
     <Layout>
@@ -1092,25 +1085,26 @@ const Formation = () => {
                     key={formationName}
                     onClick={() => {
                       setCurrentFormation(formationName);
-                    }}>
+                    }}
+                  >
                     {formationName}
                   </Dropdown.Item>
                 ))}
               </Dropdown.Menu>
             </Dropdown>
-          <ImageContainer ref={imageContainerRef}>
-            {/* 선택된 포메이션 렌더링 */}
-            {renderFormation(currentFormation)}
-          </ImageContainer>
-        </Sidebar>
-      </div>
-      <div>
-      <PlayerList>
-          <h3>선수명단</h3>
-            {modalData.map(player => (
+            <ImageContainer ref={imageContainerRef}>
+              {/* 선택된 포메이션 렌더링 */}
+              {renderFormation(currentFormation)}
+            </ImageContainer>
+          </Sidebar>
+        </div>
+        <div>
+          <PlayerList>
+            <h3>선수명단</h3>
+            {modalData.map((player) => (
               <PlayerListItem key={player.id}>
                 <PlayerNamePosition>
-                  {(player.name + ' ' + player.position).padEnd(40, ' ')}
+                  {(player.name + " " + player.position).padEnd(40, " ")}
                 </PlayerNamePosition>
                 <PlayerDropdownContainer>
                   <PlayerDropdown
@@ -1118,43 +1112,51 @@ const Formation = () => {
                     onSelectPosition={handleSelectPosition}
                   />
                 </PlayerDropdownContainer>
-            </PlayerListItem>
+              </PlayerListItem>
             ))}
-        </PlayerList>
-      </div>
-      <div>
+          </PlayerList>
+        </div>
+        <div>
           <RightContainer>
-              <h2 style={{marginTop:"20px"}}><span>{currentFormation}</span> 전술 공략</h2>
+            <h2 style={{ marginTop: "20px" }}>
+              <span>{currentFormation}</span> 전술 공략
+            </h2>
             <TacticalAdvantages>
               {formationDetails.advantages.map((advantage, index) => (
-                <TacticalPoint key={`advantage-${index}`}><b>장점</b> : {advantage}</TacticalPoint>
+                <TacticalPoint key={`advantage-${index}`}>
+                  <b>장점</b> : {advantage}
+                </TacticalPoint>
               ))}
             </TacticalAdvantages>
             <TacticalDisadvantages>
               {formationDetails.disadvantages.map((disadvantage, index) => (
-                <TacticalWeakness key={`disadvantage-${index}`}><b>단점</b> : {disadvantage}</TacticalWeakness>
+                <TacticalWeakness key={`disadvantage-${index}`}>
+                  <b>단점</b> : {disadvantage}
+                </TacticalWeakness>
               ))}
             </TacticalDisadvantages>
-              <br/>
+            <br />
             <TableContainer>
               <SectionTitle>최근 3경기간 최다 누적 경고자</SectionTitle>
               <FormationTable>
                 <tbody>
-                {warningGroupedData.map((group, index) => (
+                  {warningGroupedData.map((group, index) => (
                     <TableRow key={index}>
                       {group.map((warningMember) => (
                         <TableCell key={warningMember.member_id}>
-                          {warningMember.memberData.user.name} - {warningMember.yellowCards} 경고
+                          {warningMember.memberData.user.name} -{" "}
+                          {warningMember.yellowCards} 경고
                         </TableCell>
                       ))}
                     </TableRow>
                   ))}
-                  <TableCell colSpan={3}> 
-                    <p style={{fontSize:"15px"}}>*최근 3경기간 최다 누적 경고자 명단</p>
+                  <TableCell colSpan={3}>
+                    <p style={{ fontSize: "15px" }}>
+                      *최근 3경기간 최다 누적 경고자 명단
+                    </p>
                   </TableCell>
                 </tbody>
               </FormationTable>
-              <br/>
               <SectionTitle>추천 포메이션</SectionTitle>
               <FormationTable>
                 <tbody>
@@ -1163,32 +1165,37 @@ const Formation = () => {
                     <TableCell>{bestFormation?.formation1}</TableCell>
                     <TableCell>{bestFormation?.formation2}</TableCell>
                   </TableRow>
-                  <TableCell colSpan={2}> 
-                    <p style={{fontSize:"15px"}}>*이전 경기 기록 중 승률 높은 포메이션 추천</p>
+                  <TableCell colSpan={2}>
+                    <p style={{ fontSize: "15px" }}>
+                      *이전 경기 기록 중 승률 높은 포메이션 추천
+                    </p>
                   </TableCell>
                 </tbody>
               </FormationTable>
-              <br/>
               <SectionTitle>인기 포메이션</SectionTitle>
               <FormationTable>
                 <tbody>
                   {groupedFormationData.map((group, index) => (
                     <TableRow key={index}>
                       {group.map((formation) => (
-                        <TableCell key={formation.formation}>{formation.formation}</TableCell>
+                        <TableCell key={formation.formation}>
+                          {formation.formation}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}
-                  <TableCell colSpan={3}> 
-                    <p style={{fontSize:"15px"}}>*전체 경기 중 가장 많은 경기에 사용된 포메이션 상위 3개</p>
+                  <TableCell colSpan={3}>
+                    <p style={{ fontSize: "15px" }}>
+                      *전체 경기 중 가장 많은 경기에 사용된 포메이션 상위 3개
+                    </p>
                   </TableCell>
                 </tbody>
               </FormationTable>
             </TableContainer>
           </RightContainer>
-      </div>
-    </TripleContainer>
-    {renderModal()}
+        </div>
+      </TripleContainer>
+      {renderModal()}
     </Layout>
   );
 };

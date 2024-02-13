@@ -64,9 +64,7 @@ const CustomCard = styled(Card)`
   border: 2px solid #d6d6d6;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  transition:
-    transform 0.2s ease-in-out,
-    box-shadow 0.3s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
   will-change: transform;
   transform-origin: center center;
 
@@ -141,13 +139,11 @@ const Match = () => {
     });
   };
 
-  console.log("selectedRegion=",selectedRegion)
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
 
     const findAllSoccerField = async (page: number = 1) => {
       try {
-        console.log("api 1 selectedRegion=",selectedRegion)
         let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/soccerfield/page/?page=${page}`;
@@ -183,16 +179,17 @@ const Match = () => {
     };
 
     findAllSoccerField(); // 데이터를 불러오는 함수 호출
-  }, [searchQuery,selectedRegion]);
+  }, [searchQuery, selectedRegion]);
 
   const changePage = async (page: number) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      console.log("api2 selectedRegion=",selectedRegion)
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/soccerfield/page/?page=${page || 1}&region=${selectedRegion}&name=${searchQuery}`,
+        }/api/soccerfield/page/?page=${
+          page || 1
+        }&region=${selectedRegion}&name=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -215,7 +212,8 @@ const Match = () => {
       <RegionFilterContainer>
         <RegionFilter
           value={selectedRegion}
-          onChange={(e) => setSelectedRegion(e.target.value)}>
+          onChange={(e) => setSelectedRegion(e.target.value)}
+        >
           <option value="">전체 지역</option>
           <option value="서울특별시">서울특별시</option>
           <option value="부산광역시">부산광역시</option>
@@ -249,7 +247,8 @@ const Match = () => {
         {getField.map((field) => (
           <CustomCard
             key={field.id}
-            style={{ width: "20rem", height: "500px", marginBottom: "20px" }}>
+            style={{ width: "20rem", height: "500px", marginBottom: "20px" }}
+          >
             <Card.Img
               variant="top"
               src={field.image_url}
