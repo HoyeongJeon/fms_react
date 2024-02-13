@@ -110,7 +110,10 @@ const Profile = () => {
         <Wrapper>
           <ProfileContainer>
             <ProfileImageWrapper>
-              <img src={presignedURL} alt="프로필 이미지" />
+              <img
+                src={presignedURL ? presignedURL : undefined}
+                alt="프로필 이미지"
+              />
             </ProfileImageWrapper>
             {id ? (
               <ListGroup>
