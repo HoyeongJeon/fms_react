@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetcher
     // { dedupingInterval: 1000 * 60 * 60 * 24 }
   );
-  const { id: memberId, setMemberId } = useMemberStore();
+  const { id: memberId, setMemberId, setMember, isStaff } = useMemberStore();
   const { teamId, setTeamInfo, chatId } = useTeamStore();
   const { id: userId, setUser, role } = useUserStore();
   const { logout } = useAuthStore();
@@ -56,6 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       );
 
       setMemberId(data.data.member[0]?.id);
+      setMember(data.data.member[0]);
     }
 
     if (data?.data.profile) {
@@ -104,9 +105,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuItem>
               <StyledLink to="/player">PLAYER</StyledLink>
             </MenuItem>
-            <MenuItem>
-              <StyledLink to="/memberTable">INVITE</StyledLink>
-            </MenuItem>
+            {isStaff ? (
+              <>
+                <MenuItem>
+                  <StyledLink to="/memberTable">INVITE</StyledLink>
+                </MenuItem>
+              </>
+            ) : (
+              <></>
+            )}
+
             {/* <MenuItem>
               <StyledLink to="/teamTable">JOIN</StyledLink>
             </MenuItem> */}

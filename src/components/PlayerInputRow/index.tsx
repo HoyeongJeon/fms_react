@@ -68,6 +68,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
           type="number"
           min={0}
           value={player.yellowCards}
+          max={2}
           onChange={(e) =>
             onPlayerChange(player.id, "yellowCards", e.target.value)
           }
@@ -77,6 +78,7 @@ const PlayerInputRow: React.FC<PlayerInputRowProps> = ({
         <Input
           type="number"
           min={0}
+          max={1}
           value={player.redCards}
           onChange={(e) =>
             onPlayerChange(player.id, "redCards", e.target.value)
