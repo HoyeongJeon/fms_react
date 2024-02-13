@@ -206,7 +206,7 @@ const InputMatchResult = () => {
         </Title>
         <TeamsContainer>
           <TeamBadge>
-            <TeamLogo src={presignedURL} alt="작성자가 속한 팀 로고 넣어야함" />
+            <TeamLogo src={presignedURL} alt="팀 로고" />
             <div>{name}</div>
           </TeamBadge>
         </TeamsContainer>

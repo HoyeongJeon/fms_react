@@ -8,7 +8,7 @@ import Modal from "react-bootstrap/Modal";
 import { useTeamStore } from "store/teamStore";
 
 interface Member {
-  id:number;
+  id: number;
   isStaff: boolean;
   joinDate: string;
   team: Team;
@@ -60,7 +60,9 @@ const MemberTable = () => {
 
   const fetchProfiles = async () => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/available?page=${currentPage}`;
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/profile/available?page=${currentPage}`;
 
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
@@ -73,7 +75,6 @@ const MemberTable = () => {
       if (region.trim() !== "") {
         apiUrl += `&region=${encodeURIComponent(region)}`;
       }
-      console.log("apiurl=", apiUrl);
 
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
@@ -83,22 +84,20 @@ const MemberTable = () => {
         withCredentials: true,
       });
 
-      console.log("response.data=", response.data);
-
       if (
         response.data &&
         response.data.data &&
         response.data.data.data.length > 0
       ) {
-        const fetchedProfiles = response.data.data.data.map((profile: Profile) => ({
-          ...profile,
-          invited: false, // 초대 상태 초기화
-        }));
-        console.log("Fetched profiles:", fetchedProfiles);
+        const fetchedProfiles = response.data.data.data.map(
+          (profile: Profile) => ({
+            ...profile,
+            invited: false, // 초대 상태 초기화
+          })
+        );
         setProfiles(fetchedProfiles);
         setTotal(response.data.data.total);
       } else {
-        console.log("초대할수있는 사용자가 없습니다.");
         setProfiles([]); // 데이터가 없을 때 빈 배열로 설정하여 화면을 갱신합니다.
       }
     } catch (error) {
@@ -122,9 +121,15 @@ const MemberTable = () => {
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
     setShowModal(true);
-    
+
     // 초대 상태를 true로 변경
-    setProfiles(prevProfiles => prevProfiles.map(prevProfile => prevProfile.id === profile.id ? { ...prevProfile, invited: true } : prevProfile));
+    setProfiles((prevProfiles) =>
+      prevProfiles.map((prevProfile) =>
+        prevProfile.id === profile.id
+          ? { ...prevProfile, invited: true }
+          : prevProfile
+      )
+    );
   };
 
   const handleClose = () => {
@@ -138,7 +143,9 @@ const MemberTable = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/${selectedProfile?.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/team/${teamId}/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -155,13 +162,14 @@ const MemberTable = () => {
       alert("초대 이메일을 보냈습니다");
 
       // 초대한 멤버를 프로필 목록에서 제거
-      setProfiles(prevProfiles => prevProfiles.filter(profile => profile.id !== selectedProfile?.id));
-
+      setProfiles((prevProfiles) =>
+        prevProfiles.filter((profile) => profile.id !== selectedProfile?.id)
+      );
     } catch (error) {
       console.error("Error inviting member:", error);
     }
   };
-  
+
   const handleCancelInvite = () => {
     setShowModal(false);
     setSelectedProfile(null);
@@ -213,7 +221,7 @@ const MemberTable = () => {
               }}
             />
             <button onClick={handleSearchButtonClick}>검색</button>
-            <select value={gender || ''} onChange={handleGenderChange}>
+            <select value={gender || ""} onChange={handleGenderChange}>
               <option value="">성별 선택</option>
               <option value="Male">남성</option>
               <option value="Female">여성</option>
@@ -268,7 +276,10 @@ const MemberTable = () => {
                   <td>{profile.gender}</td>
                   <td>{profile.location.state || profile.location.city}</td>
                   <td>
-                    <button onClick={() => handleInviteButton(profile)} disabled={profile.invited}>
+                    <button
+                      onClick={() => handleInviteButton(profile)}
+                      disabled={profile.invited}
+                    >
                       초대
                     </button>
                   </td>
