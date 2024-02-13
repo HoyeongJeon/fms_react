@@ -59,8 +59,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         data.data.member[0]?.team?.imageUUID || data.data.team?.imageUUID,
         data.data.member[0]?.team?.chat?.id || data.data.team?.chat?.id
       );
-      setMemberId(data.data.member[0]?.id);
-      setMember(data.data.member[0]);
+      setMemberId(data.data?.member[0]?.id);
+      setMember(data.data?.member[0]);
     }
 
     if (data?.data.profile) {
@@ -94,8 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 alert("죄송합니다! MY PROFILE을 다시 클릭해주세요");
                 navigate("/home");
               }
-            }}
-          >
+            }}>
             MY PROFILE
           </StyledLink>
         </MenuItem>
@@ -133,8 +132,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={handleLogout}
           style={{
             color: "#445664",
-          }}
-        >
+          }}>
           LOGOUT
         </MenuItem>
       </Menu>
@@ -148,8 +146,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               fontWeight: "bold",
               marginBottom: "10px",
               color: "black",
-            }}
-          >
+            }}>
             축구왕
           </h1>
         </StyledLink>
