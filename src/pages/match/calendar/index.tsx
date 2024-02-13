@@ -366,10 +366,12 @@ const MatchCalendar = () => {
               <Button variant="primary" onClick={handleMatchPreview}>
                 매치 정보
               </Button>
-            ) : (
+            ) : isStaff ? (
               <Button variant="primary" onClick={handleBookMatch}>
                 경기 예약
               </Button>
+            ) : (
+              <></>
             )}
             {isStaff ? (
               <>

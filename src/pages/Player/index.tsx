@@ -5,6 +5,7 @@ import Layout from "layouts/App";
 import "./table.css";
 import { useTeamStore } from "store/teamStore";
 import { useNavigate } from "react-router-dom";
+import { configConsumerProps } from "antd/es/config-provider";
 
 interface Member {
   id: number;
@@ -126,7 +127,7 @@ const Player: React.FC = () => {
           withCredentials: true,
         }
       );
-      setMembers(response.data);
+      setMembers(response.data.data);
       setTotal(response.data.total);
     } catch (error) {
       console.error("멤버 정보를 불러오는 데 실패했습니다.", error);
