@@ -81,6 +81,19 @@ const CreateTeam = () => {
               level: 5,
             },
           });
+
+          setTeamInfo((prevTeamInfo) => ({
+            ...prevTeamInfo,
+            location: {
+              ...prevTeamInfo.location,
+              latitude: result[0].y,
+              longitude: result[0].x,
+              state: result[0].address.region_1depth_name,
+              city: result[0].address.region_2depth_name, 
+              district: result[0].address.region_3depth_name, 
+              address: result[0].address_name,
+            },
+          }));
         } else {
           console.error("주소를 변환할 수 없습니다.");
         }
@@ -120,35 +133,39 @@ const CreateTeam = () => {
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
+  
     if (
       !teamInfo.name ||
       !teamInfo.description ||
-      !teamInfo.location ||
+      !teamInfo.location.address ||
+      !teamInfo.location.state ||
+      !teamInfo.location.city ||
+      !teamInfo.location.district ||
       !selectedFile
     ) {
       setValidationMessage("필수 입력값을 입력해주세요");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("name", teamInfo.name);
     formData.append("description", teamInfo.description);
     formData.append("address", teamInfo.location.address);
-    formData.append("city", teamInfo.location.city);
-    formData.append("district", teamInfo.location.district);
-    formData.append("latitude", teamInfo.location.latitude);
-    formData.append("longitude", teamInfo.location.longitude);
-    formData.append("state", teamInfo.location.state);
+    formData.append("state", teamInfo.location.state); 
+    formData.append("city", teamInfo.location.city); 
+    formData.append("district", teamInfo.location.district); 
+    formData.append("latitude", teamInfo.location.latitude.toString());
+    formData.append("longitude", teamInfo.location.longitude.toString());
     formData.append("gender", selectedGender);
     formData.append("isMixedGender", selectedToggle.toString());
     if (selectedFile) {
       formData.append("file", selectedFile);
     }
-
+    console.log( "teamInfo=",teamInfo)
+  
     try {
       const accessToken = localStorage.getItem("accessToken");
-
+  
       const response = await axios.post(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
@@ -173,6 +190,8 @@ const CreateTeam = () => {
       }
     }
   };
+  
+  
 
   return (
     <Layout>
