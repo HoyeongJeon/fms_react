@@ -127,6 +127,7 @@ const Player: React.FC = () => {
           withCredentials: true,
         }
       );
+      
       setMembers(response.data);
       setTotal(response.data.total);
     } catch (error) {
