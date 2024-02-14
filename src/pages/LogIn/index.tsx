@@ -121,12 +121,12 @@ const LogIn = () => {
             아직 회원이 아니신가요?&nbsp;
             <Link to="/signup">회원가입 하러가기</Link>
           </LinkContainer>
-          <LinkContainer className="CenterAlign">
-            {" "}
+          {/* <LinkContainer className="CenterAlign">
+            {" "} */}
             {/* Apply the CenterAlign class here */}
             비밀번호를 잊으셨나요?&nbsp;
-            <Link to="/emailCode">비밀번호 찾기</Link>
-          </LinkContainer>
+            {/* <Link to="/emailCode">비밀번호 찾기</Link>
+          </LinkContainer> */}
           <LinkContainer className="CenterAlign">
             {" "}
             {/* Apply the CenterAlign class here */}
