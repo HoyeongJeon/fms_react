@@ -124,7 +124,7 @@ const LogIn = () => {
           {/* <LinkContainer className="CenterAlign">
             {" "} */}
             {/* Apply the CenterAlign class here */}
-            비밀번호를 잊으셨나요?&nbsp;
+            {/* 비밀번호를 잊으셨나요?&nbsp; */}
             {/* <Link to="/emailCode">비밀번호 찾기</Link>
           </LinkContainer> */}
           <LinkContainer className="CenterAlign">
