@@ -26,7 +26,11 @@ type Profile = {
     district: string;
     address: string;
   };
-  [key: string]: string | { latitude: number; longitude: number } | undefined | number;
+  [key: string]:
+    | string
+    | { latitude: number; longitude: number }
+    | undefined
+    | number;
 };
 
 const Wrapper = styled.div`
@@ -73,9 +77,12 @@ const Profile = () => {
   const { name } = useUserStore();
 
   const { id, gender, preferredPosition, height, weight, imageUUID, location } =
-
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
+
+
+  useEffect(() => {
+  }, [presignedURL]);
 
   useEffect(() => {
     const USER_LATITUDE = location.latitude;
@@ -83,8 +90,7 @@ const Profile = () => {
 
     const container = document.getElementById("kakao-map")!;
     const options = {
-      center: new window.kakao.maps.LatLng( USER_LATITUDE,
-        USER_LONGITUDE), 
+      center: new window.kakao.maps.LatLng(USER_LATITUDE, USER_LONGITUDE),
       level: 3,
     };
     const map = new window.kakao.maps.Map(container, options);
@@ -99,50 +105,53 @@ const Profile = () => {
 
   return (
     <Layout>
-       <ScoreboardContainer> 
-      <Wrapper>
-        <ProfileContainer>
-          <ProfileImageWrapper>
-            <img src={presignedURL} alt="프로필 이미지" />
-          </ProfileImageWrapper>
-          {id ? (
-            <ListGroup>
-              <ListGroup.Item>
-                <span>이름: </span>
-                {name}
-              </ListGroup.Item>
-              <br />
-              <ListGroup.Item>
-                <span>성별: </span>
-                {gender}
-              </ListGroup.Item>
-              <br />
+      <ScoreboardContainer>
+        <Wrapper>
+          <ProfileContainer>
+            <ProfileImageWrapper>
+              <img
+                src={presignedURL ? presignedURL : undefined}
+                alt="프로필 이미지"
+              />
+            </ProfileImageWrapper>
+            {id ? (
+              <ListGroup>
+                <ListGroup.Item>
+                  <span>이름: </span>
+                  {name}
+                </ListGroup.Item>
+                <br />
+                <ListGroup.Item>
+                  <span>성별: </span>
+                  {gender}
+                </ListGroup.Item>
+                <br />
 
-              <ListGroup.Item>
-                <span>선호 포지션: </span>
-                {preferredPosition}
-              </ListGroup.Item>
-              <br />
-              <ListGroup.Item>
-                <span>키: </span>
-                {height}cm
-              </ListGroup.Item>
-              <br />
-              <ListGroup.Item>
-                <span>몸무게: </span>
-                {weight}kg
-              </ListGroup.Item>
-              <br />
-              <LinkContainer>
-                <Link to={`/profile/${id}/edit`}>프로필 변경하기</Link>
-              </LinkContainer>
-            </ListGroup>
-          ) : (
-            <div>loading...</div>
-          )}
-          <MapContainer id="kakao-map" />
-        </ProfileContainer>
-      </Wrapper>
+                <ListGroup.Item>
+                  <span>선호 포지션: </span>
+                  {preferredPosition}
+                </ListGroup.Item>
+                <br />
+                <ListGroup.Item>
+                  <span>키: </span>
+                  {height}cm
+                </ListGroup.Item>
+                <br />
+                <ListGroup.Item>
+                  <span>몸무게: </span>
+                  {weight}kg
+                </ListGroup.Item>
+                <br />
+                <LinkContainer>
+                  <Link to={`/profile/${id}/edit`}>프로필 변경하기</Link>
+                </LinkContainer>
+              </ListGroup>
+            ) : (
+              <div>loading...</div>
+            )}
+            <MapContainer id="kakao-map" />
+          </ProfileContainer>
+        </Wrapper>
       </ScoreboardContainer>
     </Layout>
   );

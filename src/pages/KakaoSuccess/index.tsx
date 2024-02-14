@@ -28,7 +28,9 @@ const KakaoSuccess = () => {
         )
         .then((response) => {
           const { accessToken } = response.data;
+          const { refreshToken } = response.data;
           localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken)
           kakaoLogin();
           navigate("/home", { replace: true });
         });

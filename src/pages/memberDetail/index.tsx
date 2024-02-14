@@ -282,7 +282,9 @@ const MemberDetail = () => {
                   <th>{history.totalAssists ?? 0}</th>
                   <th>{history.totalPoint ?? 0}</th>
                   <th>{history.totalSave ?? 0}</th>
-                  <th>{history.totalCleanSheet ? "O" : "X"}</th>
+                  <th>
+                    {history.totalCleanSheet ? history.totalCleanSheet : 0}
+                  </th>
                 </tr>
               ))
             ) : (

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,9 @@ interface LayoutProps {
 }
 
 const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
-  const { data, error } = useSWR("/users/me", fetcher);
-  const teamId = data?.teamId;
-
+  // const { data, error } = useSWR("/users/me", fetcher);
+  const [role, setRole] = useState<string>("");
   const navigate = useNavigate();
-  // 유저 정보를 저장하고 있어야함
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -46,7 +44,7 @@ const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
       <Card>
         <h2>
           <StyledLink to="/home">
-          Football Management System (FMS) ⚽🔥
+            Football Management System (FMS) ⚽🔥
           </StyledLink>
         </h2>
         {/* {teamId ? (

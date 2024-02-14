@@ -12,7 +12,7 @@ const responsiveWidth = "768px";
 
 const Sidebar = styled.div`
   width: 95%;
-  height: 98%;
+  height : 95%;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
@@ -76,7 +76,9 @@ const Player = styled.div`
   position: absolute;
   width: 80px; // 선수 크기
   height: 80px;
-  background-color: red;
+  //background-color: red;
+  background-image: url('../../img/uniform.png'); // 여기에 이미지 경로를 입력하세요
+  background-size: cover; // 이미지가 div의 크기에 맞게 조정됩니다
   border-radius: 50%; // 원 모양
   display: flex;
   justify-content: center;
@@ -86,15 +88,15 @@ const Player = styled.div`
 `;
 
 const PlayerList = styled.ul`
-  list-style: none;
-  width: 80%;
-  height: 98%;
-  padding: 0;
-  margin-left: 10px;
-  justify-content: center;
-  overflow-y: auto; /* 목록이 길어질 경우 스크롤 가능하도록 설정 */
-  max-height: 90vh; /* 화면 크기에 따라 최대 높이 설정 */
-  overflow: visible;
+    list-style: none;
+    width: 80%;
+    height : 95%;
+    padding: 0;
+    margin-left: 10px;
+    justify-content: center;
+    overflow-y: auto; /* 목록이 길어질 경우 스크롤 가능하도록 설정 */
+    max-height: 90vh; /* 화면 크기에 따라 최대 높이 설정 */
+    overflow: visible;
 
   //background: #f8f9fa;
   background: white;
@@ -1155,7 +1157,6 @@ const Formation = () => {
                   </TableCell>
                 </tbody>
               </FormationTable>
-              <br />
               <SectionTitle>추천 포메이션</SectionTitle>
               <FormationTable>
                 <tbody>
@@ -1171,7 +1172,6 @@ const Formation = () => {
                   </TableCell>
                 </tbody>
               </FormationTable>
-              <br />
               <SectionTitle>인기 포메이션</SectionTitle>
               <FormationTable>
                 <tbody>

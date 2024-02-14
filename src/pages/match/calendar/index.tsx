@@ -11,6 +11,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
+import { useMemberStore } from "store/memberStore";
 
 const responsiveWidth = "768px";
 
@@ -267,6 +268,13 @@ const MatchCalendar = () => {
 
     setShowModal(true);
   };
+  const { isStaff } = useMemberStore();
+
+  const [isMemberStaff, setIsMemberStaff] = useState(false);
+
+  useEffect(() => {
+    setIsMemberStaff(isStaff);
+  }, [isStaff]);
 
   // 전술 설정 페이지로 이동하는 함수
   const handleTacticSetting = () => {
@@ -358,14 +366,22 @@ const MatchCalendar = () => {
               <Button variant="primary" onClick={handleMatchPreview}>
                 매치 정보
               </Button>
-            ) : (
+            ) : isStaff ? (
               <Button variant="primary" onClick={handleBookMatch}>
                 경기 예약
               </Button>
+            ) : (
+              <></>
             )}
-            <Button variant="primary" onClick={handleTacticSetting}>
-              전술 설정
-            </Button>
+            {isStaff ? (
+              <>
+                <Button variant="primary" onClick={handleTacticSetting}>
+                  전술 설정
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
             <Button variant="secondary" onClick={handleCloseModal}>
               닫기
             </Button>
