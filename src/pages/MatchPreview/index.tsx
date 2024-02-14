@@ -172,11 +172,18 @@ const MatchPreview = () => {
   useEffect(() => {
     setIsMemberStaff(isStaff);
   }, [isStaff]);
-  const isFutureMatch = () => {
-    if (!matchDate || isStaff) return false; // matchDate가 설정되지 않았으면 false 반환
+  const [isFutureGame, setIsFutureGame] = useState(false);
+  useEffect(() => {
+    if (matchDate) {
+      setIsFutureGame(matchDate > now);
+    }
+  }, [matchDate]);
 
-    return matchDate > new Date(); // 현재 날짜와 비교
-  };
+  // const isFutureMatch = () => {
+  //   if (!matchDate || isStaff) return false; // matchDate가 설정되지 않았으면 false 반환
+
+  //   return matchDate > new Date(); // 현재 날짜와 비교
+  // };
 
   useEffect(() => {
     if (!homeTeamId || !awayTeamId) return;
@@ -297,7 +304,7 @@ const MatchPreview = () => {
           ) : (
             <Button
               onClick={handleNext}
-              disabled={isFutureMatch() || !isMemberStaff}
+              disabled={isFutureGame || !isMemberStaff}
             >
               경기 종료
             </Button>
