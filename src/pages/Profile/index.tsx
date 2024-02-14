@@ -80,9 +80,8 @@ const Profile = () => {
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
 
-  console.log("presignedURL1", presignedURL);
+
   useEffect(() => {
-    console.log("presignedURL2", presignedURL);
   }, [presignedURL]);
 
   useEffect(() => {

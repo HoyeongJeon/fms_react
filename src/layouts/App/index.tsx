@@ -61,13 +61,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       );
       setMemberId(data.data?.member[0]?.id ? data.data?.member[0]?.id : null);
       setMember(data.data?.member[0] || { isStaff: false });
-      console.log("memberCheck= ", data.data);
+
     }
 
     if (data?.data.profile) {
       setProfile(data.data.profile);
-      console.log("imageUUID1", data.data.profile);
-      console.log("imageUUID2", data.data.profile.imageUUID);
+
     }
   }, [data]);
   const handleLogout = () => {
