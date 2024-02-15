@@ -156,6 +156,55 @@ const TeamTable: React.FC = () => {
     fetchTeams();
   };
 
+  // const handleApplyButton = async (teamData: Team) => {
+  //   try {
+  //     if (!teamData) {
+  //       console.error("No team data provided.");
+  //       return;
+  //     }
+
+  //     const accessToken = localStorage.getItem("accessToken");
+
+  //     if (!accessToken) {
+  //       console.error("Access token not found.");
+  //       return;
+  //     }
+
+  //     // 가입 신청을 서버로 요청하는 비동기 작업 수행
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_SERVER_HOST}:${
+  //         process.env.REACT_APP_SERVER_PORT || 3000
+  //       }/api/team/${teamData.team.id}/apply`,
+  //       {},
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //         withCredentials: true,
+  //       }
+  //     );
+
+  //     // setShowModal(false); // 모달 닫기
+  //     // setShowSuccessAlert(true); // 성공 알림 표시
+
+  //     // // 성공 알림을 5초 후에 숨김
+  //     // setTimeout(() => {
+  //     //   setShowSuccessAlert(false);
+  //     // }, 5000);
+
+  //     // // 가입 신청 후 페이지 새로고침
+  //     // window.location.reload();
+  //   } catch (error) {
+  //     console.error("Error applying to join the team:", error);
+  //     // setShowErrorAlert(true); // 오류 알림 표시
+
+  //     // // 오류 알림을 5초 후에 숨김
+  //     // setTimeout(() => {
+  //     //   setShowErrorAlert(false);
+  //     // }, 5000);
+  //   }
+  // };
+
   const handleApplyButton = async (teamData: Team) => {
     try {
       if (!teamData) {
@@ -171,10 +220,10 @@ const TeamTable: React.FC = () => {
       }
 
       // 가입 신청을 서버로 요청하는 비동기 작업 수행
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamData.team.id}/apply`,
+        }/api/team/${teamData.team.id}`,
         {},
         {
           headers: {
@@ -184,27 +233,17 @@ const TeamTable: React.FC = () => {
         }
       );
 
-      // setShowModal(false); // 모달 닫기
-      // setShowSuccessAlert(true); // 성공 알림 표시
-
-      // // 성공 알림을 5초 후에 숨김
-      // setTimeout(() => {
-      //   setShowSuccessAlert(false);
-      // }, 5000);
-
-      // // 가입 신청 후 페이지 새로고침
-      // window.location.reload();
+      // 가입 신청 후 팀 데이터 다시 불러오기
+      fetchTeams();
+      
+      // 가입 성공 메시지 표시
+      alert('팀 신청이 성공적으로 완료되었습니다.');
     } catch (error) {
       console.error("Error applying to join the team:", error);
-      // setShowErrorAlert(true); // 오류 알림 표시
-
-      // // 오류 알림을 5초 후에 숨김
-      // setTimeout(() => {
-      //   setShowErrorAlert(false);
-      // }, 5000);
+      // 가입 실패 메시지 표시
+      alert('팀 신청에 실패했습니다.');
     }
   };
-
   return (
     <Layout>
       <div>
