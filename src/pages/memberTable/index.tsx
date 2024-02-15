@@ -60,9 +60,7 @@ const MemberTable = () => {
 
   const fetchProfiles = async () => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
-        process.env.REACT_APP_SERVER_PORT || 3000
-      }/api/profile/available?page=${currentPage}`;
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/available?page=${currentPage}`;
 
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
@@ -92,13 +90,13 @@ const MemberTable = () => {
         const fetchedProfiles = response.data.data.data.map(
           (profile: Profile) => ({
             ...profile,
-            invited: false, // 초대 상태 초기화
+            invited: false,
           })
         );
         setProfiles(fetchedProfiles);
         setTotal(response.data.data.total);
       } else {
-        setProfiles([]); // 데이터가 없을 때 빈 배열로 설정하여 화면을 갱신합니다.
+        setProfiles([]);
       }
     } catch (error) {
       console.error("프로필을 불러오는 중 오류 발생:", error);
@@ -121,15 +119,6 @@ const MemberTable = () => {
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
     setShowModal(true);
-
-    // 초대 상태를 true로 변경
-    setProfiles((prevProfiles) =>
-      prevProfiles.map((prevProfile) =>
-        prevProfile.id === profile.id
-          ? { ...prevProfile, invited: true }
-          : prevProfile
-      )
-    );
   };
 
   const handleClose = () => {
@@ -143,9 +132,7 @@ const MemberTable = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/team/${teamId}/${selectedProfile?.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -158,12 +145,12 @@ const MemberTable = () => {
       setShowModal(false);
       setSelectedProfile(null);
 
-      // 초대 성공 메시지 표시
       alert("초대 이메일을 보냈습니다");
 
-      // 초대한 멤버를 프로필 목록에서 제거
       setProfiles((prevProfiles) =>
-        prevProfiles.filter((profile) => profile.id !== selectedProfile?.id)
+        prevProfiles.filter(
+          (profile) => profile.id !== selectedProfile?.id
+        )
       );
     } catch (error) {
       console.error("Error inviting member:", error);
@@ -226,7 +213,10 @@ const MemberTable = () => {
               <option value="Male">남성</option>
               <option value="Female">여성</option>
             </select>
-            <select value={region} onChange={(e) => setRegion(e.target.value)}>
+            <select
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+            >
               <option value="">전체 지역</option>
               <option value="서울">서울특별시</option>
               <option value="부산">부산광역시</option>
@@ -242,7 +232,6 @@ const MemberTable = () => {
               <option value="전남">전라남도</option>
               <option value="경북">경상북도</option>
               <option value="경남">경상남도</option>
-              {/* <option value="강원">강원특별자치도</option> */}
               <option value="강원특별자치도">강원특별자치도</option>
               <option value="전북">전북특별자치도</option>
               <option value="제주">제주특별자치도</option>
