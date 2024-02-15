@@ -4,6 +4,7 @@ import { Pagination } from "antd";
 import Layout from "layouts/App";
 import "./table.css";
 import Geolocation from "@react-native-community/geolocation";
+import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 interface Team {
   id: number;
@@ -235,31 +236,32 @@ const TeamTable: React.FC = () => {
 
       // 가입 신청 후 팀 데이터 다시 불러오기
       fetchTeams();
-      
+
       // 가입 성공 메시지 표시
-      alert('팀 신청이 성공적으로 완료되었습니다.');
+      alert("팀 신청이 성공적으로 완료되었습니다.");
     } catch (error) {
       console.error("Error applying to join the team:", error);
       // 가입 실패 메시지 표시
-      alert('팀 신청에 실패했습니다.');
+      alert("팀 신청에 실패했습니다.");
     }
   };
   return (
     <Layout>
-      <div>
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="이름 검색"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                fetchTeams();
-              }
-            }}
-          />
-          {/* <select value={isMixed} onChange={handleMixedChange}>
+      <ScoreboardContainer>
+        <div>
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="이름 검색"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  fetchTeams();
+                }
+              }}
+            />
+            {/* <select value={isMixed} onChange={handleMixedChange}>
             <option value="">혼성여부 선택</option>
             <option value="true">혼성</option>
             <option value="false">단일성별</option>
@@ -286,61 +288,61 @@ const TeamTable: React.FC = () => {
               <option value="경북">경상북도</option>
               <option value="경남">경상남도</option>
               {/* <option value="강원">강원특별자치도</option> */}
-          {/* <option value="강원특별자치도">강원특별자치도</option>
+            {/* <option value="강원특별자치도">강원특별자치도</option>
               <option value="전북">전북특별자치도</option>
               <option value="제주">제주특별자치도</option>
             </select> */}
 
-          <button onClick={handleSearchButtonClick}>검색</button>
+            <button onClick={handleSearchButtonClick}>검색</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>팀 이름</th>
+                <th>팀 설명</th>
+                <th>혼성 여부</th>
+                <th>성별</th>
+                <th>인원수</th>
+                <th>주소</th>
+                <th>신청</th>
+              </tr>
+            </thead>
+            <tbody>
+              {teams &&
+                teams.map((teamData, index) => (
+                  <tr key={`teamData-${index}`}>
+                    <td>{teamData.team.id}</td>
+                    <td>{teamData.team.name}</td>
+                    <td>{teamData.team.description}</td>
+                    <td>
+                      {teamData.team.is_mixed_gender ? "혼성" : "단일 성별"}
+                    </td>
+                    <td>{teamData.team.gender}</td>
+                    <td>{teamData.totalMember}</td>
+                    <td>{teamData.team.location.address}</td>
+                    <td>
+                      <button
+                        onClick={async () => await handleApplyButton(teamData)}>
+                        신청
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+
+          <Pagination
+            defaultCurrent={currentPage}
+            total={total}
+            defaultPageSize={5}
+            onChange={(value) => {
+              changePage(value);
+            }}
+          />
         </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>팀 이름</th>
-              <th>팀 설명</th>
-              <th>혼성 여부</th>
-              <th>성별</th>
-              <th>인원수</th>
-              <th>주소</th>
-              <th>신청</th>
-            </tr>
-          </thead>
-          <tbody>
-            {teams &&
-              teams.map((teamData, index) => (
-                <tr key={`teamData-${index}`}>
-                  <td>{teamData.team.id}</td>
-                  <td>{teamData.team.name}</td>
-                  <td>{teamData.team.description}</td>
-                  <td>
-                    {teamData.team.is_mixed_gender ? "혼성" : "단일 성별"}
-                  </td>
-                  <td>{teamData.team.gender}</td>
-                  <td>{teamData.totalMember}</td>
-                  <td>{teamData.team.location.address}</td>
-                  <td>
-                    <button
-                      onClick={async () => await handleApplyButton(teamData)}
-                    >
-                      신청
-                    </button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-
-        <Pagination
-          defaultCurrent={currentPage}
-          total={total}
-          defaultPageSize={5}
-          onChange={(value) => {
-            changePage(value);
-          }}
-        />
-      </div>
+      </ScoreboardContainer>
     </Layout>
   );
 };
