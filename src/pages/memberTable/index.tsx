@@ -58,9 +58,11 @@ const MemberTable = () => {
   const [gender, setGender] = useState<string>("");
   const [region, setRegion] = useState("");
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = async (page: number) => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile/available?page=${currentPage}`;
+      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
+        process.env.REACT_APP_SERVER_PORT || 3000
+      }/api/profile/available?page=${page}`;
 
       if (searchQuery.trim() !== "") {
         apiUrl += `&name=${searchQuery}`;
@@ -87,12 +89,10 @@ const MemberTable = () => {
         response.data.data &&
         response.data.data.data.length > 0
       ) {
-        const fetchedProfiles = response.data.data.data.map(
-          (profile: Profile) => ({
-            ...profile,
-            invited: false,
-          })
-        );
+        const fetchedProfiles = response.data.data.data.map((profile: Profile) => ({
+          ...profile,
+        }));
+        // 초대된 멤버를 필터링하여 프로필 리스트에 저장
         setProfiles(fetchedProfiles);
         setTotal(response.data.data.total);
       } else {
@@ -103,8 +103,9 @@ const MemberTable = () => {
     }
   };
 
+
   useEffect(() => {
-    fetchProfiles();
+    fetchProfiles(currentPage); // 페이지 로드 시 프로필 가져오기
   }, [currentPage, searchQuery, gender, region]);
 
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -113,12 +114,15 @@ const MemberTable = () => {
 
   const changePage = async (page: number) => {
     setCurrentPage(page);
-    fetchProfiles();
+    fetchProfiles(page); // 페이지 번호를 전달하여 호출
   };
 
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
-    setShowModal(true);
+    if (!profile.invited) {
+      // 초대된 멤버가 아닌 경우에만 모달 표시
+      setShowModal(true);
+    }
   };
 
   const handleClose = () => {
@@ -132,7 +136,9 @@ const MemberTable = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/${teamId}/${selectedProfile?.id}`,
+        `${process.env.REACT_APP_SERVER_HOST}:${
+          process.env.REACT_APP_SERVER_PORT || 3000
+        }/api/team/${teamId}/${selectedProfile?.id}`,
         null,
         {
           headers: {
@@ -147,9 +153,12 @@ const MemberTable = () => {
 
       alert("초대 이메일을 보냈습니다");
 
+      // 초대 후에 초대된 상태 업데이트
       setProfiles((prevProfiles) =>
-        prevProfiles.filter(
-          (profile) => profile.id !== selectedProfile?.id
+        prevProfiles.map((profile) =>
+          profile.id === selectedProfile?.id
+            ? { ...profile, invited: true }
+            : profile
         )
       );
     } catch (error) {
@@ -163,7 +172,7 @@ const MemberTable = () => {
   };
 
   const handleSearchButtonClick = () => {
-    fetchProfiles();
+    fetchProfiles(currentPage);
   };
 
   const handleCheckboxChange = (profileId: number) => {
@@ -203,7 +212,7 @@ const MemberTable = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  fetchProfiles();
+                  fetchProfiles(currentPage);
                 }
               }}
             />
@@ -213,10 +222,7 @@ const MemberTable = () => {
               <option value="Male">남성</option>
               <option value="Female">여성</option>
             </select>
-            <select
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-            >
+            <select value={region} onChange={(e) => setRegion(e.target.value)}>
               <option value="">전체 지역</option>
               <option value="서울">서울특별시</option>
               <option value="부산">부산광역시</option>
@@ -254,26 +260,27 @@ const MemberTable = () => {
               </tr>
             </thead>
             <tbody>
-              {profiles.map((profile) => (
-                <tr key={profile.id}>
-                  <td>{profile.id}</td>
-                  <td>{profile.user.name}</td>
-                  <td>{profile.weight}</td>
-                  <td>{profile.height}</td>
-                  <td>{profile.preferredPosition}</td>
-                  <td>{profile.age}</td>
-                  <td>{profile.gender}</td>
-                  <td>{profile.location.state || profile.location.city}</td>
-                  <td>
-                    <button
-                      onClick={() => handleInviteButton(profile)}
-                      disabled={profile.invited}
-                    >
-                      초대
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {profiles
+                .map((profile) => (
+                  <tr key={profile.id}>
+                    <td>{profile.id}</td>
+                    <td>{profile.user.name}</td>
+                    <td>{profile.weight}</td>
+                    <td>{profile.height}</td>
+                    <td>{profile.preferredPosition}</td>
+                    <td>{profile.age}</td>
+                    <td>{profile.gender}</td>
+                    <td>{profile.location.state || profile.location.city}</td>
+                    <td>
+                      <button
+                        onClick={() => handleInviteButton(profile)}
+                        disabled={profile.invited} // 초대된 멤버의 경우 버튼 비활성화
+                      >
+                        초대
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         ) : (
