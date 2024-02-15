@@ -3,20 +3,16 @@ import Layout from "layouts/App";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
-import { useProfileStore } from "store/profileStore";
 import { Alert } from "antd";
 import FileUploader from "components/file/FileUploader";
 import KakaoLocation from "components/location/Location";
 import { useDaumPostcodePopup } from "react-daum-postcode";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 type Profile = {
   height: string;
   weight: string;
   preferredPosition: string;
-  //birthdate: string;
   location: {
     latitude: string;
     longitude: string;
@@ -107,12 +103,10 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const accessToken = localStorage.getItem("accessToken");
-  const { id: profileId } = useProfileStore();
   const [profile, setProfile] = useState<Profile>({
     height: "",
     weight: "",
     preferredPosition: "",
-    //birthdate: "",
     location: {
       latitude: "",
       longitude: "",
@@ -151,16 +145,6 @@ const EditProfile = () => {
     }));
   };
 
-  // const handleDateChange = (date: Date | null) => {
-  //   if (date) {
-  //     const formattedDate = date.toISOString().split("T")[0];
-  //     setProfile((prevProfile) => ({
-  //       ...prevProfile,
-  //       birthdate: formattedDate,
-  //     }));
-  //   }
-  // };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
 
@@ -194,22 +178,38 @@ const EditProfile = () => {
 
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (
-      //!profile.birthdate ||
-      !profile.height ||
-      !profile.weight ||
-      !profile.preferredPosition ||
-      !profile.location
-    ) {
-      setValidationMessage("필수 입력값을 입력해주세요");
+    const missingFields = [];
+  
+    if (!profile.height) {
+      missingFields.push("키");
+    }
+  
+    if (!profile.weight) {
+      missingFields.push("몸무게");
+    }
+  
+    if (!profile.preferredPosition) {
+      missingFields.push("선호 포지션");
+    }
+  
+    if (!profile.location) {
+      missingFields.push("위치 정보");
+    }
+  
+    if (!selectedFile) {
+      missingFields.push("프로필 사진");
+    }
+  
+    if (missingFields.length > 0) {
+      setValidationMessage(`${missingFields.join(", ")}을(를) 입력해주세요`);
       return;
     }
-
+  
     try {
       const response = await axios.put(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/profile/${profileId}`,
+        }/api/profile/${userId}`,
         {
           height: profile.height,
           weight: profile.weight,
@@ -228,7 +228,7 @@ const EditProfile = () => {
           },
         }
       );
-
+  
       if (response.status === 200) {
         setProfile(response.data.data);
         alert("프로필 수정이 완료되었습니다.");
@@ -241,9 +241,9 @@ const EditProfile = () => {
       }
     }
   };
-
+  
+  
   useEffect(() => {
-    // Kakao 지도 API 로드 여부 확인
     if (!window.kakao) {
       const script = document.createElement("script");
       script.async = true;
@@ -257,13 +257,11 @@ const EditProfile = () => {
 
   useEffect(() => {
     if (kakaoMapLoaded) {
-      // Kakao 지도 API 로드가 완료된 경우에만 실행
       searchLocation(addressValues.roadAddress);
     }
   }, [kakaoMapLoaded, addressValues.roadAddress]);
 
   const searchLocation = (address: string) => {
-    // 주소가 있는 경우에만 API 호출
     if (address) {
       const geocoder = new kakao.maps.services.Geocoder();
       geocoder.addressSearch(address, (result, status) => {
@@ -365,7 +363,6 @@ const EditProfile = () => {
                   </Select>
                 );
               } else if (key !== "location") {
-                // location 필드는 제외
                 return (
                   <Input
                     key={key}

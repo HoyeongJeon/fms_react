@@ -10,20 +10,15 @@ import { useDaumPostcodePopup } from "react-daum-postcode";
 import { ScoreboardContainer } from "pages/MatchResult/styles";
 
 type Profile = {
-  // name: string;
   age: string;
   height: number;
   weight: number;
   preferredPosition: string;
   gender: string;
-  // password: string;
-  // confirmPassword: string;
-  //[key: string]: string; // 인덱스 서명 추가
   birthdate: string;
   location: {
     latitude: string;
     longitude: string;
-    // state:string;
     city: string;
     district: string;
     address: string;
@@ -38,7 +33,6 @@ type Profile = {
 type ProfileLocation = {
   latitude: string;
   longitude: string;
-  //state:string;
   city: string;
   district: string;
   address: string;
@@ -60,7 +54,7 @@ const Wrapper = styled.div`
 const ProfileContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* 이미지가 위쪽에 정렬되도록 함 */
+  align-items: flex-start;
   background-color: white;
   padding: 2rem;
   border-radius: 10px;
@@ -70,7 +64,7 @@ const ProfileContainer = styled.div`
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  width: 100%; /* 폼의 너비를 부모 요소의 100%로 설정 */
+  width: 100%;
 `;
 
 const Input = styled.input`
@@ -123,7 +117,7 @@ const RegisterProfile = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState<string | null | File>(null);
   const [profile, setProfile] = useState<Profile>({
-    age: "", // Initialize age as an empty string
+    age: "",
     height: 0,
     weight: 0,
     gender: "",
@@ -189,7 +183,6 @@ const RegisterProfile = () => {
   };
 
   useEffect(() => {
-    // Kakao 지도 API 로드 여부 확인
     if (!window.kakao) {
       const script = document.createElement("script");
       script.async = true;
@@ -203,13 +196,11 @@ const RegisterProfile = () => {
 
   useEffect(() => {
     if (kakaoMapLoaded) {
-      // Kakao 지도 API 로드가 완료된 경우에만 실행
       searchLocation(profile.location.address);
     }
   }, [kakaoMapLoaded, profile.location.address]);
 
   const searchLocation = (address: string) => {
-    // 주소가 있는 경우에만 API 호출
     if (address) {
       const geocoder = new kakao.maps.services.Geocoder();
       geocoder.addressSearch(address, (result, status) => {
@@ -254,17 +245,28 @@ const RegisterProfile = () => {
     return age.toString();
   };
 
+  const checkRequiredFields = (): boolean => {
+    const requiredFields = ["birthdate", "height", "weight", "preferredPosition", "gender", "location"];
+    const missingFields = [];
+    
+    for (const field of requiredFields) {
+      if (!profile[field]) {
+        missingFields.push(field);
+      }
+    }
+  
+    if (missingFields.length > 0) {
+      setValidationMessage(`${missingFields.join(", ")}을(를) 입력해주세요`);
+      return false;
+    }
+  
+    return true;
+  };
+  
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (
-      !profile.birthdate ||
-      !profile.height ||
-      !profile.weight ||
-      !profile.preferredPosition ||
-      !profile.gender ||
-      !profile.location
-    ) {
-      setValidationMessage("필수 입력값을 입력해주세요");
+    const isAllFieldsValid = checkRequiredFields();
+    if (!isAllFieldsValid) {
       return;
     }
 
@@ -272,7 +274,7 @@ const RegisterProfile = () => {
     formData.append("height", `${profile.height}`);
     formData.append("weight", `${profile.weight}`);
     formData.append("preferredPosition", profile.preferredPosition);
-    formData.append("age", calculateAge(profile.birthdate)); // Calculate age here
+    formData.append("age", calculateAge(profile.birthdate));
     formData.append("gender", profile.gender);
     formData.append("birthdate", profile.birthdate);
     formData.append("latitude", profile.location.latitude.toString());
@@ -288,9 +290,7 @@ const RegisterProfile = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.post(
-        `${process.env.REACT_APP_SERVER_HOST}:${
-          process.env.REACT_APP_SERVER_PORT || 3000
-        }/api/profile`,
+        `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/profile`,
         formData,
         {
           headers: {
@@ -307,7 +307,6 @@ const RegisterProfile = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         alert(error.response?.data.message);
-        return;
       }
     }
   };
@@ -411,15 +410,14 @@ const RegisterProfile = () => {
                     </Select>
                   );
                 } else if (key === "height" || key === "weight") {
-                  // For 'height' and 'weight', use specific placeholders
                   return (
                     <Input
                       key={key}
                       name={key}
                       type="number"
                       min="0"
-                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize first letter
-                      value={profile[key] === 0 ? "" : profile[key].toString()} // If the value is 0, show an empty string
+                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                      value={profile[key] === 0 ? "" : profile[key].toString()}
                       onChange={handleChange}
                       required
                     />
@@ -429,13 +427,12 @@ const RegisterProfile = () => {
                   key !== "age" &&
                   key !== "location"
                 ) {
-                  // For other fields, use 'key' as placeholder
                   return (
                     <Input
                       key={key}
                       name={key}
                       type="text"
-                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize first letter
+                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                       value={profile[key] as string}
                       onChange={handleChange}
                       required
