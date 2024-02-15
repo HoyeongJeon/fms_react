@@ -176,10 +176,17 @@ const EditProfile = () => {
     e.preventDefault();
   };
 
+  
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const missingFields = [];
   
+    // 프로필 사진 체크
+    if (!selectedFile) {
+      missingFields.push("프로필 사진");
+    }
+  
+    // 나머지 필드 체크 (키, 몸무게, 선호 포지션, 위치 정보)
     if (!profile.height) {
       missingFields.push("키");
     }
@@ -192,12 +199,13 @@ const EditProfile = () => {
       missingFields.push("선호 포지션");
     }
   
-    if (!profile.location) {
+    if (
+      !profile.location ||
+      !profile.location.latitude ||
+      !profile.location.longitude ||
+      !profile.location.address
+    ) {
       missingFields.push("위치 정보");
-    }
-  
-    if (!selectedFile) {
-      missingFields.push("프로필 사진");
     }
   
     if (missingFields.length > 0) {
@@ -242,7 +250,7 @@ const EditProfile = () => {
     }
   };
   
-  
+
   useEffect(() => {
     if (!window.kakao) {
       const script = document.createElement("script");
@@ -313,8 +321,7 @@ const EditProfile = () => {
                 type="error"
                 showIcon
                 closable
-                onClose={() => setValidationMessage("")}
-              ></Alert>
+                onClose={() => setValidationMessage("")}></Alert>
             )}
             <FileUploader
               descLabel="프로필 사진을 등록해주세요"
@@ -352,8 +359,7 @@ const EditProfile = () => {
                     name={key}
                     value={profile[key]}
                     onChange={handleChange}
-                    required
-                  >
+                    required>
                     <option value="">포지션 선택</option>
                     {Position.map((position) => (
                       <option key={position} value={position}>

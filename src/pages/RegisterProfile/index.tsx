@@ -245,31 +245,41 @@ const RegisterProfile = () => {
     return age.toString();
   };
 
-  const checkRequiredFields = (): boolean => {
-    const requiredFields = ["birthdate", "height", "weight", "preferredPosition", "gender", "location"];
+  
+  const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     const missingFields = [];
-    
-    for (const field of requiredFields) {
-      if (!profile[field]) {
-        missingFields.push(field);
-      }
+  
+    // 프로필 사진 체크
+    if (!selectedFile) {
+      missingFields.push("프로필 사진");
+    }
+  
+    // 나머지 필드 체크 (키, 몸무게, 선호 포지션, 위치 정보)
+    if (!profile.height) {
+      missingFields.push("키");
+    }
+    if (!profile.weight) {
+      missingFields.push("몸무게");
+    }
+  
+    if (!profile.preferredPosition) {
+      missingFields.push("선호 포지션");
+    }
+  
+    if (
+      !profile.location ||
+      !profile.location.latitude ||
+      !profile.location.longitude ||
+      !profile.location.address
+    ) {
+      missingFields.push("위치 정보");
     }
   
     if (missingFields.length > 0) {
       setValidationMessage(`${missingFields.join(", ")}을(를) 입력해주세요`);
-      return false;
-    }
-  
-    return true;
-  };
-  
-  const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const isAllFieldsValid = checkRequiredFields();
-    if (!isAllFieldsValid) {
       return;
     }
-
     const formData = new FormData();
     formData.append("height", `${profile.height}`);
     formData.append("weight", `${profile.weight}`);
