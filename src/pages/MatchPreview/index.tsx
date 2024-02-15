@@ -14,6 +14,7 @@ import useSWR from "swr";
 import fetcher from "utils/fetcher";
 import { match } from "assert";
 import dayjs from "dayjs";
+import { useMemberStore } from "store/memberStore";
 const { Title, Text, Link } = Typography;
 
 type MatchInfo = {
@@ -164,12 +165,25 @@ const MatchPreview = () => {
         });
     }
   }, [matchId]);
+  const { isStaff } = useMemberStore();
 
-  const isFutureMatch = () => {
-    if (!matchDate) return false; // matchDate가 설정되지 않았으면 false 반환
+  const [isMemberStaff, setIsMemberStaff] = useState(false);
 
-    return matchDate > new Date(); // 현재 날짜와 비교
-  };
+  useEffect(() => {
+    setIsMemberStaff(isStaff);
+  }, [isStaff]);
+  const [isFutureGame, setIsFutureGame] = useState(false);
+  useEffect(() => {
+    if (matchDate) {
+      setIsFutureGame(matchDate > now);
+    }
+  }, [matchDate]);
+
+  // const isFutureMatch = () => {
+  //   if (!matchDate || isStaff) return false; // matchDate가 설정되지 않았으면 false 반환
+
+  //   return matchDate > new Date(); // 현재 날짜와 비교
+  // };
 
   useEffect(() => {
     if (!homeTeamId || !awayTeamId) return;
@@ -226,7 +240,7 @@ const MatchPreview = () => {
         </Title>
         <TeamsContainer>
           <TeamBadge>
-            <TeamLogo src={homePresignedURL} alt="홈 팀 로고 넣어야함" />
+            <TeamLogo src={homePresignedURL} alt="홈 팀 로고" />
             <div>{homeTeam.name}</div>
             <Text type="secondary">
               {matchInfo.home.result.W}승 {matchInfo.home.result.D}무{" "}
@@ -255,7 +269,7 @@ const MatchPreview = () => {
           </TeamBadge>
           <Title level={4}>vs</Title>
           <TeamBadge>
-            <TeamLogo src={awayPresignedURL} alt="어웨이 팀 로고 넣어야함" />
+            <TeamLogo src={awayPresignedURL} alt="어웨이 팀 로고" />
             <div>{awayTeam.name}</div>
             <Text type="secondary">
               {matchInfo.away.result.W}승 {matchInfo.away.result.D}무{" "}
@@ -288,7 +302,10 @@ const MatchPreview = () => {
           gameOver ? (
             <Button onClick={handleReview}>경기 리뷰 확인</Button>
           ) : (
-            <Button onClick={handleNext} disabled={isFutureMatch()}>
+            <Button
+              onClick={handleNext}
+              disabled={isFutureGame || !isMemberStaff}
+            >
               경기 종료
             </Button>
           )

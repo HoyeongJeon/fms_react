@@ -5,6 +5,7 @@ import Layout from 'layouts/App';
 import './table.css';
 import { useTeamStore } from 'store/teamStore';
 import { useNavigate } from 'react-router-dom';
+import { configConsumerProps } from 'antd/es/config-provider';
 import { useUserStore } from 'store/userStore';
 
 interface Member {
@@ -45,7 +46,6 @@ const Player: React.FC = () => {
                 process.env.REACT_APP_SERVER_PORT || 3000
             }/api/team/${teamId}/members/?page=${page}`;
 
-            // 검색어가 있는 경우 검색 쿼리 추가
             if (searchQuery.trim() !== '') {
                 apiUrl += `&name=${searchQuery}`;
             }
@@ -57,14 +57,10 @@ const Player: React.FC = () => {
                 withCredentials: true,
             });
 
-            // 이 부분에서 getTeamId를 사용하는 코드 삭제
-            // setTeamId(getTeamId);
-
-            setMembers(response.data);
+            setMembers(response.data.data);
             setTotal(response.data.total);
         } catch (error) {
             console.error('팀 정보를 불러오는 데 실패했습니다.', error);
-            // Clear the members array in case of an error
             setMembers([]);
             setTotal(0);
         }
@@ -95,13 +91,11 @@ const Player: React.FC = () => {
 
         const fetchData = async () => {
             try {
-                // teamId가 undefined이거나 null이면 fetchMembers를 호출하지 않음
                 if (teamId === undefined || teamId === null) {
                     console.error('Team ID is not defined.');
                     return;
                 }
 
-                // teamId가 정의되어 있을 때만 setTeamId 호출
                 setTeamId(teamId);
 
                 const response = await axios.get(
@@ -119,13 +113,11 @@ const Player: React.FC = () => {
                 setTotal(response.data.total);
             } catch (error) {
                 console.error('팀 정보를 불러오는 데 실패했습니다.', error);
-                // Clear the members array in case of an error
                 setMembers([]);
                 setTotal(0);
             }
         };
 
-        // 최초 호출 시에는 teamId가 undefined일 수 있으므로 setTeamId 호출을 하지 않음
         if (teamId !== undefined) {
             fetchData();
             checkIfIsCreator();
@@ -138,25 +130,8 @@ const Player: React.FC = () => {
     }, [teamId, currentPage, searchQuery]);
 
     const changePage = async (page: number) => {
-        try {
-            const accessToken = localStorage.getItem('accessToken');
-
-            const response = await axios.get(
-                `${process.env.REACT_APP_SERVER_HOST}:${
-                    process.env.REACT_APP_SERVER_PORT || 3000
-                }/api/team/${teamId}/members/?page=${page || 1}&name=${searchQuery}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    withCredentials: true,
-                }
-            );
-            setMembers(response.data);
-            setTotal(response.data.total);
-        } catch (error) {
-            console.error('멤버 정보를 불러오는 데 실패했습니다.', error);
-        }
+        setCurrentPage(page);
+        fetchMembers();
     };
 
     const [show, setShow] = useState(false);
@@ -166,7 +141,6 @@ const Player: React.FC = () => {
         setShowModal(true);
         setShow(true);
 
-        // Navigate to the MemberDetail page with the selected member's ID
         if (team.id) {
             navigate(`/team/member/${team.id}`);
         }
@@ -236,7 +210,6 @@ const Player: React.FC = () => {
                         <th>이메일</th>
                         <th>선호 포지션</th>
                         <th>나이</th>
-                        {/* <th>사진</th> */}
                         <th>더보기</th>
                     </tr>
                 </thead>
@@ -247,12 +220,10 @@ const Player: React.FC = () => {
                             <tr key={`memberData-${index}`}>
                                 <td>{member.id}</td>
                                 <td>{member.user.name}</td>
-                                {/* 구단 주인 여부에 따라 텍스트를 다르게 표시 */}
                                 <td>{member.isStaff ? '구단주' : '일반선수'}</td>
                                 <td>{member.user.email}</td>
                                 <td>{member.user.profile?.preferredPosition}</td>
                                 <td>{member.user.profile?.age}</td>
-                                {/* <td>{member.user.profile.imageUrl}</td> */}
                                 <td>
                                     <button onClick={() => handleApplyButton(member)}>링크</button>
                                     {isCreator && parseInt(id) !== member.user.id ? (
