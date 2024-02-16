@@ -224,6 +224,8 @@ const Home = () => {
     }
   }, [show]);
 
+  const chatSections = makeSection(messages ? [...messages].reverse() : []);
+
   useEffect(() => {
     const getWinningRate = async () => {
       const resultRate = await axios.get<TeamStatsType>(
@@ -253,90 +255,15 @@ const Home = () => {
     }
   }, [teamWinningRate]);
 
-  const chatSections = makeSection(messages ? [...messages].reverse() : []);
   return (
     <>
       <Layout>
-        <div>
-          <ToastContainer limit={1} autoClose={4000} hideProgressBar />
-        </div>
         {teamId ? (
           <>
-            <Button
-              variant="outline-light"
-              onClick={() => setShow(true)}
-              style={{
-                border: "none",
-                backgroundColor: "transparent",
-                outline: "none",
-                cursor: "pointer",
-              }}
-            >
-              <AiTwotoneMessage size={30} />
-            </Button>
-            <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
-              <Modal.Header closeButton>
-                <Modal.Title>{teamName}의 채팅방</Modal.Title>
-              </Modal.Header>
-              <Modal.Body
-                style={{
-                  overflow: "scroll",
-                }}
-                onScroll={onScroll}
-              >
-                {Object.entries(chatSections).map(([date, chats]) => {
-                  return (
-                    <Section className={`section-${date}`} key={date}>
-                      <StickyHeader>
-                        <button>{date}</button>
-                      </StickyHeader>
-                      {chats.map((chat) => (
-                        <>
-                          {userId === chat?.author?.id ? (
-                            <ChatWrapper>
-                              <MyChatMessage>
-                                {chat.message}
-                                <MyTime>{chat.createdAt}</MyTime>
-                              </MyChatMessage>
-                            </ChatWrapper>
-                          ) : (
-                            <ChatWrapper>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "flex-start",
-                                }}
-                              >
-                                <ChatMessage>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    {chat?.author?.name}
-                                  </span>
-                                  : {chat.message}
-                                  <OthersTime>{chat.createdAt}</OthersTime>
-                                </ChatMessage>
-                              </div>
-                            </ChatWrapper>
-                          )}
-                        </>
-                      ))}
-                    </Section>
-                  );
-                })}
+            <div>
+              <ToastContainer limit={1} autoClose={4000} hideProgressBar />
+            </div>
 
-                <div ref={messagesEndRef} />
-              </Modal.Body>
-              <ChatBox
-                chat={chat}
-                teamId={teamId}
-                onChangeChat={onChangeChat}
-                onSubmitForm={onSubmitForm}
-              />
-              <Modal.Footer>
-                <Button variant="outline-dark" onClick={handleClose}>
-                  닫기
-                </Button>
-              </Modal.Footer>
-            </Modal>
             <div>
               <div>
                 <h3>팀 승률</h3>
