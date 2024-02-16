@@ -40,53 +40,53 @@ const TeamTable: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isMixed, setIsMixed] = useState<string>("");
+  const [isMixedGender, setIsMixed] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [region, setRegion] = useState<string>("");
 
   const fetchTeams = async (page: number = 1) => {
     try {
-      let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${
-        process.env.REACT_APP_SERVER_PORT || 3000
-      }/api/team/?page=${page}`;
+        let apiUrl = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT || 3000}/api/team/?page=${page}`;
 
-      if (searchQuery.trim() !== "") {
-        apiUrl += `&name=${searchQuery}`;
-      }
+        if (searchQuery.trim() !== "") {
+            apiUrl += `&name=${searchQuery}`;
+        }
 
-      if (isMixed.trim() !== "") {
-        apiUrl += `&isMixed=${isMixed}`;
-      }
+        if (isMixedGender.trim() !== "") {
+            apiUrl += `&isMixedGender=${isMixedGender === "true" ? true : false}`;
+        }
+        
 
-      if (gender) {
-        apiUrl += `&gender=${gender}`;
-      }
+        if (gender) {
+            apiUrl += `&gender=${gender}`;
+        }
 
-      if (region.trim() !== "") {
-        apiUrl += `&region=${encodeURIComponent(region)}`;
-      }
+        if (region.trim() !== "") {
+            apiUrl += `&region=${encodeURIComponent(region)}`;
+        }
+  
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+        });
 
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      });
-
-      setTeams(response.data.data);
-      setTotal(response.data.total); // 서버에서 받은 전체 페이지 수로 설정
+        setTeams(response.data.data);
+        setTotal(response.data.total); 
     } catch (error) {
-      console.error("팀 정보를 불러오는 데 실패했습니다.", error);
-      setTeams([]);
-      setTotal(0);
+        console.error("팀 정보를 불러오는 데 실패했습니다.", error);
+        setTeams([]);
+        setTotal(0);
     }
-  };
+};
+
 
   useEffect(() => {
     // currentPage 상태가 변경될 때마다 fetchTeams 함수 호출
     fetchTeams(currentPage);
-  }, [currentPage, searchQuery, isMixed, gender, region]);
+  }, [currentPage, searchQuery, isMixedGender , gender, region]);
 
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setGender(e.target.value);
@@ -150,7 +150,7 @@ const TeamTable: React.FC = () => {
         <div>
           <div className="search-container">
             {/* 혼성 여부 선택 */}
-            <select value={isMixed} onChange={handleMixedChange}>
+            <select value={isMixedGender} onChange={handleMixedChange}>
               <option value="">혼성여부 선택</option>
               <option value="true">혼성</option>
               <option value="false">단일성별</option>
@@ -162,14 +162,14 @@ const TeamTable: React.FC = () => {
             </select>
             <select value={region} onChange={handleRegionChange}>
               <option value="">전체 지역</option>
-              <option value="서울특별시">서울특별시</option>
-              <option value="부산광역시">부산광역시</option>
-              <option value="인천광역시">인천광역시</option>
-              <option value="대구광역시">대구광역시</option>
-              <option value="대전광역시">대전광역시</option>
-              <option value="광주광역시">광주광역시</option>
-              <option value="울산광역시">울산광역시</option>
-              <option value="세종특별자치시">세종특별자치시</option>
+              <option value="서울">서울특별시</option>
+              <option value="부산">부산광역시</option>
+              <option value="인천">인천광역시</option>
+              <option value="대구">대구광역시</option>
+              <option value="대전">대전광역시</option>
+              <option value="광주">광주광역시</option>
+              <option value="울산">울산광역시</option>
+              <option value="세종">세종특별자치시</option>
               <option value="경기도">경기도</option>
               <option value="충청북도">충청북도</option>
               <option value="충청남도">충청남도</option>
