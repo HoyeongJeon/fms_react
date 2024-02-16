@@ -22,6 +22,10 @@ interface User {
   member: Member[];
   name: string;
 }
+interface Invite {
+ isInvited:boolean;
+}
+
 
 interface Profile {
   id: number;
@@ -43,8 +47,9 @@ interface Profile {
     district: string;
     address: string;
   };
+  receivedInvites: Invite;
   user: User;
-  invited: boolean; // 초대된 상태 저장
+  //invited: boolean; // 초대된 상태 저장
 }
 
 const MemberTable = () => {
@@ -104,22 +109,22 @@ const MemberTable = () => {
   };
 
 
-  useEffect(() => {
-    fetchProfiles(currentPage); // 페이지 로드 시 프로필 가져오기
-  }, [currentPage, searchQuery, gender, region]);
-
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setGender(e.target.value);
   };
 
   const changePage = async (page: number) => {
     setCurrentPage(page);
-    fetchProfiles(page); // 페이지 번호를 전달하여 호출
-  };
+    // fetchProfiles 함수 호출이 필요합니다.
+};
+
+useEffect(() => {
+    fetchProfiles(currentPage); // 페이지 로드 시 프로필 가져오기
+}, [currentPage, searchQuery, gender, region]);
 
   const handleInviteButton = (profile: Profile) => {
     setSelectedProfile(profile);
-    if (!profile.invited) {
+    if (!profile.receivedInvites.isInvited) {
       // 초대된 멤버가 아닌 경우에만 모달 표시
       setShowModal(true);
     }
@@ -154,12 +159,8 @@ const MemberTable = () => {
       alert("초대 이메일을 보냈습니다");
 
       // 초대 후에 초대된 상태 업데이트
-      setProfiles((prevProfiles) =>
-        prevProfiles.map((profile) =>
-          profile.id === selectedProfile?.id
-            ? { ...profile, invited: true }
-            : profile
-        )
+      setProfiles(prevProfiles =>
+        prevProfiles.filter(profile => profile.id !== selectedProfile?.id)
       );
     } catch (error) {
       console.error("Error inviting member:", error);
@@ -278,7 +279,7 @@ const MemberTable = () => {
                     <td>
                       <button
                         onClick={() => handleInviteButton(profile)}
-                        disabled={profile.invited} // 초대된 멤버의 경우 버튼 비활성화
+                        disabled={profile.receivedInvites.isInvited} // 초대된 멤버의 경우 버튼 비활성화
                       >
                         초대
                       </button>
