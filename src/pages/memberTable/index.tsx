@@ -203,47 +203,51 @@ const MemberTable = () => {
           </Modal>
         )}
         <h2>멤버 초대</h2>
-        <div>
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="이름 검색"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  fetchProfiles(currentPage);
-                }
-              }}
-            />
-            <button onClick={handleSearchButtonClick}>검색</button>
-            <select value={gender || ""} onChange={handleGenderChange}>
-              <option value="">성별 선택</option>
-              <option value="Male">남성</option>
-              <option value="Female">여성</option>
-            </select>
-            <select value={region} onChange={(e) => setRegion(e.target.value)}>
-              <option value="">전체 지역</option>
-              <option value="서울">서울특별시</option>
-              <option value="부산">부산광역시</option>
-              <option value="인천">인천광역시</option>
-              <option value="대구">대구광역시</option>
-              <option value="대전">대전광역시</option>
-              <option value="광주">광주광역시</option>
-              <option value="울산">울산광역시</option>
-              <option value="세종">세종특별자치시</option>
-              <option value="경기">경기도</option>
-              <option value="충북">충청북도</option>
-              <option value="충남">충청남도</option>
-              <option value="전남">전라남도</option>
-              <option value="경북">경상북도</option>
-              <option value="경남">경상남도</option>
-              <option value="강원특별자치도">강원특별자치도</option>
-              <option value="전북">전북특별자치도</option>
-              <option value="제주">제주특별자치도</option>
-            </select>
-          </div>
-        </div>
+        <div className="search-container">
+  <select value={gender} onChange={handleGenderChange}>
+    <option value="">혼성여부 선택</option>
+    <option value="true">혼성</option>
+    <option value="false">단일성별</option>
+  </select>
+  <select value={gender} onChange={handleGenderChange}>
+    <option value="">성별 선택</option>
+    <option value="Male">남성</option>
+    <option value="Female">여성</option>
+  </select>
+  <select value={region} onChange={(e) => setRegion(e.target.value)}>
+    <option value="">전체 지역</option>
+    <option value="서울">서울특별시</option>
+    <option value="부산">부산광역시</option>
+    <option value="인천">인천광역시</option>
+    <option value="대구">대구광역시</option>
+    <option value="대전">대전광역시</option>
+    <option value="광주">광주광역시</option>
+    <option value="울산">울산광역시</option>
+    <option value="세종">세종특별자치시</option>
+    <option value="경기도">경기도</option>
+    <option value="충청북도">충청북도</option>
+    <option value="충청남도">충청남도</option>
+    <option value="전라남도">전라남도</option>
+    <option value="경상북도">경상북도</option>
+    <option value="경상남도">경상남도</option>
+    <option value="강원특별자치도">강원특별자치도</option>
+    <option value="전북특별자치도">전북특별자치도</option>
+    <option value="제주특별자치도">제주특별자치도</option>
+  </select>
+  <input
+    type="text"
+    placeholder="이름 검색"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    onKeyPress={(e) => {
+      if (e.key === "Enter") {
+        fetchProfiles(currentPage);
+      }
+    }}
+  />
+  <button onClick={handleSearchButtonClick}>검색</button>
+</div>
+
         {profiles.length > 0 ? (
           <table>
             <thead>

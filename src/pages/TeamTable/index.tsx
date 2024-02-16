@@ -86,8 +86,7 @@ const TeamTable: React.FC = () => {
   useEffect(() => {
     // currentPage 상태가 변경될 때마다 fetchTeams 함수 호출
     fetchTeams(currentPage);
-}, [currentPage, searchQuery, isMixed, gender, region]);
-
+  }, [currentPage, searchQuery, isMixed, gender, region]);
 
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setGender(e.target.value);
@@ -105,7 +104,6 @@ const TeamTable: React.FC = () => {
     fetchTeams();
   };
 
-  
   const handleApplyButton = async (teamData: Team) => {
     try {
       if (!teamData) {
@@ -151,23 +149,12 @@ const TeamTable: React.FC = () => {
       <ScoreboardContainer>
         <div>
           <div className="search-container">
-            <input
-              type="text"
-              placeholder="이름 검색"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  fetchTeams();
-                }
-              }}
-            />
             {/* 혼성 여부 선택 */}
-<select value={isMixed} onChange={handleMixedChange}>
-  <option value="">혼성여부 선택</option>
-  <option value="true">혼성</option>
-  <option value="false">단일성별</option>
-</select>
+            <select value={isMixed} onChange={handleMixedChange}>
+              <option value="">혼성여부 선택</option>
+              <option value="true">혼성</option>
+              <option value="false">단일성별</option>
+            </select>
             <select value={gender} onChange={handleGenderChange}>
               <option value="">성별 선택</option>
               <option value="Male">남성</option>
@@ -193,6 +180,17 @@ const TeamTable: React.FC = () => {
               <option value="전북특별자치도">전북특별자치도</option>
               <option value="제주특별자치도">제주특별자치도</option>
             </select>
+            <input
+              type="text"
+              placeholder="이름 검색"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  fetchTeams();
+                }
+              }}
+            />
             <button onClick={handleSearchButtonClick}>검색</button>
           </div>
 
