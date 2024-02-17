@@ -80,7 +80,6 @@ const MemberTable = () => {
       if (region.trim() !== "") {
         apiUrl += `&region=${encodeURIComponent(region)}`;
       }
-
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(apiUrl, {
         headers: {
@@ -205,11 +204,6 @@ useEffect(() => {
         )}
         <h2>멤버 초대</h2>
         <div className="search-container">
-  <select value={gender} onChange={handleGenderChange}>
-    <option value="">혼성여부 선택</option>
-    <option value="true">혼성</option>
-    <option value="false">단일성별</option>
-  </select>
   <select value={gender} onChange={handleGenderChange}>
     <option value="">성별 선택</option>
     <option value="Male">남성</option>
