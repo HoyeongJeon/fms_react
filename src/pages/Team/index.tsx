@@ -156,7 +156,7 @@ export const getImageUrl = async (url: string) => {
 const Team = () => {
     const [isCreator, setIsCreator] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [temaData, setTeamData] = useState<TeamDetailType | null>(null);
+    const [teamData, setTeamData] = useState<TeamDetailType | null>(null);
     const { teamId } = useTeamStore();
     const [players, setPlayers] = useState<PlayersType>();
     const [teamStats, setTeamStats] = useState<TeamStatsType>();
@@ -171,6 +171,7 @@ const Team = () => {
     const [topAttactPointPlayer, setAttactPointPlayer] = useState<string>('/img/empty_profile_iamge.png');
     const [topSavePlayer, setTopSavePlayer] = useState<string>('/img/empty_profile_iamge.png');
     const [yellowAndRedCards, setYellowAndRedCards] = useState<YellowAndRedCardsType>();
+    const [winRate, setWinRate] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -298,6 +299,12 @@ const Team = () => {
     }, [teamId]);
 
     useEffect(() => {
+        const getWinRate = () => {
+            if (teamStats?.wins && teamStats?.totalGames) {
+                setWinRate(Math.floor((teamStats?.wins / teamStats?.totalGames) * 100));
+            }
+        };
+
         setTeamGraphData({
             data: [
                 {
@@ -317,6 +324,8 @@ const Team = () => {
                 },
             ],
         });
+
+        getWinRate();
     }, [teamStats]);
 
     useEffect(() => {
@@ -393,56 +402,54 @@ const Team = () => {
             <ScoreboardContainer>
                 <Card className="card-div">
                     <div className="team-info-preview">
-                        <ImageView imageUUID={temaData?.imageUUID} />
-                        <div className="team-div">
-                            <div className="team-child-div">
-                                {temaData && <TitleText title={temaData.name} />}
-                                {temaData && (
-                                    <DlText title="감독" content={temaData.creator.name} className="team-dl" />
-                                )}
-                                {temaData && (
-                                    <DlText
-                                        title="연고지"
-                                        content={`${temaData.location.state} ${temaData.location.city}`}
-                                    />
-                                )}
+                        <div className="team-info-wrap">
+                            <ImageView imageUUID={teamData?.imageUUID} />
+                            <div className="teamInfoContainer">
+                                <h1 className="teamTitle">{teamData?.name}</h1>
+                                <div>
+                                    <div className="teamInfoWrap">
+                                        <span className="teamInfoBoldTitle">감독</span>
+                                        <span>{teamData?.creator.name}</span>
+                                    </div>
+                                    <div className="teamInfoWrap">
+                                        <span className="teamInfoBoldTitle">연고지</span>
+                                        <span>{`${teamData?.location.state} ${teamData?.location.city}`}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <div className="team-div">
-                                    <DlText
-                                        title="승"
-                                        content={teamStats?.wins ? teamStats?.wins : 0}
-                                        className="team-dl"
-                                    />
-                                    <DlText
-                                        title="무"
-                                        content={teamStats?.draws ? teamStats?.draws : 0}
-                                        className="team-dl"
-                                    />
-                                    <DlText
-                                        title="패"
-                                        content={teamStats?.loses ? teamStats?.loses : 0}
-                                        className="team-dl"
-                                    />
-                                    <DlText title="승률" data={teamStats} className="team-dl" />
-                                </div>
-                                <div className="team-div">
-                                    <DlText
-                                        title="득점"
-                                        content={teamStats?.goals ? teamStats?.goals : 0}
-                                        className="team-dl"
-                                    />
-                                    <DlText
-                                        title="실점"
-                                        content={teamStats?.conceded ? teamStats?.conceded : 0}
-                                        className="team-dl"
-                                    />
-                                    <DlText
-                                        title="경기"
-                                        content={teamStats?.totalGames ? teamStats?.totalGames : 0}
-                                        className="team-dl"
-                                    />
-                                </div>
+                        </div>
+                        <div className="teamStatusContainer">
+                            <div className="teamStatusWrap">
+                                <dl>
+                                    <dt>승</dt>
+                                    <dd>{teamStats?.wins ?? 0}</dd>
+                                </dl>
+                                <dl>
+                                    <dt>무</dt>
+                                    <dd>{teamStats?.draws ?? 0}</dd>
+                                </dl>
+                                <dl>
+                                    <dt>패</dt>
+                                    <dd>{teamStats?.loses ?? 0}</dd>
+                                </dl>
+                                <dl>
+                                    <dt>승률</dt>
+                                    <dd>{winRate ?? 0}%</dd>
+                                </dl>
+                            </div>
+                            <div className="teamStatusWrap">
+                                <dl>
+                                    <dt>득점</dt>
+                                    <dd>{teamStats?.goals ?? 0}</dd>
+                                </dl>
+                                <dl>
+                                    <dt>실점</dt>
+                                    <dd>{teamStats?.conceded ?? 0}</dd>
+                                </dl>
+                                <dl>
+                                    <dt>경기</dt>
+                                    <dd>{teamStats?.totalGames ?? 0}</dd>
+                                </dl>
                             </div>
                         </div>
                     </div>
@@ -460,40 +467,386 @@ const Team = () => {
                 </Card>
                 <Card className="card-div">
                     <TitleText title="탑 플레이어" />
-                    <CardGroup>
-                        <Card className="team-card">
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                        <div
+                            style={{
+                                width: '25%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '12px 24px',
+                                border: '1px solid grey',
+                            }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 600 }}>득점</div>
+                            {topPlaeyr?.topGoals.map((item, index) =>
+                                index === 0 ? (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            borderBottom: '1px solid #e9e9e9',
+                                            width: '100%',
+                                            padding: '12px',
+                                            marginBottom: '18px',
+                                            borderRadius: '4px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <img
+                                                src={topGoalsPlayer}
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: '120px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div style={{ color: 'red', opacity: 0.8 }}>{item.totalGoals}</div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0 12px' }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div>{item.totalGoals}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        <div
+                            style={{
+                                width: '25%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '12px 24px',
+                                border: '1px solid grey',
+                            }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 600 }}>도움</div>
+                            {topPlaeyr?.topAssists.map((item, index) =>
+                                index === 0 ? (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            borderBottom: '1px solid #e9e9e9',
+                                            width: '100%',
+                                            padding: '12px',
+                                            marginBottom: '18px',
+                                            borderRadius: '4px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <img
+                                                src={topAssistsPlayer}
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: '120px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div style={{ color: 'red', opacity: 0.8 }}>{item.totalAssists}</div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0 12px' }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div>{item.totalAssists}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        <div
+                            style={{
+                                width: '25%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '12px 24px',
+                                border: '1px solid grey',
+                            }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 600 }}>공격P</div>
+                            {topPlaeyr?.topAttactPoint.map((item, index) =>
+                                index === 0 ? (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            borderBottom: '1px solid #e9e9e9',
+                                            width: '100%',
+                                            padding: '12px',
+                                            marginBottom: '18px',
+                                            borderRadius: '4px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <img
+                                                src={topAttactPointPlayer}
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: '120px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div style={{ color: 'red', opacity: 0.8 }}>{item.attactPoint}</div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0 12px' }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div>{item.attactPoint}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        <div
+                            style={{
+                                width: '25%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '12px 24px',
+                                border: '1px solid grey',
+                            }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 600 }}>출전수</div>
+                            {topPlaeyr?.topJoining.map((item, index) =>
+                                index === 0 ? (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            borderBottom: '1px solid #e9e9e9',
+                                            width: '100%',
+                                            padding: '12px',
+                                            marginBottom: '18px',
+                                            borderRadius: '4px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <img
+                                                src={topGamesPlayer}
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: '120px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName}
+                                        </div>
+                                        <div style={{ color: 'red', opacity: 0.8 }}>{item.joining}</div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0 12px' }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div>{item.joining}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        <div
+                            style={{
+                                width: '25%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '12px 24px',
+                                border: '1px solid grey',
+                            }}
+                        >
+                            <div style={{ fontSize: '18px', fontWeight: 600 }}>세이브</div>
+                            {topPlaeyr?.topSave.map((item, index) =>
+                                index === 0 ? (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            borderBottom: '1px solid #e9e9e9',
+                                            width: '100%',
+                                            padding: '12px',
+                                            marginBottom: '18px',
+                                            borderRadius: '4px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <img
+                                                src={topSavePlayer}
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: '120px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName}
+                                        </div>
+                                        <div style={{ color: 'red', opacity: 0.8 }}>{item.totalSave}</div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0 12px' }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            {index + 1}. {item.userName ?? ''}
+                                        </div>
+                                        <div>{item.totalSave}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                    </div>
+                    {/* <Card className="team-card">
                             <p className="card-p-title">득점</p>
                             {topPlaeyr?.topGoals.map((item, index) =>
                                 index === 0 ? (
                                     <div>
                                         <p>
-                                            {index + 1}. {item.userName} {item.totalGoals}득점
+                                            {item.userName} {item.totalGoals}득점
                                         </p>
                                         <Card.Img variant="top" src={topGoalsPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
                                         <Card.Text className="card-p-text">
-                                            {index + 1}. {item.userName} {item.totalGoals}득점
+                                            {item.userName} {item.totalGoals}득점
                                         </Card.Text>
                                     </Card.Body>
                                 )
                             )}
-                        </Card>
-                        <Card className="team-card">
+                        </Card> */}
+                    {/* <Card className="team-card">
                             <p className="card-p-title">도움</p>
                             {topPlaeyr?.topAssists.map((item, index) =>
                                 index === 0 ? (
-                                    <div>
-                                        <p>
-                                            {index + 1}. {item.userName} {item.totalAssists}도움
+                                    <>
+                                        <p className="topPlayerStatusTitle">
+                                            {item.userName} {item.totalAssists}도움
                                         </p>
                                         <Card.Img variant="top" src={topAssistsPlayer} />
-                                    </div>
+                                    </>
                                 ) : (
                                     <Card.Body>
                                         <Card.Text className="card-p-text">
-                                            {index + 1}. {item.userName} {item.totalAssists}도움
+                                            {item.userName} {item.totalAssists}도움
                                         </Card.Text>
                                     </Card.Body>
                                 )
@@ -503,16 +856,17 @@ const Team = () => {
                             <p className="card-p-title">공격P</p>
                             {topPlaeyr?.topAttactPoint.map((item, index) =>
                                 index === 0 ? (
-                                    <div>
-                                        <p>
-                                            {index + 1}. {item.userName} {item.attactPoint}공격P
-                                        </p>
+                                    <>
                                         <Card.Img variant="top" src={topAttactPointPlayer} />
-                                    </div>
+                                        <div>
+                                            <p>{item.userName}</p>
+                                            <p>{item.attactPoint}공격P</p>
+                                        </div>
+                                    </>
                                 ) : (
                                     <Card.Body>
                                         <Card.Text className="card-p-text">
-                                            {index + 1}. {item.userName} {item.attactPoint}공격P
+                                            {item.userName} {item.attactPoint}공격P
                                         </Card.Text>
                                     </Card.Body>
                                 )
@@ -524,14 +878,14 @@ const Team = () => {
                                 index === 0 ? (
                                     <div>
                                         <p>
-                                            {index + 1}. {item.userName} {item.joining}경기
+                                            {item.userName} {item.joining}경기
                                         </p>
                                         <Card.Img variant="top" src={topGamesPlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
                                         <Card.Text className="card-p-text">
-                                            {index + 1}. {item.userName} {item.joining}경기
+                                            {item.userName} {item.joining}경기
                                         </Card.Text>
                                     </Card.Body>
                                 )
@@ -543,20 +897,19 @@ const Team = () => {
                                 index === 0 ? (
                                     <div>
                                         <p>
-                                            {index + 1}. {item.userName} {item.totalSave}세이브
+                                            {item.userName} {item.totalSave}세이브
                                         </p>
                                         <Card.Img variant="top" src={topSavePlayer} />
                                     </div>
                                 ) : (
                                     <Card.Body>
                                         <Card.Text className="card-p-text">
-                                            {index + 1}. {item.userName} {item.totalSave}세이브
+                                            {item.userName} {item.totalSave}세이브
                                         </Card.Text>
                                     </Card.Body>
                                 )
                             )}
-                        </Card>
-                    </CardGroup>
+                        </Card> */}
                 </Card>
                 <Card className="card-div">{players && <PlaneTable data={players} />}</Card>
             </ScoreboardContainer>
