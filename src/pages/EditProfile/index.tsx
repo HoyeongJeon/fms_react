@@ -145,13 +145,22 @@ const EditProfile = () => {
     }));
   };
 
+  const [imageUrl, setImageUrl] = useState<string | null | File>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
-
     if (file) {
       setSelectedFile(file);
+      const fileReader = new FileReader();
+      fileReader.onload = (ev) => {
+        if (ev.target?.result) {
+          setImageUrl(ev.target.result as string);
+        }
+      };
+      fileReader.readAsDataURL(file);
     } else {
       setSelectedFile(null);
+      setImageUrl(null);
     }
   };
 
@@ -176,29 +185,28 @@ const EditProfile = () => {
     e.preventDefault();
   };
 
-  
   const onClickAddButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const missingFields = [];
-  
+
     // 프로필 사진 체크
     if (!selectedFile) {
       missingFields.push("프로필 사진");
     }
-  
+
     // 나머지 필드 체크 (키, 몸무게, 선호 포지션, 위치 정보)
     if (!profile.height) {
       missingFields.push("키");
     }
-  
+
     if (!profile.weight) {
       missingFields.push("몸무게");
     }
-  
+
     if (!profile.preferredPosition) {
       missingFields.push("선호 포지션");
     }
-  
+
     if (
       !profile.location ||
       !profile.location.latitude ||
@@ -207,36 +215,51 @@ const EditProfile = () => {
     ) {
       missingFields.push("위치 정보");
     }
-  
+
     if (missingFields.length > 0) {
       setValidationMessage(`${missingFields.join(", ")}을(를) 입력해주세요`);
       return;
     }
-  
+    const formData = new FormData();
+    formData.append("height", profile.height);
+    formData.append("weight", profile.weight);
+    formData.append("preferredPosition", profile.preferredPosition);
+    formData.append("latitude", profile.location.latitude);
+    formData.append("longitude", profile.location.longitude);
+    formData.append("city", profile.location.city);
+    formData.append("district", profile.location.district);
+    formData.append("state", profile.location.state);
+    formData.append("address", profile.location.address);
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
     try {
       const response = await axios.put(
         `${process.env.REACT_APP_SERVER_HOST}:${
           process.env.REACT_APP_SERVER_PORT || 3000
         }/api/profile/${userId}`,
-        {
-          height: profile.height,
-          weight: profile.weight,
-          preferredPosition: profile.preferredPosition,
-          latitude: profile.location.latitude,
-          longitude: profile.location.longitude,
-          city: profile.location.city,
-          district: profile.location.district,
-          state: profile.location.state,
-          address: profile.location.address,
-        },
+        formData,
+        // {
+        //   height: profile.height,
+        //   weight: profile.weight,
+        //   preferredPosition: profile.preferredPosition,
+        //   latitude: profile.location.latitude,
+        //   longitude: profile.location.longitude,
+        //   city: profile.location.city,
+        //   district: profile.location.district,
+        //   state: profile.location.state,
+        //   address: profile.location.address,
+        // },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-  
+
       if (response.status === 200) {
         setProfile(response.data.data);
         alert("프로필 수정이 완료되었습니다.");
@@ -249,7 +272,6 @@ const EditProfile = () => {
       }
     }
   };
-  
 
   useEffect(() => {
     if (!window.kakao) {
@@ -321,7 +343,8 @@ const EditProfile = () => {
                 type="error"
                 showIcon
                 closable
-                onClose={() => setValidationMessage("")}></Alert>
+                onClose={() => setValidationMessage("")}
+              ></Alert>
             )}
             <FileUploader
               descLabel="프로필 사진을 등록해주세요"
@@ -359,7 +382,8 @@ const EditProfile = () => {
                     name={key}
                     value={profile[key]}
                     onChange={handleChange}
-                    required>
+                    required
+                  >
                     <option value="">포지션 선택</option>
                     {Position.map((position) => (
                       <option key={position} value={position}>

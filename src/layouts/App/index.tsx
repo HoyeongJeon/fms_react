@@ -96,7 +96,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
 
   const { teamId, name: teamName, chatId, setTeamInfo } = useTeamStore();
-  const { setProfile, id: profileId, resetProfile } = useProfileStore();
+  const {
+    setProfile,
+    id: profileId,
+    resetProfile,
+    imageUUID,
+  } = useProfileStore();
   const { id: userId, setUser } = useUserStore();
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.data.length) return null;
@@ -269,12 +274,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (data) {
       resetProfile();
 
+      console.log("data.data", data.data);
+      console.log("data.data.profile", data.data.profile);
+
       setUser(data.data);
       setTeamInfo(
-        data.data?.member[0]?.team?.id || data.data?.team?.id,
-        data.data?.member[0]?.team?.name || data.data?.team?.name,
-        data.data?.member[0]?.team?.imageUUID || data.data?.team?.imageUUID,
-        data.data?.member[0]?.team?.chat?.id || data.data?.team?.chat?.id
+        data.data?.member[0]?.team?.id,
+        data.data?.member[0]?.team?.name,
+        data.data?.member[0]?.team?.imageUUID,
+        data.data?.member[0]?.team?.chat?.id
+      );
+      console.log(
+        " data.data?.member[0]?.team?.id= ",
+        data.data?.member[0]?.team?.id
+      );
+      console.log(
+        "data.data?.member[0]?.team?.imageUUID=",
+        data.data?.member[0]?.team?.imageUUID
       );
       setMemberId(data.data?.member[0]?.id ? data.data?.member[0]?.id : null);
       setMember(data.data?.member[0] || { isStaff: false });
