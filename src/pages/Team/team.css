@@ -1,5 +1,6 @@
 .card-div {
     width: 1200px; /* 고정된 너비 */
+    margin-top: 40px;
 }
 
 .card-p-title {
@@ -18,9 +19,74 @@
 
 .team-info-preview {
     /* width: 300px; */
+    display: flex;
+    gap: 64px;
 }
 
 .team-info-graph {
     display: flex;
     justify-content: space-between;
+}
+
+.team-info-wrap {
+    display: flex;
+    gap: 32px;
+}
+
+.teamInfoContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.teamInfoWrap {
+    display: flex;
+    gap: 12px;
+}
+
+.teamInfoBoldTitle {
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.teamStatusContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+}
+
+.teamStatusWrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.teamStatusWrap dl {
+    display: flex;
+    align-content: center;
+}
+
+.teamStatusWrap dt {
+    font-size: 24px;
+    opacity: 0.6;
+}
+
+.teamStatusWrap dd {
+    font-size: 24px;
+}
+
+.teamStatusInfo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.teamStatusInfo > h2 {
+    opacity: 0.6;
+}
+
+.topPlayerStatusTitle {
+    font-weight: 600;
 }
