@@ -80,7 +80,6 @@ const Profile = () => {
     useProfileStore();
   const { data: presignedURL } = useSWR(`/image/${imageUUID}`, fetcher);
 
-  console.log("presignedURL", presignedURL);
   useEffect(() => {
     const USER_LATITUDE = location.latitude;
     const USER_LONGITUDE = location.longitude;

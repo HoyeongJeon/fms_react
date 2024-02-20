@@ -273,7 +273,7 @@ useEffect(() => {
                     <td>
                       <button
                         onClick={() => handleInviteButton(profile)}
-                        disabled={profile.receivedInvites.isInvited} // 초대된 멤버의 경우 버튼 비활성화
+                        disabled={profile.receivedInvites?.isInvited} // 초대된 멤버의 경우 버튼 비활성화
                       >
                         초대
                       </button>
